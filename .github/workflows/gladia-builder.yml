@@ -153,7 +153,7 @@ jobs:
         working-directory: ./src
         run: |-
           { docker build -t ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{env.DOCKER_BUILD_TAG}} -f - . <<-EOF
-              FROM ${{env.DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE}}
+              FROM ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:latest
               COPY . /app/
               ENTRYPOINT ["micromamba", "run", "-n", "server"]
               CMD ["/app/run_server.sh"]
