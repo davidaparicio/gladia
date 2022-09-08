@@ -115,7 +115,7 @@ jobs:
           DOCKER_BUILDKIT: 1
         working-directory: ./src
         run: >-
-          docker build
+          docker build --pull	
           ${{env.DOCKER_BUILD_CACHE}}
           -t ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia-base:${{env.DOCKER_BUILD_TAG}}
           -f base.Dockerfile
@@ -135,7 +135,7 @@ jobs:
           DOCKER_BUILDKIT: 1
         working-directory: ./src
         run: >-
-          docker build ${{env.DOCKER_BUILD_CACHE}}
+          docker build --pull	${{env.DOCKER_BUILD_CACHE}}
           --build-arg GLADIA_BASE_IMAGE=${{env.DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE}}
           -t ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{env.DOCKER_BUILD_TAG}}
           -f gpu.Dockerfile
@@ -152,9 +152,11 @@ jobs:
           DOCKER_BUILDKIT: 1
         working-directory: ./src
         run: |-
-          { docker build -t ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{env.DOCKER_BUILD_TAG}} -f - . <<-EOF
-              FROM ${{env.DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE}}
+          { docker build --pull	-t ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{env.DOCKER_BUILD_TAG}} -f - . <<-EOF
+              FROM ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:latest
               COPY . /app/
+              ENTRYPOINT ["micromamba", "run", "-n", "server"]
+              CMD ["/app/run_server.sh"]
           EOF
           } && docker push ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{env.DOCKER_BUILD_TAG}}
 
@@ -222,6 +224,7 @@ jobs:
           -e CUDA_VISIBLE_DEVICES=${{steps.gpuid.outputs.gpuid}}
           -p ${{steps.gpuid.outputs.gpuid}}8000:8000
           -v /data/volumes/:/tmp/gladia/
+          --pull always
           --name jlmagouille-${{ github.event.pull_request.number }}
           ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{ needs.build.outputs.dockerimage }}
 

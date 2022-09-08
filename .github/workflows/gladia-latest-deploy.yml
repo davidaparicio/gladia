@@ -1,4 +1,4 @@
-name: Gladia Docker Hub Push
+name: Gladia Promote & deploy
 
 on:
   workflow_dispatch:
@@ -22,6 +22,7 @@ jobs:
 
   promote-gladia-image:
     runs-on: [self-hosted, linux, STD]
+    if: github.event.pull_request.merged == true
     steps:
       - name: Promote *gladia-base* image to Gladia Registry
         if: |
