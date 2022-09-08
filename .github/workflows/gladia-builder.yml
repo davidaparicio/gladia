@@ -155,6 +155,8 @@ jobs:
           { docker build -t ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{env.DOCKER_BUILD_TAG}} -f - . <<-EOF
               FROM ${{env.DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE}}
               COPY . /app/
+              ENTRYPOINT ["micromamba", "run", "-n", "server"]
+              CMD ["/app/run_server.sh"]
           EOF
           } && docker push ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{env.DOCKER_BUILD_TAG}}
 
