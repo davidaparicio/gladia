@@ -1,0 +1,22 @@
+api:
+  content: ''
+  tags: []
+gladia:
+  accelerator: ''
+  example: http://files.gladia.io/output/image/image/colorization/deoldify-stable/example/from_rsz_paris_jpg.png
+  examples:
+    from_rsz_paris_jpg: http://files.gladia.io/output/image/image/colorization/deoldify-stable/examples/from_rsz_paris_jpg.png
+    from_rsz_paris_png: http://files.gladia.io/output/image/image/colorization/deoldify-stable/examples/from_rsz_paris_png.png
+  format: ''
+  latency: ''
+huggingface:
+  link: ''
+license:
+  content: ''
+  link: ''
+  title: ''
+paper:
+  authors: []
+  citation: ''
+  link: ''
+  title: ''
