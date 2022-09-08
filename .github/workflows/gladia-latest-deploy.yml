@@ -1,4 +1,4 @@
-name: Gladia Docker Hub Push
+name: Gladia Promote & deploy
 
 on:
   workflow_dispatch:
