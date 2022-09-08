@@ -29,15 +29,15 @@ jobs:
         env:
           REPOSITORY: gladia-base
         run: |
-          MANIFEST=$(curl -u ${{ secrets.DOCKER_HUB_USERNAME }}:${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} -H "Accept: ${{ env.CONTENT_TYPE }}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTED }}")
-          curl -u ${{ secrets.DOCKER_HUB_USERNAME }}:${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} -X PUT -H "Content-Type: ${{ env.CONTENT_TYPE }}" -d "${{ env.MANIFEST }}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTE }}"
+          MANIFEST=$(curl -u ${{ secrets.DOCKER_GLADIA_USERNAME }}:${{ secrets.DOCKER_GLADIA_ACCESS_TOKEN }} -H "Accept: ${{ env.CONTENT_TYPE }}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTED }}")
+          curl -u ${{ secrets.DOCKER_GLADIA_USERNAME }}:${{ secrets.DOCKER_GLADIA_ACCESS_TOKEN }} -X PUT -H "Content-Type: ${{ env.CONTENT_TYPE }}" -d "${{ env.MANIFEST }}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTE }}"
 
       - name: Promote *gladia* image to Gladia Registry
         env:
           REPOSITORY: gladia
         run: |
-          MANIFEST=$(curl -u ${{ secrets.DOCKER_HUB_USERNAME }}:${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} -H "Accept: ${{ env.CONTENT_TYPE }}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTED }}")
-          curl -u ${{ secrets.DOCKER_HUB_USERNAME }}:${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} -X PUT -H "Content-Type: ${{ env.CONTENT_TYPE }}" -d "${{ env.MANIFEST }}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTE }}"
+          MANIFEST=$(curl -u ${{ secrets.DOCKER_GLADIA_USERNAME }}:${{ secrets.DOCKER_GLADIA_ACCESS_TOKEN }} -H "Accept: ${{ env.CONTENT_TYPE }}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTED }}")
+          curl -u ${{ secrets.DOCKER_GLADIA_USERNAME }}:${{ secrets.DOCKER_GLADIA_ACCESS_TOKEN }} -X PUT -H "Content-Type: ${{ env.CONTENT_TYPE }}" -d "${{ env.MANIFEST }}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTE }}"
 
   promote-gladia-to-DH:
     needs: promote-gladia-image
