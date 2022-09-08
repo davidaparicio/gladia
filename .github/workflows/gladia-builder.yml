@@ -224,6 +224,7 @@ jobs:
           -e CUDA_VISIBLE_DEVICES=${{steps.gpuid.outputs.gpuid}}
           -p ${{steps.gpuid.outputs.gpuid}}8000:8000
           -v /data/volumes/:/tmp/gladia/
+          --pull always
           --name jlmagouille-${{ github.event.pull_request.number }}
           ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{ needs.build.outputs.dockerimage }}
 
