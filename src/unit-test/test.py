@@ -1,7 +1,6 @@
 import json
 import os
 import sys
-from pathlib import Path
 from time import sleep
 from urllib.request import Request, urlopen
 

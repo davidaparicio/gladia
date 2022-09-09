@@ -19,4 +19,6 @@ output = {"name": "colorized_image", "type": "image", "example": "image"}
 
 router = APIRouter()
 
-TaskRouter(router=router, input=inputs, output=output, default_model="deoldify-stable")
+TaskRouter(
+    router=router, input=inputs, output=output, default_model="mlhubber_colorize"
+)
