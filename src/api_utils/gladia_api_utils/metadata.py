@@ -1,6 +1,6 @@
 import os
-from pathlib import Path
 from logging import getLogger
+from pathlib import Path
 
 import yaml
 from gladia_api_utils.OVHFileManager import OVHFileManager
@@ -146,8 +146,8 @@ def create_metadata_examples_with_reponse(endpoint, params, data, files, respons
 
         fallback_extension = {
             "image": "jpg",
-            "audio": "mp3", # NOTE to change when we will have audio output model
-            "video": "avi" # NOTE to change when we will have video output model
+            "audio": "mp3",  # NOTE to change when we will have audio output model
+            "video": "avi",  # NOTE to change when we will have video output model
         }
 
         # Upload file to OVH

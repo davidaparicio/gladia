@@ -5,6 +5,7 @@ import swiftclient
 
 logger = getLogger(__name__)
 
+
 class OVHFileManager:
     def __init__(self):
         self.USERNAME = os.getenv("OVH_OBJECT_STORAGE_USERNAME")
