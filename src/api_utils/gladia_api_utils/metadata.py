@@ -1,11 +1,13 @@
 import os
 from pathlib import Path
+from logging import getLogger
 
 import yaml
-from gladia_api_utils.OvhObjectStorageHelper import OVHFileManager
+from gladia_api_utils.OVHFileManager import OVHFileManager
 
 dir_ignore = ["__pycache__"]
-root_path = os.getcwd()
+PATH_TO_GLADIA_SRC = os.getenv("PATH_TO_GLADIA_SRC", "/app")
+logger = getLogger(__name__)
 
 
 def get_all_metadata_files_path():
@@ -23,7 +25,7 @@ def get_all_metadata_files_path():
     task_paths = []
 
     # /apis/
-    apis_path = os.path.join(root_path, "apis")
+    apis_path = os.path.join(PATH_TO_GLADIA_SRC, "apis")
     input_dir_list = os.listdir(apis_path)
     # /apis/<input>/
     for input_dir in input_dir_list:
@@ -72,10 +74,10 @@ def update_all_metadata_fields_from_template():
     task_paths, model_paths = get_all_metadata_files_path()
 
     template_task_metadata_path = os.path.join(
-        root_path, "apis/.metadata_task_template.yaml"
+        PATH_TO_GLADIA_SRC, "apis/.metadata_task_template.yaml"
     )
     template_model_metadata_path = os.path.join(
-        root_path, "apis/.metadata_model_template.yaml"
+        PATH_TO_GLADIA_SRC, "apis/.metadata_model_template.yaml"
     )
     destination_model_file_name = ".model_metadata.yaml"
     destination_task_file_name = ".task_metadata.yaml"
@@ -142,12 +144,19 @@ def create_metadata_examples_with_reponse(endpoint, params, data, files, respons
             "audio/x-m4a": "m4a",
         }
 
+        fallback_extension = {
+            "image": "jpg",
+            "audio": "mp3", # NOTE to change when we will have audio output model
+            "video": "avi" # NOTE to change when we will have video output model
+        }
+
         # Upload file to OVH
         content_type = response.headers["content-type"]
         try:
             output_extension = extensions[content_type]
         except Exception as e:
-            print(f"Error: '{content_type}' is not a known content-type")
+            logger.error(f"Error: '{content_type}' is not a known content-type")
+            output_extension = fallback_extension[output]
 
         if input != "text":
             file_path = (
@@ -216,7 +225,7 @@ def get_model_metadata_path(endpoint, model):
     """
     task_name = endpoint.split("/")[3]
     task_models_folder = endpoint.replace(task_name, f"{task_name}-models")
-    source_folder = Path(__file__).parent.parent.parent.absolute()
+    source_folder = PATH_TO_GLADIA_SRC
     path_to_metadata = f"{source_folder}/apis{task_models_folder}{model}"
     metadata_file_name = ".model_metadata.yaml"
     metadata_file_path = os.path.join(path_to_metadata, metadata_file_name)

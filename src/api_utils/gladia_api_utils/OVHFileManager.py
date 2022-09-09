@@ -1,7 +1,9 @@
 import os
+from logging import getLogger
 
 import swiftclient
 
+logger = getLogger(__name__)
 
 class OVHFileManager:
     def __init__(self):
@@ -51,12 +53,12 @@ class OVHFileManager:
                     content_type=self.content_type[file_extension],
                 )
             except Exception as e:
-                print("error uploading file on ovh:", file_path)
-                print("Error message:", e)
+                logger.error("error uploading file on ovh:", file_path)
+                logger.error("Error message:", e)
 
     def delete_file(self, ovh_file_name):
         try:
             self.conn.delete_object(self.CONTAINER_NAME, ovh_file_name)
         except Exception as e:
-            print("error deleting file on ovh:", ovh_file_name)
-            print("Error message:", e)
+            logger.error("error deleting file on ovh:", ovh_file_name)
+            logger.error("Error message:", e)
