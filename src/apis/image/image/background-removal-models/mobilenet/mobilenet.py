@@ -1,6 +1,5 @@
 from gladia_api_utils.model_management import download_model
 from gladia_api_utils.OnnxBackgroundRemoval import OnnxBackgroundRemoval
-
 from PIL import Image
 
 MODEL_PATH = download_model(
@@ -10,6 +9,7 @@ MODEL_PATH = download_model(
 )
 
 onnx_bg_remover = OnnxBackgroundRemoval(model_path=MODEL_PATH)
+
 
 def predict(image: bytes) -> Image:
     """

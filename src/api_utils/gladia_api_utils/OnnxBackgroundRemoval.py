@@ -8,11 +8,18 @@ from numpy import asarray as as_nparray
 from numpy import ndarray
 from PIL import Image
 
+
 class OnnxBackgroundRemoval(object):
     """
     Call the model to return the image without its background
     """
-    def __init__(self, model_path: str, model_input_size: int=513, model_input_tensor_name: str="ImageTensor:0") -> None:
+
+    def __init__(
+        self,
+        model_path: str,
+        model_input_size: int = 513,
+        model_input_tensor_name: str = "ImageTensor:0",
+    ) -> None:
         """
         Constructor for the BackgroundRemoval class
 
@@ -24,11 +31,10 @@ class OnnxBackgroundRemoval(object):
         Returns:
             None
         """
-        
+
         self.model_path = model_path
         self.model_input_size = model_input_size
         self.model_input_tensor_name = model_input_tensor_name
-
 
     def remove_bg(self, image: bytes) -> Tuple[Image.Image, ndarray]:
         """
@@ -48,7 +54,9 @@ class OnnxBackgroundRemoval(object):
         resized_image = image.convert("RGB").resize(target_size, Image.ANTIALIAS)
 
         ort_sess = ort.InferenceSession(self.model_path)
-        seg_map = ort_sess.run(None, {self.model_input_tensor_name: [as_nparray(resized_image)]})[0][0]
+        seg_map = ort_sess.run(
+            None, {self.model_input_tensor_name: [as_nparray(resized_image)]}
+        )[0][0]
 
         img = draw_segment(resized_image, seg_map)
 
