@@ -84,7 +84,16 @@ class TestBackgroundRemoval:
         assert response.status_code == 200
 
     @pytest.mark.parametrize("model", models)
-    def test_invalid_image_input_task(self, model):
+    def test_invalid_image_input_task(self, model: str) -> bool:
+        """
+        Test the background removal endpoint with an invalid image input
+
+        Args:
+            model (str): model to test
+
+        Returns:
+            bool: True if the test passed, False otherwise
+        """
         with pytest.raises(Exception):
             response = client.post(
                 url=f"/image/image/background-removal/",
