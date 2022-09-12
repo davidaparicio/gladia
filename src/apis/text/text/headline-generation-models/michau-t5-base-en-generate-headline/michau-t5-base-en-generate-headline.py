@@ -4,13 +4,13 @@ from transformers import T5ForConditionalGeneration,T5Tokenizer
 from typing import Dict, Union
 
 
-def predict(text: str, max_len: int=16) -> Dict[str, Union[str, Dict[str, float]]]:
+def predict(text: str, max_length: int=16) -> Dict[str, Union[str, Dict[str, float]]]:
     """
     Predict the headline from a given text
 
     Args:
         text (str): The text to be detect hate in
-        max_len (int): The maximum length of the headline
+        max_length (int): The maximum length of the headline
 
     Returns:
         Dict[str, Union[str, Dict[str, float]]]: The predicted headline
@@ -30,7 +30,7 @@ def predict(text: str, max_len: int=16) -> Dict[str, Union[str, Dict[str, float]
     beam_outputs = model.generate(
         input_ids = input_ids,
         attention_mask = attention_masks,
-        max_length = max_len,
+        max_length = max_length,
         num_beams = 3,
         early_stopping = True,
     )
