@@ -4,7 +4,17 @@ from transformers import T5ForConditionalGeneration,T5Tokenizer
 from typing import Dict, Union
 
 
-def predict(text: str, max_len: int=256) -> Dict[str, Union[str, Dict[str, float]]]:
+def predict(text: str, max_len: int=16) -> Dict[str, Union[str, Dict[str, float]]]:
+    """
+    Predict the headline from a given text
+
+    Args:
+        text (str): The text to be detect hate in
+        max_len (int): The maximum length of the headline
+
+    Returns:
+        Dict[str, Union[str, Dict[str, float]]]: The predicted headline
+    """
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

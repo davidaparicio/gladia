@@ -9,6 +9,12 @@ inputs = [
         "name": "text",
         "example": "Input text to generate the headline from",
         "placeholder": "Insert text here to generate the headline from",
+    },
+    {
+        "type": "integer",
+        "name": "max_length",
+        "example": "16",
+        "placeholder": "Maximum length for the headline",
     }
 ]
 
