@@ -12,6 +12,9 @@ models = get_models_to_test(os.path.split(__file__)[0])
 
 
 class TestBackgroundRemoval:
+  """
+  Class to test the background removal endpoint
+  """
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)
     def test_jpg_image_input_task(self, model):
