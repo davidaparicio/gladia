@@ -37,6 +37,8 @@ def predict(text: str, max_length: int = 16) -> Dict[str, Union[str, Dict[str, f
         early_stopping=True,
     )
 
-    result = tokenizer.decode(beam_outputs[0], skip_special_tokens=True, clean_up_tokenization_spaces=True)
+    result = tokenizer.decode(
+        beam_outputs[0], skip_special_tokens=True, clean_up_tokenization_spaces=True
+    )
 
     return {"prediction": result, "prediction_raw": result}
