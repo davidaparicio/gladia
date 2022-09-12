@@ -1,6 +1,7 @@
 from typing import Dict, Union
 
-import torch
+from torch import device as get_device
+from torch.cuda import is_available as cuda_is_available
 from transformers import T5ForConditionalGeneration, T5Tokenizer
 
 
@@ -16,7 +17,7 @@ def predict(text: str, max_length: int = 16) -> Dict[str, Union[str, Dict[str, f
         Dict[str, Union[str, Dict[str, float]]]: The predicted headline
     """
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = get_device("cuda" if cuda_is_available() else "cpu")
 
     model = T5ForConditionalGeneration.from_pretrained(
         "Michau/t5-base-en-generate-headline"
