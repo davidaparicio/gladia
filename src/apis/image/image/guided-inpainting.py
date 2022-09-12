@@ -14,10 +14,16 @@ inputs = [
         "example": "https://raw.githubusercontent.com/CompVis/latent-diffusion/main/data/inpainting_examples/overture-creations-5sI6fQgYIuo_mask.png",
         "placeholder": "Mask to guide inpainting",
     },
+    {
+        "type": "string",
+        "name": "prompt",
+        "example": "a cat sitting on a bench",
+        "placeholder": "Mask to guide inpainting",
+    },
 ]
 
 output = {"name": "inpainted_image", "type": "image", "example": "inpainted_image"}
 
 router = APIRouter()
 
-TaskRouter(router=router, input=inputs, output=output, default_model="zits")
+TaskRouter(router=router, input=inputs, output=output, default_model="stable-diffusion")
