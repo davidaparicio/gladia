@@ -3,7 +3,12 @@ api:
   tags: []
 gladia:
   accelerator: ''
-  example: ''
+  example:
+    output:
+      prediction: Once, a group of frogs was roaming around the forest in search of
+        water.
+      prediction_raw:
+      - Once, a group of frogs was roaming around the forest in search of water.
   examples: {}
   format: ''
   latency: ''

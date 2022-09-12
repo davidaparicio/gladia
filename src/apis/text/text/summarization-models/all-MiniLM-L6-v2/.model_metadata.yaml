@@ -5,8 +5,20 @@ gladia:
   accelerator: ''
   example:
     output:
-      prediction: 0.9097199440002441
-      prediction_raw: 0.9097199440002441
+      prediction: The Crown is a British historical drama series on Netflix. Created
+        by Peter Morgan and produced by Left Bank Pictures and Sony Pictures Television.
+        First season was released by Netflix on 4 November 2016, the second on 8 December
+        2017, the third on 17 November 2019, and the fourth on 15 November 2020. As
+        of 2020, the estimated production budget of The Crown has been reported to
+        be $260 million, making it one of the most expensive television series in
+        history.
+      prediction_raw: The Crown is a British historical drama series on Netflix. Created
+        by Peter Morgan and produced by Left Bank Pictures and Sony Pictures Television.
+        First season was released by Netflix on 4 November 2016, the second on 8 December
+        2017, the third on 17 November 2019, and the fourth on 15 November 2020. As
+        of 2020, the estimated production budget of The Crown has been reported to
+        be $260 million, making it one of the most expensive television series in
+        history.
   examples: {}
   format: ''
   latency: ''

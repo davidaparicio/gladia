@@ -3,7 +3,10 @@ api:
   tags: []
 gladia:
   accelerator: ''
-  example: ''
+  example:
+    output:
+      prediction: hate-speech
+      prediction_raw: hate-speech
   examples: {}
   format: ''
   latency: ''

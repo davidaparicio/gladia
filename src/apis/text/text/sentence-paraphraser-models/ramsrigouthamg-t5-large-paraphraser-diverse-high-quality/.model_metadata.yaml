@@ -8,12 +8,6 @@ gladia:
       prediction: A herd of frogs was wandering around the woods in search of water.
       prediction_raw:
       - A herd of frogs was wandering around the woods in search of water.
-      - A group of frogs was wandering around the forest in search of water at one
-        time.
-      - A group of frogs was wandering around the forest in search of water at one
-        point.
-      - A group of frogs was wandering around the forest in search of water once more.
-      - A swarm of frogs was wandering around the woods in search of water.
   examples: {}
   format: ''
   latency: ''
