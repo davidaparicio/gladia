@@ -63,7 +63,16 @@ class TestBackgroundRemoval:
         assert response.status_code == 200
 
     @pytest.mark.parametrize("model", models)
-    def test_png_image_url_input_task(self, model):
+    def test_png_image_url_input_task(self, model: str) -> bool:
+        """
+        Test the background removal endpoint with a png image input retrieved from an url
+
+        Args:
+            model (str): model to test
+
+        Returns:
+            bool: True if the test passed, False otherwise
+        """
         response = client.post(
             url=f"/image/image/background-removal/",
             params={"model": model} if model else {},
