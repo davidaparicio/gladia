@@ -7,7 +7,7 @@ inputs = [
         "name": "image",
         "example": "http://files.gladia.io/examples/image/image/background-removal/owl2.png",
         "examples": [
-            "http://files.gladia.io/examples/image/image/background-removal/owl2.gif",
+            "https://15pictures.com/wp-content/gallery/15-pictures-lions/lions-4.jpg",
             "http://files.gladia.io/examples/image/image/background-removal/owl2.jpg",
             "http://files.gladia.io/examples/image/image/background-removal/owl2.png",
         ],

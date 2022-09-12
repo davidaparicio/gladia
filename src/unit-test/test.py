@@ -161,7 +161,7 @@ def get_task_inputs(task_details):
         url_data = data.copy()
         for url_file in urls_files:
             key, value = list(url_file.keys())[0], list(url_file.values())[0]
-            url_data.update({key: list(value)[0]})
+            url_data.update({key: value})
         task_inputs.append({"data": url_data, "files": {}})
 
         # Then, for each input type (audio, video, image),
