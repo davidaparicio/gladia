@@ -1,6 +1,6 @@
 import os
 import random
-from typing import Union
+from typing import List, Tuple, Union
 
 import cv2
 import numpy as np
@@ -34,21 +34,68 @@ from .utils import (
 )
 
 
-def upfirdn2d(x, f, up=1, down=1, padding=0, flip_filter=False, gain=1, impl="cuda"):
+def upfirdn2d(
+    x: torch.Tensor,
+    f: torch.Tensor,
+    up: int = 1,
+    down: int = 1,
+    padding: int = 0,
+    flip_filter: bool = False,
+    gain: float = 1.0,
+) -> torch.Tensor:
+    """
+    Upsample, FIR filter, and downsample 2D tensor. This is a generalization of `scipy.signal.upfirdn()`.
+
+    Args:
+        x (torch.Tensor): Input tensor of shape [batch_size, num_channels, in_height, in_width].
+        f (torch.Tensor): 1D or 2D FIR filter tensor of shape [filter_height] or [filter_height, filter_width].
+        up (int): Upsampling factor. Must be a power of 2. (default: 1)
+        down (int): Downsampling factor. Must be a power of 2. (default: 1)
+        padding (int): Padding size. (default: 0)
+        flip_filter (bool): Flip the filter in the time domain. (default: False)
+        gain (float): Overall scaling factor. (default: 1.0)
+
+    Returns:
+        torch.Tensor: Output tensor of shape [batch_size, num_channels, out_height, out_width].
+    """
+
     assert isinstance(x, torch.Tensor)
     return _upfirdn2d_ref(
         x, f, up=up, down=down, padding=padding, flip_filter=flip_filter, gain=gain
     )
 
 
-def _upfirdn2d_ref(x, f, up=1, down=1, padding=0, flip_filter=False, gain=1):
-    """Slow reference implementation of `upfirdn2d()` using standard PyTorch ops."""
-    # Validate arguments.
+def _upfirdn2d_ref(
+    x: torch.Tensor,
+    f: torch.Tensor,
+    up: int = 1,
+    down: int = 1,
+    padding: int = 0,
+    flip_filter: bool = False,
+    gain: float = 1.0,
+) -> torch.Tensor:
+    """
+    Slow reference implementation of `upfirdn2d()` using standard PyTorch ops. Used for testing.
+
+    Args:
+        x (torch.Tensor): Input tensor of shape [batch_size, num_channels, in_height, in_width].
+        f (torch.Tensor): 1D or 2D FIR filter tensor of shape [filter_height] or [filter_height, filter_width].
+        up (int): Upsampling factor. Must be a power of 2. (default: 1)
+        down (int): Downsampling factor. Must be a power of 2. (default: 1)
+        padding (int): Padding size. (default: 0)
+        flip_filter (bool): Flip the filter in the time domain. (default: False)
+        gain (float): Overall scaling factor. (default: 1.0)
+
+    Returns:
+        torch.Tensor: Output tensor of shape [batch_size, num_channels, out_height, out_width].
+    """
+
     assert isinstance(x, torch.Tensor) and x.ndim == 4
     if f is None:
         f = torch.ones([1, 1], dtype=torch.float32, device=x.device)
     assert isinstance(f, torch.Tensor) and f.ndim in [1, 2]
     assert f.dtype == torch.float32 and not f.requires_grad
+
     batch_size, num_channels, in_height, in_width = x.shape
     upx, upy = _parse_scaling(up)
     downx, downy = _parse_scaling(down)
@@ -63,6 +110,7 @@ def _upfirdn2d_ref(x, f, up=1, down=1, padding=0, flip_filter=False, gain=1):
     x = torch.nn.functional.pad(
         x, [max(padx0, 0), max(padx1, 0), max(pady0, 0), max(pady1, 0)]
     )
+
     x = x[
         :,
         :,
@@ -73,6 +121,7 @@ def _upfirdn2d_ref(x, f, up=1, down=1, padding=0, flip_filter=False, gain=1):
     # Setup filter.
     f = f * (gain ** (f.ndim / 2))
     f = f.to(x.dtype)
+
     if not flip_filter:
         f = f.flip(list(range(f.ndim)))
 
@@ -86,23 +135,63 @@ def _upfirdn2d_ref(x, f, up=1, down=1, padding=0, flip_filter=False, gain=1):
 
     # Downsample by throwing away pixels.
     x = x[:, :, ::downy, ::downx]
+
     return x
 
 
 class EncoderEpilogue(torch.nn.Module):
+    """
+    Encoder epilogue block.
+    This block is used in the encoder of the generator and discriminator.
+    It consists of a minibatch standard deviation layer, a convolutional layer, and an activation function.
+
+    Args:
+        in_channels (int): Number of input channels.
+        cmap_dim (int): Dimensionality of mapped conditioning label, 0 = no label.
+        z_dim (int): Output Latent (Z) dimensionality.
+        resolution (int): Resolution of this block.
+        img_channels (int): Number of input color channels.
+        architecture (str): Architecture: 'orig', 'skip', 'resnet'. (default: 'resnet')
+        mbstd_group_size (int): Group size for the minibatch standard deviation layer, None = entire minibatch. (default: 4)
+        mbstd_num_channels (int): Number of features for the minibatch standard deviation layer, 0 = disable. (default: 1)
+        activation (str): Activation function: 'relu', 'lrelu', etc. (default: 'lrelu')
+        conv_clamp (Union[float, None]): Clamp the output of convolution layers to +-X, None = disable clamping. (default: None)
+
+    Inherited from torch.nn.Module
+    """
+
     def __init__(
         self,
-        in_channels,  # Number of input channels.
-        cmap_dim,  # Dimensionality of mapped conditioning label, 0 = no label.
-        z_dim,  # Output Latent (Z) dimensionality.
-        resolution,  # Resolution of this block.
-        img_channels,  # Number of input color channels.
-        architecture="resnet",  # Architecture: 'orig', 'skip', 'resnet'.
-        mbstd_group_size=4,  # Group size for the minibatch standard deviation layer, None = entire minibatch.
-        mbstd_num_channels=1,  # Number of features for the minibatch standard deviation layer, 0 = disable.
-        activation="lrelu",  # Activation function: 'relu', 'lrelu', etc.
-        conv_clamp=None,  # Clamp the output of convolution layers to +-X, None = disable clamping.
+        in_channels: int,
+        cmap_dim: int,
+        z_dim: int,
+        resolution: int,
+        img_channels: int,
+        architecture: str = "resnet",
+        mbstd_group_size: int = 4,
+        mbstd_num_channels: int = 1,
+        activation: str = "lrelu",
+        conv_clamp: Union[float, None] = None,
     ):
+        """
+        Constructor for the EncoderEpilogue class.
+
+        Args:
+            in_channels (int): Number of input channels.
+            cmap_dim (int): Dimensionality of mapped conditioning label, 0 = no label.
+            z_dim (int): Output Latent (Z) dimensionality.
+            resolution (int): Resolution of this block.
+            img_channels (int): Number of input color channels.
+            architecture (str): Architecture: 'orig', 'skip', 'resnet'. (default: 'resnet')
+            mbstd_group_size (int): Group size for the minibatch standard deviation layer, None = entire minibatch. (default: 4)
+            mbstd_num_channels (int): Number of features for the minibatch standard deviation layer, 0 = disable. (default: 1)
+            activation (str): Activation function: 'relu', 'lrelu', etc. (default: 'lrelu')
+            conv_clamp (Union[float, None]): Clamp the output of convolution layers to +-X, None = disable clamping. (default: None)
+
+        Returns:
+            None
+        """
+
         assert architecture in ["orig", "skip", "resnet"]
         super().__init__()
         self.in_channels = in_channels
@@ -134,7 +223,20 @@ class EncoderEpilogue(torch.nn.Module):
         )
         self.dropout = torch.nn.Dropout(p=0.5)
 
-    def forward(self, x, cmap, force_fp32=False):
+    def forward(
+        self, x: torch.Tensor, cmap: torch.Tensor, force_fp32: bool = False
+    ) -> torch.Tensor:
+        """
+        Forward pass of the EncoderEpilogue class.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape [batch_size, img_channels, resolution, resolution].
+            cmap (torch.Tensor): Conditioning label tensor of shape [batch_size, cmap_dim].
+            force_fp32 (bool): Force the output to be FP32, useful for mixed precision training. (default: False)
+
+        Returns:
+            torch.Tensor: Output tensor of shape [batch_size, z_dim].
+        """
         _ = force_fp32  # unused
         dtype = torch.float32
         memory_format = torch.contiguous_format
@@ -158,27 +260,70 @@ class EncoderEpilogue(torch.nn.Module):
 
 
 class EncoderBlock(torch.nn.Module):
+    """
+    Encoder block.
+
+    Args:
+        in_channels (int): Number of input channels, 0 = first block.
+        tmp_channels (int): Number of intermediate channels.
+        out_channels (int): Number of output channels.
+        resolution (int): Resolution of this block.
+        img_channels (int): Number of input color channels.
+        first_layer_idx (int): Index of the first layer.
+        architecture (str): Architecture: 'orig', 'skip', 'resnet'. (default: 'skip')
+        activation (str): Activation function: 'relu', 'lrelu', etc. (default: 'lrelu')
+        resample_filter (list): Low-pass filter to apply when resampling activations. (default: [1, 3, 3, 1])
+        conv_clamp (Union[float, None]): Clamp the output of convolution layers to +-X, None = disable clamping. (default: None)
+        use_fp16 (bool): Use FP16 for this block (default: False)
+        fp16_channels_last (bool): Use channels-last memory format with FP16? (default: False)
+        freeze_layers (int): Freeze-D: Number of layers to freeze. (default: 0)
+
+    Inherited from torch.nn.Module
+    """
+
     def __init__(
         self,
-        in_channels,  # Number of input channels, 0 = first block.
-        tmp_channels,  # Number of intermediate channels.
-        out_channels,  # Number of output channels.
-        resolution,  # Resolution of this block.
-        img_channels,  # Number of input color channels.
-        first_layer_idx,  # Index of the first layer.
-        architecture="skip",  # Architecture: 'orig', 'skip', 'resnet'.
-        activation="lrelu",  # Activation function: 'relu', 'lrelu', etc.
-        resample_filter=[
+        in_channels: int,
+        tmp_channels: int,
+        out_channels: int,
+        resolution: int,
+        img_channels: int,
+        first_layer_idx: int,
+        architecture: str = "skip",
+        activation: str = "lrelu",
+        resample_filter: list = [
             1,
             3,
             3,
             1,
-        ],  # Low-pass filter to apply when resampling activations.
-        conv_clamp=None,  # Clamp the output of convolution layers to +-X, None = disable clamping.
-        use_fp16=False,  # Use FP16 for this block?
-        fp16_channels_last=False,  # Use channels-last memory format with FP16?
-        freeze_layers=0,  # Freeze-D: Number of layers to freeze.
-    ):
+        ],
+        conv_clamp: Union[float, None] = None,
+        use_fp16: bool = False,
+        fp16_channels_last: bool = False,
+        freeze_layers: int = 0,
+    ) -> None:
+        """
+        Constructor for the EncoderBlock class.
+
+        Args:
+            in_channels (int): Number of input channels, 0 = first block.
+            tmp_channels (int): Number of intermediate channels.
+            out_channels (int): Number of output channels.
+            resolution (int): Resolution of this block.
+            img_channels (int): Number of input color channels.
+            first_layer_idx (int): Index of the first layer.
+            architecture (str): Architecture: 'orig', 'skip', 'resnet'. (default: 'skip')
+            activation (str): Activation function: 'relu', 'lrelu', etc. (default: 'lrelu')
+            resample_filter (list): Low-pass filter to apply when resampling activations. (default: [1, 3, 3, 1])
+            conv_clamp (Union[float, None]): Clamp the output of convolution layers to +-X, None = disable clamping. (default: None)
+            use_fp16 (bool): Use FP16 for this block (default: False)
+            fp16_channels_last (bool): Use channels-last memory format with FP16? (default: False)
+            freeze_layers (int): Freeze-D: Number of layers to freeze. (default: 0)
+
+        Returns:
+            None
+        """
+
         assert in_channels in [0, tmp_channels]
         assert architecture in ["orig", "skip", "resnet"]
         super().__init__()
@@ -193,7 +338,17 @@ class EncoderBlock(torch.nn.Module):
 
         self.num_layers = 0
 
-        def trainable_gen():
+        def trainable_gen() -> None:
+            """
+            Trainable layer generator. Yields the layer index and the layer itself.
+
+            Args:
+                None
+
+            Returns:
+                None
+            """
+
             while True:
                 layer_idx = self.first_layer_idx + self.num_layers
                 trainable = layer_idx >= freeze_layers
@@ -247,8 +402,21 @@ class EncoderBlock(torch.nn.Module):
                 channels_last=self.channels_last,
             )
 
-    def forward(self, x, img, force_fp32=False):
-        # dtype = torch.float16 if self.use_fp16 and not force_fp32 else torch.float32
+    def forward(
+        self, x: torch.Tensor, img: torch.Tensor, force_fp32: bool = False
+    ) -> torch.Tensor:
+        """
+        Forward pass of the EncoderBlock class.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape [batch_size, in_channels, resolution, resolution].
+            img (torch.Tensor): Input image tensor of shape [batch_size, img_channels, resolution, resolution].
+            force_fp32 (bool): Force the output to be FP32, useful for mixed precision training. (default: False)
+
+        Returns:
+            torch.Tensor: Output tensor of shape [batch_size, out_channels, resolution, resolution].
+        """
+
         dtype = torch.float32
         memory_format = (
             torch.channels_last
@@ -288,22 +456,52 @@ class EncoderBlock(torch.nn.Module):
 
 
 class EncoderNetwork(torch.nn.Module):
+    """
+    Encoder network class. Takes an image and produces a latent vector.
+    The latent vector is a concatenation of the outputs of the encoder blocks.
+
+    Args:
+
+    """
+
     def __init__(
         self,
-        c_dim,  # Conditioning label (C) dimensionality.
-        z_dim,  # Input latent (Z) dimensionality.
-        img_resolution,  # Input resolution.
-        img_channels,  # Number of input color channels.
-        architecture="orig",  # Architecture: 'orig', 'skip', 'resnet'.
-        channel_base=16384,  # Overall multiplier for the number of channels.
-        channel_max=512,  # Maximum number of channels in any layer.
-        num_fp16_res=0,  # Use FP16 for the N highest resolutions.
-        conv_clamp=None,  # Clamp the output of convolution layers to +-X, None = disable clamping.
-        cmap_dim=None,  # Dimensionality of mapped conditioning label, None = default.
-        block_kwargs={},  # Arguments for DiscriminatorBlock.
-        mapping_kwargs={},  # Arguments for MappingNetwork.
-        epilogue_kwargs={},  # Arguments for EncoderEpilogue.
-    ):
+        c_dim: int,
+        z_dim: int,
+        img_resolution: int,
+        img_channels: int,
+        architecture: str = "orig",
+        channel_base: int = 16384,
+        channel_max: int = 512,
+        num_fp16_res: int = 0,
+        conv_clamp: Union[float, None] = None,
+        cmap_dim: Union[int, None] = None,
+        block_kwargs: dict = {},
+        mapping_kwargs: dict = {},
+        epilogue_kwargs: dict = {},
+    ) -> None:
+        """
+        Constructor method for the EncoderNetwork class.
+
+        Args:
+            c_dim (int): Conditioning label (C) dimensionality.
+            z_dim (int): Input latent (Z) dimensionality.
+            img_resolution (int): Input resolution.
+            img_channels (int): Number of input color channels.
+            architecture (str): Architecture: 'orig', 'skip', 'resnet'. (default: 'orig')
+            channel_base (int): Overall multiplier for the number of channels. (default: 16384)
+            channel_max (int): Maximum number of channels in any layer. (default: 512)
+            num_fp16_res (int): Use FP16 for the N highest resolutions. (default: 0)
+            conv_clamp (Union[float, None]): Clamp the output of convolution layers to +-X, None = disable clamping. (default: None)
+            cmap_dim (Union[int, None]): Dimensionality of mapped conditioning label, None = default. (default: None)
+            block_kwargs (dict): Arguments for DiscriminatorBlock. (default: {})
+            mapping_kwargs (dict): Arguments for MappingNetwork. (default: {})
+            epilogue_kwargs (dict): Arguments for EncoderEpilogue. (default: {})
+
+        Returns:
+            None
+        """
+
         super().__init__()
         self.c_dim = c_dim
         self.z_dim = z_dim
@@ -364,7 +562,21 @@ class EncoderNetwork(torch.nn.Module):
             **common_kwargs,
         )
 
-    def forward(self, img, c, **block_kwargs):
+    def forward(
+        self, img: torch.Tensor, c: torch.Tensor, **block_kwargs: dict
+    ) -> torch.Tensor:
+        """
+        Forward pass of the EncoderNetwork class. Takes an image and a conditioning label and produces a latent vector.
+
+        Args:
+            img (torch.Tensor): Input image tensor.
+            c (torch.Tensor): Conditioning label tensor.
+            block_kwargs (dict): Arguments for DiscriminatorBlock.
+
+        Returns:
+            torch.Tensor: Latent vector.
+        """
+
         x = None
         feats = {}
         for res in self.block_resolutions:
@@ -382,23 +594,74 @@ class EncoderNetwork(torch.nn.Module):
         z = torch.zeros(
             (B, self.z_dim), requires_grad=False, dtype=x.dtype, device=x.device
         )  ## Noise for Co-Modulation
+
         return x, z, feats
 
 
-def fma(a, b, c):  # => a * b + c
+def fma(a: torch.Tensor, b: torch.Tensor, c: torch.Tensor) -> torch.Tensor:
+    """
+    Fused multiply-add function.
+    Computes a * b + c with reduced rounding error.
+
+    Args:
+        a (torch.Tensor): First input tensor.
+        b (torch.Tensor): Second input tensor.
+        c (torch.Tensor): Third input tensor.
+
+    Returns:
+        torch.Tensor: Result of a * b + c.
+    """
+
     return _FusedMultiplyAdd.apply(a, b, c)
 
 
-class _FusedMultiplyAdd(torch.autograd.Function):  # a * b + c
+class _FusedMultiplyAdd(torch.autograd.Function):
+    """
+    Fused multiply-add function. Used to calculate a * b + c
+
+    Inherited from torch.autograd.Function.
+    """
+
     @staticmethod
-    def forward(ctx, a, b, c):  # pylint: disable=arguments-differ
+    def forward(
+        ctx: torch.autograd.function._ContextMethodMixin,
+        a: torch.Tensor,
+        b: torch.Tensor,
+        c: torch.Tensor,
+    ) -> torch.Tensor:
+        """
+        Forward pass of the _FusedMultiplyAdd class.
+
+        Args:
+            ctx (torch.autograd.function._ContextMethodMixin): Context object.
+            a (torch.Tensor): First input tensor.
+            b (torch.Tensor): Second input tensor.
+            c (torch.Tensor): Third input tensor.
+
+        Returns:
+            torch.Tensor: Result of a * b + c.
+        """
         out = torch.addcmul(c, a, b)
         ctx.save_for_backward(a, b)
         ctx.c_shape = c.shape
+
         return out
 
     @staticmethod
-    def backward(ctx, dout):  # pylint: disable=arguments-differ
+    def backward(
+        ctx: torch.autograd.function._ContextMethodMixin, grad_out: torch.Tensor
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        """
+        Backward pass of the _FusedMultiplyAdd class.
+
+        Args:
+            ctx (torch.autograd.function._ContextMethodMixin): Context object.
+            grad_out (torch.Tensor): Gradient of the output.
+
+        Returns:
+            Tuple[torch.Tensor, torch.Tensor, torch.Tensor]: Gradients of the inputs.
+        """
+
         a, b = ctx.saved_tensors
         c_shape = ctx.c_shape
         da = None
@@ -406,18 +669,29 @@ class _FusedMultiplyAdd(torch.autograd.Function):  # a * b + c
         dc = None
 
         if ctx.needs_input_grad[0]:
-            da = _unbroadcast(dout * b, a.shape)
+            da = _unbroadcast(grad_out * b, a.shape)
 
         if ctx.needs_input_grad[1]:
-            db = _unbroadcast(dout * a, b.shape)
+            db = _unbroadcast(grad_out * a, b.shape)
 
         if ctx.needs_input_grad[2]:
-            dc = _unbroadcast(dout, c_shape)
+            dc = _unbroadcast(grad_out, c_shape)
 
         return da, db, dc
 
 
-def _unbroadcast(x, shape):
+def _unbroadcast(x: torch.Tensor, shape: Tuple[int, ...]) -> torch.Tensor:
+    """
+    Unbroadcasts a tensor. Used to calculate gradients of the fused multiply-add function.
+
+    Args:
+        x (torch.Tensor): Input tensor.
+        shape (Tuple[int, ...]): Shape of the output tensor.
+
+    Returns:
+        torch.Tensor: Unbroadcasted tensor.
+    """
+
     extra_dims = x.ndim - len(shape)
     assert extra_dims >= 0
     dim = [
@@ -434,21 +708,39 @@ def _unbroadcast(x, shape):
 
 
 def modulated_conv2d(
-    x,  # Input tensor of shape [batch_size, in_channels, in_height, in_width].
-    weight,  # Weight tensor of shape [out_channels, in_channels, kernel_height, kernel_width].
-    styles,  # Modulation coefficients of shape [batch_size, in_channels].
-    noise=None,  # Optional noise tensor to add to the output activations.
-    up=1,  # Integer upsampling factor.
-    down=1,  # Integer downsampling factor.
-    padding=0,  # Padding with respect to the upsampled image.
-    resample_filter=None,
-    # Low-pass filter to apply when resampling activations. Must be prepared beforehand by calling upfirdn2d.setup_filter().
-    demodulate=True,  # Apply weight demodulation?
-    flip_weight=True,  # False = convolution, True = correlation (matches torch.nn.functional.conv2d).
-    fused_modconv=True,  # Perform modulation, convolution, and demodulation as a single fused operation?
-):
+    x: torch.Tensor,
+    weight: torch.Tensor,
+    styles: torch.Tensor,
+    noise: Union[torch.Tensor, None] = None,
+    up: int = 1,
+    down: int = 1,
+    padding: int = 0,
+    resample_filter: Union[torch.Tensor, None] = None,
+    demodulate: bool = True,
+    flip_weight: bool = True,
+    fused_modconv: bool = True,
+) -> torch.Tensor:
+    """
+    Modulated 2D convolution. Used to calculate the output of a convolutional layer.
+
+    Args:
+        x (torch.Tensor): Input tensor of shape [batch_size, in_channels, in_height, in_width].
+        weight (torch.Tensor): Weight tensor of shape [out_channels, in_channels, kernel_height, kernel_width].
+        styles (torch.Tensor): Modulation coefficients of shape [batch_size, in_channels].
+        noise (Union[torch.Tensor, None], optional): Optional noise tensor to add to the output activations. (default: None)
+        up (int, optional): Integer upsampling factor. (default: 1)
+        down (int, optional): Integer downsampling factor. (default: 1)
+        padding (int, optional): Padding with respect to the upsampled image. (default: 0)
+        resample_filter (Union[torch.Tensor, None], optional): Low-pass filter to apply when resampling activations. Must be prepared beforehand by calling upfirdn2d.setup_filter(). (default: None)
+        demodulate (bool, optional): Apply weight demodulation? (default: True)
+        flip_weight (bool, optional): False = convolution, True = correlation (matches torch.nn.functional.conv2d). (default: True)
+        fused_modconv (bool, optional): Perform modulation, convolution, and demodulation as a single fused operation? (default: True)
+
+    Returns:
+        torch.Tensor: Output tensor of shape [batch_size, out_channels, out_height, out_width].
+    """
     batch_size = x.shape[0]
-    out_channels, in_channels, kh, kw = weight.shape
+    _, in_channels, kh, kw = weight.shape
 
     # Pre-normalize inputs to avoid FP16 overflow.
     if x.dtype == torch.float16 and demodulate:
@@ -512,25 +804,46 @@ def modulated_conv2d(
 
 
 class SynthesisLayer(torch.nn.Module):
+    """
+    Synthesis layer. Used to calculate the output of a single layer in the generator.
+
+    Args:
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+
+    """
+
     def __init__(
         self,
-        in_channels,  # Number of input channels.
-        out_channels,  # Number of output channels.
-        w_dim,  # Intermediate latent (W) dimensionality.
-        resolution,  # Resolution of this layer.
-        kernel_size=3,  # Convolution kernel size.
-        up=1,  # Integer upsampling factor.
-        use_noise=True,  # Enable noise input?
-        activation="lrelu",  # Activation function: 'relu', 'lrelu', etc.
-        resample_filter=[
-            1,
-            3,
-            3,
-            1,
-        ],  # Low-pass filter to apply when resampling activations.
-        conv_clamp=None,  # Clamp the output of convolution layers to +-X, None = disable clamping.
-        channels_last=False,  # Use channels_last format for the weights?
-    ):
+        in_channels: int,
+        out_channels: int,
+        w_dim: int,
+        resolution: int,
+        kernel_size: int = 3,
+        up: int = 1,
+        use_noise: bool = True,
+        activation: str = "lrelu",
+        resample_filter: List[float] = [1, 3, 3, 1],
+        conv_clamp: Union[float, None] = None,
+        channels_last: bool = False,
+    ) -> None:
+        """
+        Constructor for the SynthesisLayer class.
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            w_dim (int): Intermediate latent (W) dimensionality.
+            resolution (int): Resolution of this layer.
+            kernel_size (int, optional): Convolution kernel size. (default: 3)
+            up (int, optional): Integer upsampling factor. (default: 1)
+            use_noise (bool, optional): Enable noise input? (default: True)
+            activation (str, optional): Activation function: 'relu', 'lrelu', etc. (default: 'lrelu')
+            resample_filter (list, optional): Low-pass filter to apply when resampling activations. (default: [1, 3, 3, 1])
+            conv_clamp (Union[float, None], optional): Clamp the output of convolution layers to +-X, None = disable clamping. (default: None)
+            channels_last (bool, optional): Use channels_last format for the weights? (default: False)
+
+        """
         super().__init__()
         self.resolution = resolution
         self.up = up
@@ -555,7 +868,28 @@ class SynthesisLayer(torch.nn.Module):
             self.noise_strength = torch.nn.Parameter(torch.zeros([]))
         self.bias = torch.nn.Parameter(torch.zeros([out_channels]))
 
-    def forward(self, x, w, noise_mode="none", fused_modconv=True, gain=1):
+    def forward(
+        self,
+        x: torch.Tensor,
+        w: torch.Tensor,
+        noise_mode: str = "none",
+        fused_modconv: bool = True,
+        gain: float = 1.0,
+    ) -> torch.Tensor:
+        """
+        Forward pass of the SynthesisLayer class.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+            w (torch.Tensor): Intermediate latent (W) tensor.
+            noise_mode (str, optional): Noise mode: 'const', 'random', 'none'. (default: 'none')
+            fused_modconv (bool, optional): Enable fused modulated convolution? (default: True)
+            gain (float, optional): Overall scaling factor. (default: 1.0)
+
+        Returns:
+            torch.Tensor: Output tensor.
+        """
+
         assert noise_mode in ["random", "const", "none"]
         in_resolution = self.resolution // self.up
         styles = self.affine(w)
@@ -595,15 +929,38 @@ class SynthesisLayer(torch.nn.Module):
 
 
 class ToRGBLayer(torch.nn.Module):
+    """
+    Convert feature map to RGB image. Used to calculate the RGB output image of a single layer in the generator.
+
+    Args:
+
+    Inherited from torch.nn.Module
+    """
+
     def __init__(
         self,
-        in_channels,
-        out_channels,
-        w_dim,
-        kernel_size=1,
-        conv_clamp=None,
-        channels_last=False,
-    ):
+        in_channels: int,
+        out_channels: int,
+        w_dim: int,
+        kernel_size: int = 1,
+        conv_clamp: Union[float, None] = None,
+        channels_last: bool = False,
+    ) -> None:
+        """
+        Constructor for the ToRGBLayer class.
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            w_dim (int): Intermediate latent (W) dimensionality.
+            kernel_size (int, optional): Convolution kernel size. (default: 1)
+            conv_clamp (Union[float, None], optional): Clamp the output of convolution layers to +-X, None = disable clamping. (default: None)
+            channels_last (bool, optional): Use channels_last format for the weights? (default: False)
+
+        Returns:
+            None
+        """
+
         super().__init__()
         self.conv_clamp = conv_clamp
         self.affine = FullyConnectedLayer(w_dim, in_channels, bias_init=1)
@@ -618,7 +975,20 @@ class ToRGBLayer(torch.nn.Module):
         self.bias = torch.nn.Parameter(torch.zeros([out_channels]))
         self.weight_gain = 1 / np.sqrt(in_channels * (kernel_size**2))
 
-    def forward(self, x, w, fused_modconv=True):
+    def forward(
+        self, x: torch.Tensor, w: torch.Tensor, fused_modconv=True
+    ) -> torch.Tensor:
+        """
+        Forward pass of the ToRGBLayer class.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+            w (torch.Tensor): Intermediate latent (W) tensor.
+            fused_modconv (bool, optional): Enable fused modulated convolution? (default: True)
+
+        Returns:
+            torch.Tensor: Output tensor.
+        """
         styles = self.affine(w) * self.weight_gain
         x = modulated_conv2d(
             x=x,
@@ -634,13 +1004,29 @@ class ToRGBLayer(torch.nn.Module):
 class SynthesisForeword(torch.nn.Module):
     def __init__(
         self,
-        z_dim,  # Output Latent (Z) dimensionality.
-        resolution,  # Resolution of this block.
-        in_channels,
-        img_channels,  # Number of input color channels.
-        architecture="skip",  # Architecture: 'orig', 'skip', 'resnet'.
-        activation="lrelu",  # Activation function: 'relu', 'lrelu', etc.
-    ):
+        z_dim: int,
+        resolution: int,
+        in_channels: int,
+        img_channels: int,
+        architecture: str = "skip",
+        activation: str = "lrelu",
+    ) -> None:
+        """
+        Constructor for the SynthesisForeword class.
+        This class is used to calculate the RGB output image of a single layer in the generator.
+
+        Args:
+            z_dim (int): Output Latent (Z) dimensionality.
+            resolution (int): Resolution of this block.
+            in_channels (int): Number of input channels.
+            img_channels (int): Number of input color channels.
+            architecture (str, optional): Architecture: 'orig', 'skip', 'resnet'. (default: 'skip')
+            activation (str, optional): Activation function: 'relu', 'lrelu', etc. (default: 'lrelu')
+
+        Returns:
+            None
+        """
+
         super().__init__()
         self.in_channels = in_channels
         self.z_dim = z_dim
@@ -663,7 +1049,27 @@ class SynthesisForeword(torch.nn.Module):
                 w_dim=(z_dim // 2) * 3,
             )
 
-    def forward(self, x, ws, feats, img, force_fp32=False):
+    def forward(
+        self,
+        x: torch.Tensor,
+        ws: torch.Tensor,
+        feats: torch.Tensor,
+        img: torch.Tensor,
+        force_fp32=False,
+    ) -> torch.Tensor:
+        """
+        Forward pass of the SynthesisForeword class.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+            ws (torch.Tensor): Intermediate latent (W) tensor.
+            feats (torch.Tensor): Intermediate latent (W) tensor.
+            img (torch.Tensor): Output image.
+            force_fp32 (bool, optional): Force FP32 (default: False)
+
+        Returns:
+            torch.Tensor: Output tensor.
+        """
         _ = force_fp32  # unused
         dtype = torch.float32
         memory_format = torch.contiguous_format
@@ -698,8 +1104,26 @@ class SynthesisForeword(torch.nn.Module):
         return x, img
 
 
-class SELayer(nn.Module):
-    def __init__(self, channel, reduction=16):
+class SELayer(torch.nn.Module):
+    """
+    Squeeze-and-Excitation Layer.
+
+    Args:
+        channel (int): Number of channels.
+        reduction (int, optional): Reduction factor. (default: 16)
+
+    Inherited from torch.nn.Module
+
+    """
+
+    def __init__(self, channel: int, reduction: int = 16):
+        """
+        Constructor for the SELayer class.
+
+        Args:
+            channel (int): Number of channels.
+            reduction (int, optional): Reduction factor. (default: 16)
+        """
         super(SELayer, self).__init__()
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Sequential(
@@ -709,7 +1133,16 @@ class SELayer(nn.Module):
             nn.Sigmoid(),
         )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass of the SELayer class.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+
+        Returns:
+            torch.Tensor: Output tensor.
+        """
         b, c, _, _ = x.size()
         y = self.avg_pool(x).view(b, c)
         y = self.fc(y).view(b, c, 1, 1)
@@ -717,7 +1150,25 @@ class SELayer(nn.Module):
         return res
 
 
-class FourierUnit(nn.Module):
+class FourierUnit(torch.nn.Module):
+    """
+    Fourier Unit. (https://arxiv.org/abs/2006.10739)
+
+    Args:
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        groups (int, optional): Number of groups. (default: 1)
+        spatial_scale_factor (Union[int, float], optional): Spatial scale factor. (default: None)
+        spatial_scale_mode (str, optional): Spatial scale mode. (default: 'bilinear')
+        spectral_pos_encoding (bool, optional): Use spectral positional encoding. (default: False)
+        use_se (bool, optional): Use squeeze-and-excitation. (default: False)
+        se_kwargs (Union[dict, None], optional): Squeeze-and-excitation kwargs. (default: None)
+        ffc3d (bool, optional): Use 3D FFT. (default: False)
+        fft_norm (str, optional): FFT normalization. (default: 'ortho')
+
+    Inherited from torch.nn.Module
+    """
+
     def __init__(
         self,
         in_channels,
@@ -731,6 +1182,24 @@ class FourierUnit(nn.Module):
         ffc3d=False,
         fft_norm="ortho",
     ):
+        """
+        Constructor for the FourierUnit class.
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            groups (int, optional): Number of groups. (default: 1)
+            spatial_scale_factor (Union[int, float], optional): Spatial scale factor. (default: None)
+            spatial_scale_mode (str, optional): Spatial scale mode. (default: 'bilinear')
+            spectral_pos_encoding (bool, optional): Use spectral positional encoding. (default: False)
+            use_se (bool, optional): Use squeeze-and-excitation. (default: False)
+            se_kwargs (Union[dict, None], optional): Squeeze-and-excitation kwargs. (default: None)
+            ffc3d (bool, optional): Use 3D FFT. (default: False)
+            fft_norm (str, optional): FFT normalization. (default: 'ortho')
+
+        Returns:
+            None
+        """
         # bn_layer not used
         super(FourierUnit, self).__init__()
         self.groups = groups
@@ -759,7 +1228,16 @@ class FourierUnit(nn.Module):
         self.ffc3d = ffc3d
         self.fft_norm = fft_norm
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass of the FourierUnit class.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+
+        Returns:
+            torch.Tensor: Output tensor.
+        """
         batch = x.shape[0]
 
         if self.spatial_scale_factor is not None:
@@ -835,16 +1313,45 @@ class FourierUnit(nn.Module):
         return output
 
 
-class SpectralTransform(nn.Module):
+class SpectralTransform(torch.nn.Module):
+    """
+    Spectral transform.
+
+    Args:
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        stride (int, optional): Stride. (default: 1)
+        groups (int, optional): Number of groups. (default: 1)
+        enable_lfu (bool, optional): Enable local Fourier unit. (default: True)
+        **fu_kwargs (dict, optional): Fourier unit kwargs. (default: {})
+
+
+    Inherited from torch.nn.Module
+    """
+
     def __init__(
         self,
-        in_channels,
-        out_channels,
-        stride=1,
-        groups=1,
-        enable_lfu=True,
-        **fu_kwargs,
-    ):
+        in_channels: int,
+        out_channels: int,
+        stride: int = 1,
+        groups: int = 1,
+        enable_lfu: bool = True,
+        **fu_kwargs: dict,
+    ) -> None:
+        """
+        Constructor for the SpectralTransform class.
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            stride (int, optional): Stride. (default: 1)
+            groups (int, optional): Number of groups. (default: 1)
+            enable_lfu (bool, optional): Enable local Fourier unit. (default: True)
+            **fu_kwargs (dict, optional): Fourier unit kwargs. (default: {})
+
+        Returns:
+            None
+        """
         # bn_layer not used
         super(SpectralTransform, self).__init__()
         self.enable_lfu = enable_lfu
@@ -868,7 +1375,16 @@ class SpectralTransform(nn.Module):
             out_channels // 2, out_channels, kernel_size=1, groups=groups, bias=False
         )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass of the SpectralTransform class.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+
+        Returns:
+            torch.Tensor: Output tensor.
+        """
 
         x = self.downsample(x)
         x = self.conv1(x)
@@ -892,7 +1408,30 @@ class SpectralTransform(nn.Module):
         return output
 
 
-class FFC(nn.Module):
+class FFC(torch.nn.Module):
+    """
+    Class for the Fourier Feature Convolutional (FFC) network.
+
+    Args:
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        kernel_size (int): Size of the convolutional kernel.
+        ratio_gin (int): Ratio of input channels to be grouped.
+        ratio_gout (int): Ratio of output channels to be grouped.
+        stride (int, optional): Stride of the convolutional kernel. (default: 1)
+        padding (int, optional): Padding of the convolutional kernel. (default: 0)
+        dilation (int, optional): Dilation of the convolutional kernel. (default: 1)
+        groups (int, optional): Number of groups. (default: 1)
+        bias (bool, optional): Whether to use bias or not. (default: False)
+        enable_lfu (bool, optional): Whether to use the local Fourier Unit or not. (default: True)
+        padding_type (str, optional): Type of padding to be used. (default: "reflect")
+        gated (bool, optional): Whether to use the gated version of the Fourier Unit or not. (default: False)
+        **spectral_kwargs: Keyword arguments for the Fourier Unit.
+
+    Inherited from torch.nn.Module.
+
+    """
+
     def __init__(
         self,
         in_channels,
@@ -910,6 +1449,29 @@ class FFC(nn.Module):
         gated=False,
         **spectral_kwargs,
     ):
+        """
+        Constructor method for the FFC class. It initializes the convolutional layer
+        and the Fourier Unit.
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            kernel_size (int): Size of the convolutional kernel.
+            ratio_gin (int): Ratio of input channels to be grouped.
+            ratio_gout (int): Ratio of output channels to be grouped.
+            stride (int, optional): Stride of the convolutional kernel. (default: 1)
+            padding (int, optional): Padding of the convolutional kernel. (default: 0)
+            dilation (int, optional): Dilation of the convolutional kernel. (default: 1)
+            groups (int, optional): Number of groups. (default: 1)
+            bias (bool, optional): Whether to use bias or not. (default: False)
+            enable_lfu (bool, optional): Whether to use the local Fourier Unit or not. (default: True)
+            padding_type (str, optional): Type of padding to be used. (default: "reflect")
+            gated (bool, optional): Whether to use the gated version of the Fourier Unit or not. (default: False)
+            **spectral_kwargs: Keyword arguments for the Fourier Unit.
+
+        Returns:
+            None
+        """
         super(FFC, self).__init__()
 
         assert stride == 1 or stride == 2, "Stride should be 1 or 2."
@@ -978,7 +1540,17 @@ class FFC(nn.Module):
         )
         self.gate = module(in_channels, 2, 1)
 
-    def forward(self, x, fname=None):
+    def forward(self, x: torch.Tensor, fname: Union[str, None] = None) -> torch.Tensor:
+        """
+        Forward pass of the FFC class.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+            fname (Union[str, None], optional): Name of the feature map. (default: None) (unused)
+
+        Returns:
+            torch.Tensor: Output tensor.
+        """
         x_l, x_g = x if type(x) is tuple else (x, 0)
         out_xl, out_xg = 0, 0
 
@@ -1003,25 +1575,71 @@ class FFC(nn.Module):
         return out_xl, out_xg
 
 
-class FFC_BN_ACT(nn.Module):
+class FFC_BN_ACT(torch.nn.Module):
+    """
+    Fourier Feature Convolutional Block with Batch Normalization and Activation.
+
+    Args:
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        kernel_size (int): Size of the convolutional kernel.
+        ratio_gin (int): Ratio of input channels to be grouped.
+        ratio_gout (int): Ratio of output channels to be grouped.
+        stride (int, optional): Stride of the convolutional kernel. (default: 1)
+        padding (int, optional): Padding of the convolutional kernel. (default: 0)
+        dilation (int, optional): Dilation of the convolutional kernel. (default: 1)
+        groups (int, optional): Number of groups. (default: 1)
+        bias (bool, optional): Whether to use bias or not. (default: False)
+        norm_layer (torch.nn.Module, optional): Normalization layer to be used. (default: nn.SyncBatchNorm)
+        activation_layer (torch.nn.Module, optional): Activation layer to be used. (default: nn.Identity)
+        padding_type (str, optional): Type of padding to be used. (default: "reflect")
+        enable_lfu (bool, optional): Whether to use LFU or not. (default: True)
+        **kwargs: Keyword arguments for the SpectralTransform class.
+
+    Inherited from torch.nn.Module.
+    """
+
     def __init__(
         self,
-        in_channels,
-        out_channels,
-        kernel_size,
-        ratio_gin,
-        ratio_gout,
-        stride=1,
-        padding=0,
-        dilation=1,
-        groups=1,
-        bias=False,
-        norm_layer=nn.SyncBatchNorm,
-        activation_layer=nn.Identity,
-        padding_type="reflect",
-        enable_lfu=True,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int,
+        ratio_gin: int,
+        ratio_gout: int,
+        stride: int = 1,
+        padding: int = 0,
+        dilation: int = 1,
+        groups: int = 1,
+        bias: bool = False,
+        norm_layer: torch.nn.Module = nn.SyncBatchNorm,
+        activation_layer: torch.nn.Module = nn.Identity,
+        padding_type: str = "reflect",
+        enable_lfu: bool = True,
         **kwargs,
-    ):
+    ) -> None:
+        """
+        Constructor method for the FFC_BN_ACT class. It initializes the FFC layer,
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            kernel_size (int): Size of the convolutional kernel.
+            ratio_gin (int): Ratio of input channels to be grouped.
+            ratio_gout (int): Ratio of output channels to be grouped.
+            stride (int, optional): Stride of the convolutional kernel. (default: 1)
+            padding (int, optional): Padding of the convolutional kernel. (default: 0)
+            dilation (int, optional): Dilation of the convolutional kernel. (default: 1)
+            groups (int, optional): Number of groups. (default: 1)
+            bias (bool, optional): Whether to use bias or not. (default: False)
+            norm_layer (torch.nn.Module, optional): Normalization layer to be used. (default: nn.SyncBatchNorm)
+            activation_layer (torch.nn.Module, optional): Activation layer to be used. (default: nn.Identity)
+            padding_type (str, optional): Type of padding to be used. (default: "reflect")
+            enable_lfu (bool, optional): Whether to use LFU or not. (default: True)
+            **kwargs: Keyword arguments for the SpectralTransform class.
+
+        Returns:
+            None
+        """
         super(FFC_BN_ACT, self).__init__()
         self.ffc = FFC(
             in_channels,
@@ -1049,7 +1667,17 @@ class FFC_BN_ACT(nn.Module):
         self.act_l = lact(inplace=True)
         self.act_g = gact(inplace=True)
 
-    def forward(self, x, fname=None):
+    def forward(self, x: torch.Tensor, fname: Union[str, None] = None) -> torch.Tensor:
+        """
+        Forward pass of the FFC_BN_ACT class.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+            fname (Union[str, None], optional): Name of the feature to be extracted. (default: None)
+
+        Returns:
+            torch.Tensor: Output tensor.
+        """
         x_l, x_g = self.ffc(
             x,
             fname=fname,
@@ -1060,6 +1688,24 @@ class FFC_BN_ACT(nn.Module):
 
 
 class FFCResnetBlock(nn.Module):
+    """
+    Fourier Feature Convolutional Residual Block. It consists of two FFC_BN_ACT blocks.
+    The output of the first block is added to the input of the second block.
+
+    Args:
+        dim (int): Number of channels.
+        padding_type (str): Type of padding to be used.
+        norm_layer (torch.nn.Module): Normalization layer to be used.
+        activation_layer (torch.nn.Module, optional): Activation layer to be used. (default: nn.ReLU)
+        dilation (int, optional): Dilation of the convolutional kernel. (default: 1)
+        spatial_transform_kwargs (Union[dict, None], optional): Keyword arguments for the SpectralTransform class. (default: None)
+        inline (bool, optional): Whether to use inline or not. (default: False)
+        ratio_gin (float, optional): Ratio of input channels to be grouped. (default: 0.75)
+        ratio_gout (float, optional): Ratio of output channels to be grouped. (default: 0.75)
+
+    Inherited from torch.nn.Module.
+    """
+
     def __init__(
         self,
         dim,
@@ -1072,6 +1718,23 @@ class FFCResnetBlock(nn.Module):
         ratio_gin=0.75,
         ratio_gout=0.75,
     ):
+        """
+        Constructor method for the FFCResnetBlock class. It initializes the FFCResnetBlock layer.
+
+        Args:
+            dim (int): Number of channels.
+            padding_type (str): Type of padding to be used.
+            norm_layer (torch.nn.Module): Normalization layer to be used.
+            activation_layer (torch.nn.Module, optional): Activation layer to be used. (default: nn.ReLU)
+            dilation (int, optional): Dilation of the convolutional kernel. (default: 1)
+            spatial_transform_kwargs (Union[dict, None], optional): Keyword arguments for the SpectralTransform class. (default: None)
+            inline (bool, optional): Whether to use inline or not. (default: False)
+            ratio_gin (float, optional): Ratio of input channels to be grouped. (default: 0.75)
+            ratio_gout (float, optional): Ratio of output channels to be grouped. (default: 0.75)
+
+        Returns:
+            None
+        """
         super().__init__()
         self.conv1 = FFC_BN_ACT(
             dim,
@@ -1099,7 +1762,17 @@ class FFCResnetBlock(nn.Module):
         )
         self.inline = inline
 
-    def forward(self, x, fname=None):
+    def forward(self, x: torch.Tensor, fname: Union[str, None] = None) -> torch.Tensor:
+        """
+        Forward pass of the FFCResnetBlock class.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+            fname (Union[str, None], optional): Name of the feature to be extracted. (default: None)
+
+        Returns:
+            torch.Tensor: Output tensor.
+        """
         if self.inline:
             x_l, x_g = (
                 x[:, : -self.conv1.ffc.global_in_num],
@@ -1120,8 +1793,27 @@ class FFCResnetBlock(nn.Module):
         return out
 
 
-class ConcatTupleLayer(nn.Module):
-    def forward(self, x):
+class ConcatTupleLayer(torch.nn.Module):
+    """
+    Concatenate tuple of tensors along the channel dimension.
+
+    Args:
+        x (Tuple[torch.Tensor, torch.Tensor]): Tuple of tensors.
+
+    Inherited from torch.nn.Module.
+    """
+
+    def forward(self, x: Tuple[torch.Tensor, torch.Tensor]) -> torch.Tensor:
+        """
+        Forward pass of the ConcatTupleLayer class.
+
+        Args:
+            x (Tuple[torch.Tensor, torch.Tensor]): Tuple of tensors.
+
+        Returns:
+            torch.Tensor: Concatenated tensor.
+        """
+
         assert isinstance(x, tuple)
         x_l, x_g = x
         assert torch.is_tensor(x_l) or torch.is_tensor(x_g)
@@ -1131,15 +1823,45 @@ class ConcatTupleLayer(nn.Module):
 
 
 class FFCBlock(torch.nn.Module):
+    """
+
+    FFCBlock class. This class implements the FFCBlock module. It is a
+    combination of a FFCResnetBlock and a ConcatTupleLayer.
+
+    Args:
+        dim (int): Number of output/input channels.
+        kernel_size (int): Width and height of the convolution kernel.
+        padding (int): Padding size.
+        ratio_gin (float, optional): Ratio of global channels in the input. (default: 0.75)
+        ratio_gout (float, optional): Ratio of global channels in the output. (default: 0.75)
+        activation (str, optional): Activation function: 'relu', 'lrelu', etc. (default: 'linear')
+
+    Inherited from torch.nn.Module.
+    """
+
     def __init__(
         self,
-        dim,  # Number of output/input channels.
-        kernel_size,  # Width and height of the convolution kernel.
-        padding,
-        ratio_gin=0.75,
-        ratio_gout=0.75,
-        activation="linear",  # Activation function: 'relu', 'lrelu', etc.
-    ):
+        dim: int,
+        kernel_size: int,
+        padding: int,
+        ratio_gin: float = 0.75,
+        ratio_gout: float = 0.75,
+        activation: str = "linear",
+    ) -> None:
+        """
+        Constructor method for the FFCBlock class.
+
+        Args:
+            dim (int): Number of output/input channels.
+            kernel_size (int): Width and height of the convolution kernel.
+            padding (int): Padding size.
+            ratio_gin (float, optional): Ratio of global channels in the input. (default: 0.75)
+            ratio_gout (float, optional): Ratio of global channels in the output. (default: 0.75)
+            activation (str, optional): Activation function: 'relu', 'lrelu', etc. (default: 'linear')
+
+        Returns:
+            None
+        """
         super().__init__()
         if activation == "linear":
             self.activation = nn.Identity
@@ -1159,7 +1881,19 @@ class FFCBlock(torch.nn.Module):
 
         self.concat_layer = ConcatTupleLayer()
 
-    def forward(self, gen_ft, mask, fname=None):
+    def forward(
+        self, gen_ft: torch.Tensor, mask: torch.Tensor, fname: Union[str, None] = None
+    ) -> torch.Tensor:
+        """
+        Forward pass of the FFCBlock class.
+
+        Args:
+            gen_ft (torch.Tensor): Generated feature tensor.
+            mask (torch.Tensor): Mask tensor (unused).
+            fname (Union[str, None], optional): Filename. (default: None)
+        Returns:
+            torch.Tensor: Output tensor.
+        """
         x = gen_ft.float()
 
         x_l, x_g = (
@@ -1176,6 +1910,20 @@ class FFCBlock(torch.nn.Module):
 
 
 class FFCSkipLayer(torch.nn.Module):
+    """
+    FFCSkipLayer class. This class is used to skip the FFCBlock.
+    It is used in the case of the first block of the generator and the last block of the discriminator
+    to avoid the concatenation of the global feature map with the local feature map of the previous block.
+
+    Args:
+        dim (int): Number of input/output channels.
+        kernel_size (int, optional): Convolution kernel size. (default: 3)
+        ratio_gin (float, optional): Ratio of global input channels. (default: 0.75)
+        ratio_gout (float, optional): Ratio of global output channels. (default: 0.75)
+
+    Inherited from torch.nn.Module.
+    """
+
     def __init__(
         self,
         dim,  # Number of input/output channels.
@@ -1183,6 +1931,18 @@ class FFCSkipLayer(torch.nn.Module):
         ratio_gin=0.75,
         ratio_gout=0.75,
     ):
+        """
+        Constructor method for the FFCSkipLayer class.
+
+        Args:
+            dim (int): Number of input/output channels.
+            kernel_size (int, optional): Convolution kernel size. (default: 3)
+            ratio_gin (float, optional): Ratio of global input channels. (default: 0.75)
+            ratio_gout (float, optional): Ratio of global output channels. (default: 0.75)
+
+        Returns:
+            None
+        """
         super().__init__()
         self.padding = kernel_size // 2
 
@@ -1195,12 +1955,49 @@ class FFCSkipLayer(torch.nn.Module):
             ratio_gout=ratio_gout,
         )
 
-    def forward(self, gen_ft, mask, fname=None):
+    def forward(
+        self,
+        gen_ft: torch.Tensor,
+        mask: torch.Tensor,
+        fname: Union[str, None] = None,
+    ) -> torch.Tensor:
+        """
+        Forward pass of the FFCSkipLayer class.
+
+        Args:
+            gen_ft (torch.Tensor): Input tensor.
+            mask (torch.Tensor): Input mask.
+            fname (Union[str, None], optional): Name of the file to save the feature maps. (default: None)
+
+        Returns:
+            torch.Tensor: Output tensor.
+        """
         x = self.ffc_act(gen_ft, mask, fname=fname)
         return x
 
 
 class SynthesisBlock(torch.nn.Module):
+    """
+    Synthesis block of the generator. It consists of a convolutional layer, an FFC layer, and an activation layer.
+    The FFC layer is optional.
+
+    Args:
+        in_channels (int): Number of input channels, 0 = first block.
+        out_channels (int): Number of output channels.
+        w_dim (int): Intermediate latent (W) dimensionality.
+        resolution (int): Resolution of this block.
+        img_channels (int): Number of output color channels.
+        is_last (bool): Is this the last block
+        architecture (str, optional): Architecture: 'orig', 'skip', 'resnet'.
+        resample_filter (List[int], optional): Low-pass filter to apply when resampling activations. (default: [1, 3, 3, 1])
+        conv_clamp([Union[float, None]], optional): Clamp the output of convolution layers to +-X, None = disable clamping. (default: None)
+        use_fp16 (bool, optional): Use FP16 for this block? (default: False)
+        fp16_channels_last (bool, optional): Use channels-last memory format with FP16? (default: False)
+        **layer_kwargs (dict): Arguments for SynthesisLayer.
+
+    Inherited from torch.nn.Module.
+    """
+
     def __init__(
         self,
         in_channels,  # Number of input channels, 0 = first block.
@@ -1220,7 +2017,29 @@ class SynthesisBlock(torch.nn.Module):
         use_fp16=False,  # Use FP16 for this block?
         fp16_channels_last=False,  # Use channels-last memory format with FP16?
         **layer_kwargs,  # Arguments for SynthesisLayer.
-    ):
+    ) -> None:
+        """
+        Resolution-specific synthesis block. This block takes a batch of latent vectors and
+        produces a batch of images. The images are not necessarily square -- use the 'img_channels'
+        argument to control the number of channels in the output image.
+
+        Args:
+            in_channels (int): Number of input channels, 0 = first block.
+            out_channels (int): Number of output channels.
+            w_dim (int): Intermediate latent (W) dimensionality.
+            resolution (int): Resolution of this block.
+            img_channels (int): Number of output color channels.
+            is_last (bool): Is this the last block
+            architecture (str, optional): Architecture: 'orig', 'skip', 'resnet'.
+            resample_filter (List[int], optional): Low-pass filter to apply when resampling activations. (default: [1, 3, 3, 1])
+            conv_clamp([Union[float, None]], optional): Clamp the output of convolution layers to +-X, None = disable clamping. (default: None)
+            use_fp16 (bool, optional): Use FP16 for this block? (default: False)
+            fp16_channels_last (bool, optional): Use channels-last memory format with FP16? (default: False)
+            **layer_kwargs (dict): Arguments for SynthesisLayer.
+
+        Returns:
+            None
+        """
         assert architecture in ["orig", "skip", "resnet"]
         super().__init__()
         self.in_channels = in_channels
@@ -1294,17 +2113,34 @@ class SynthesisBlock(torch.nn.Module):
 
     def forward(
         self,
-        x,
-        mask,
-        feats,
-        img,
-        ws,
-        fname=None,
-        force_fp32=False,
-        fused_modconv=None,
-        **layer_kwargs,
-    ):
-        dtype = torch.float16 if self.use_fp16 and not force_fp32 else torch.float32
+        x: torch.Tensor,
+        mask: torch.Tensor,
+        feats: List[torch.Tensor],
+        img: torch.Tensor,
+        ws: List[torch.Tensor],
+        fname: Union[str, None] = None,
+        force_fp32: bool = False,
+        fused_modconv: Union[torch.nn.Module, None] = None,
+        **layer_kwargs: dict,
+    ) -> torch.Tensor:
+        """
+        Forward pass for SynthesisBlock.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+            mask (torch.Tensor): Mask tensor.
+            feats (List[torch.Tensor]): List of feature tensors.
+            img (torch.Tensor): Output image tensor.
+            ws (torch.Tensor): Intermediate latent (W) tensor.
+            fname (Union[str, None], optional): Filename for saving intermediate results. (default: None)
+            force_fp32 (bool, optional): Force FP32 for this block (default: False)
+            fused_modconv (Union[torch.nn.Module, None], optional): Fused modulated convolution layer. (default: None)
+            layer_kwargs (dict): Arguments for SynthesisLayer.
+
+        Returns:
+            torch.Tensor: Output tensor.
+        """
+
         dtype = torch.float32
         memory_format = (
             torch.channels_last
@@ -1381,17 +2217,50 @@ class SynthesisBlock(torch.nn.Module):
 
 
 class SynthesisNetwork(torch.nn.Module):
+    """
+    Synthesis network. (Generator)
+
+    Args:
+        w_dim (int): Intermediate latent (W) dimensionality.
+        z_dim (int): Output Latent (Z) dimensionality.
+        img_resolution (int): Output image resolution.
+        img_channels (int): Number of color channels.
+        channel_base (int, optional): Overall multiplier for the number of channels. (default: 16384)
+        channel_max (int, optional): Maximum number of channels in any layer. (default: 512)
+        num_fp16_res (int, optional): Use FP16 for the N highest resolutions. (default: 0)
+        **block_kwargs (dict, optional): Arguments for SynthesisBlock. (default: {})
+
+    Inherits from torch.nn.Module.
+    """
+
     def __init__(
         self,
-        w_dim,  # Intermediate latent (W) dimensionality.
-        z_dim,  # Output Latent (Z) dimensionality.
-        img_resolution,  # Output image resolution.
-        img_channels,  # Number of color channels.
-        channel_base=16384,  # Overall multiplier for the number of channels.
-        channel_max=512,  # Maximum number of channels in any layer.
-        num_fp16_res=0,  # Use FP16 for the N highest resolutions.
-        **block_kwargs,  # Arguments for SynthesisBlock.
-    ):
+        w_dim: int,
+        z_dim: int,
+        img_resolution: int,
+        img_channels: int,
+        channel_base: int = 16384,
+        channel_max: int = 512,
+        num_fp16_res: int = 0,
+        **block_kwargs: dict,
+    ) -> None:
+        """
+        Constructs a SynthesisNetwork object.
+
+        Args:
+            w_dim (int): Intermediate latent (W) dimensionality.
+            z_dim (int): Output Latent (Z) dimensionality.
+            img_resolution (int): Output image resolution.
+            img_channels (int): Number of color channels.
+            channel_base (int, optional): Overall multiplier for the number of channels. (default: 16384)
+            channel_max (int, optional): Maximum number of channels in any layer. (default: 512)
+            num_fp16_res (int, optional): Use FP16 for the N highest resolutions. (default: 0)
+            **block_kwargs (dict, optional): Arguments for SynthesisBlock. (default: {})
+
+        Returns:
+            None
+        """
+
         assert img_resolution >= 4 and img_resolution & (img_resolution - 1) == 0
         super().__init__()
         self.w_dim = w_dim
@@ -1435,7 +2304,29 @@ class SynthesisNetwork(torch.nn.Module):
             )
             setattr(self, f"b{res}", block)
 
-    def forward(self, x_global, mask, feats, ws, fname=None, **block_kwargs):
+    def forward(
+        self,
+        x_global: torch.Tensor,
+        mask: torch.Tensor,
+        feats: dict,
+        ws: list,
+        fname: Union[str, None],
+        **block_kwargs: dict,
+    ) -> torch.Tensor:
+        """
+        Forward pass for the synthesis network.
+
+        Args:
+            x_global (torch.Tensor): Global latent vector.
+            mask (torch.Tensor): Mask for the foreground.
+            feats (dict): Dictionary of features from the encoder.
+            ws (list): List of intermediate latent vectors.
+            fname (Union[str, None]): Filename to save the intermediate images. If None, no images are saved. (default: None)
+            block_kwargs (dict): Arguments for SynthesisBlock.
+
+        Returns:
+            torch.Tensor: Output image.
+        """
 
         img = None
 
@@ -1470,19 +2361,56 @@ class SynthesisNetwork(torch.nn.Module):
 
 
 class MappingNetwork(torch.nn.Module):
+    """
+    Mapping network from latent vectors z to intermediate latent vectors w.
+
+    Args:
+        z_dim (int): Input latent (Z) dimensionality, 0 = no latent.
+        c_dim (int): Conditioning label (C) dimensionality, 0 = no label.
+        w_dim (int): Intermediate latent (W) dimensionality.
+        num_ws (int): Number of intermediate latents to output, None = do not broadcast.
+        num_layers (int, optional): Number of mapping layers. (default: 8)
+        embed_features (Union[int, None], optional): Label embedding dimensionality, None = same as w_dim. (default: None)
+        layer_features (Union[int, None], optional): Number of intermediate features in the mapping layers, None = same as w_dim. (default: None)
+        activation (str, optional): Activation function: 'relu', 'lrelu', etc. (default: 'lrelu')
+        lr_multiplier (float, optional): Learning rate multiplier for the mapping layers. (default: 0.01)
+        w_avg_beta (Union[float, None], optional): Decay for tracking the moving average of W during training, None = do not track. (default: 0.995)
+
+    Inherited from torch.nn.Module
+    """
+
     def __init__(
         self,
-        z_dim,  # Input latent (Z) dimensionality, 0 = no latent.
-        c_dim,  # Conditioning label (C) dimensionality, 0 = no label.
-        w_dim,  # Intermediate latent (W) dimensionality.
-        num_ws,  # Number of intermediate latents to output, None = do not broadcast.
-        num_layers=8,  # Number of mapping layers.
-        embed_features=None,  # Label embedding dimensionality, None = same as w_dim.
-        layer_features=None,  # Number of intermediate features in the mapping layers, None = same as w_dim.
-        activation="lrelu",  # Activation function: 'relu', 'lrelu', etc.
-        lr_multiplier=0.01,  # Learning rate multiplier for the mapping layers.
-        w_avg_beta=0.995,  # Decay for tracking the moving average of W during training, None = do not track.
-    ):
+        z_dim: int,
+        c_dim: int,
+        w_dim: int,
+        num_ws: int,
+        num_layers: int = 8,
+        embed_features: Union[int, None] = None,
+        layer_features: Union[int, None] = None,
+        activation: str = "lrelu",
+        lr_multiplier: float = 0.01,
+        w_avg_beta: float = 0.995,
+    ) -> None:
+        """
+        Construct a MappingNetwork object.
+
+        Args:
+            z_dim (int): Input latent (Z) dimensionality, 0 = no latent.
+            c_dim (int): Conditioning label (C) dimensionality, 0 = no label.
+            w_dim (int): Intermediate latent (W) dimensionality.
+            num_ws (int): Number of intermediate latents to output, None = do not broadcast.
+            num_layers (int, optional): Number of mapping layers. (default: 8)
+            embed_features (Union[int, None], optional): Label embedding dimensionality, None = same as w_dim. (default: None)
+            layer_features (Union[int, None], optional): Number of intermediate features in the mapping layers, None = same as w_dim. (default: None)
+            activation (str, optional): Activation function: 'relu', 'lrelu', etc. (default: 'lrelu')
+            lr_multiplier (float, optional): Learning rate multiplier for the mapping layers. (default: 0.01)
+            w_avg_beta (Union[float, None], optional): Decay for tracking the moving average of W during training, None = do not track. (default: 0.995)
+
+        Returns:
+            None
+
+        """
         super().__init__()
         self.z_dim = z_dim
         self.c_dim = c_dim
@@ -1518,8 +2446,26 @@ class MappingNetwork(torch.nn.Module):
             self.register_buffer("w_avg", torch.zeros([w_dim]))
 
     def forward(
-        self, z, c, truncation_psi=1, truncation_cutoff=None, skip_w_avg_update=False
-    ):
+        self,
+        z: torch.Tensor,
+        c: torch.Tensor,
+        truncation_psi: int = 1,
+        truncation_cutoff: Union[int, None] = None,
+        skip_w_avg_update: bool = False,
+    ) -> torch.Tensor:
+        """
+        Forward pass of the mapping network.
+
+        Args:
+            z (torch.Tensor): Input latent tensor, shape = [batch_size, z_dim].
+            c (torch.Tensor): Conditioning label tensor, shape = [batch_size, c_dim].
+            truncation_psi (Union[float, None], optional): Style strength multiplier for the truncation trick. None = disable. (default: 1.0)
+            truncation_cutoff (Union[int, None], optional): Number of layers for which to apply the truncation trick. None = disable. (default: None)
+            skip_w_avg_update (bool, optional): If True, skip updating the moving average of W during training. (default: False)
+
+        Returns:
+            torch.Tensor: Output tensor, shape = [batch_size, num_ws, w_dim].
+        """
         # Embed, normalize, and concat inputs.
         x = None
         with torch.autograd.profiler.record_function("input"):
@@ -1668,6 +2614,17 @@ FCF_MODEL_URL = os.environ.get(
 
 
 class FcF(InpaintModel):
+    """
+    FcF model class. This class is used to load the FcF model and perform inference.
+    It is based on the FcF model from the paper "Free-Form Image Inpainting with Gated Convolution"
+    (https://arxiv.org/abs/1806.03589).
+
+    Args:
+        device (torch.device): Device to use for inference.
+
+    Inherits from InpaintModel.
+    """
+
     min_size = 512
     pad_mod = 512
     pad_to_square = True
@@ -1677,7 +2634,7 @@ class FcF(InpaintModel):
         Initialize the model and load the weights
 
         Args:
-            device: torch.device
+            device (torch.device): Device to load the model on.
 
         Returns:
             None
