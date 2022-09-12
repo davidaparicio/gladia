@@ -1,6 +1,9 @@
 from gladia_api_utils.model_management import download_model
-from apis.image.image.background_removal_models.OnnxBackgroundRemoval import OnnxBackgroundRemoval
 from PIL import Image
+
+from apis.image.image.background_removal_models.OnnxBackgroundRemoval import (
+    OnnxBackgroundRemoval,
+)
 
 MODEL_PATH = download_model(
     url="https://huggingface.co/Gladiaio/databuzzword_xception_onnx/resolve/main/databuzzword_xception_onnx.onnx",
