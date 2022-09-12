@@ -1,0 +1,30 @@
+import torch
+from transformers import T5ForConditionalGeneration,T5Tokenizer
+
+from typing import Dict, Union
+
+
+def predict(text: str, max_len: int=256) -> Dict[str, Union[str, Dict[str, float]]]:
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    model = T5ForConditionalGeneration.from_pretrained("Michau/t5-base-en-generate-headline")
+    tokenizer = T5Tokenizer.from_pretrained("Michau/t5-base-en-generate-headline")
+    model = model.to(device)
+
+
+    encoding = tokenizer.encode_plus(text, return_tensors = "pt")
+    input_ids = encoding["input_ids"].to(device)
+    attention_masks = encoding["attention_mask"].to(device)
+
+    beam_outputs = model.generate(
+        input_ids = input_ids,
+        attention_mask = attention_masks,
+        max_length = max_len,
+        num_beams = 3,
+        early_stopping = True,
+    )
+
+    result = tokenizer.decode(beam_outputs[0]).replace("<pad> ", "").replace("</s>", "")
+    
+    return {"prediction": result, "prediction_raw": result}
