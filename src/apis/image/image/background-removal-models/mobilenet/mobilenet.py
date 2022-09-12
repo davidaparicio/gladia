@@ -1,5 +1,5 @@
 from gladia_api_utils.model_management import download_model
-from gladia_api_utils.OnnxBackgroundRemoval import OnnxBackgroundRemoval
+from apis.image.image.background_removal_models.OnnxBackgroundRemoval import OnnxBackgroundRemoval
 from PIL import Image
 
 MODEL_PATH = download_model(
