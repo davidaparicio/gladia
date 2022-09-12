@@ -1,5 +1,6 @@
 import os
 import random
+from typing import List, Tuple, Union
 
 import cv2
 import numpy as np
@@ -25,24 +26,58 @@ from .utils import (
 )
 
 
-class ModulatedConv2d(nn.Module):
+class ModulatedConv2d(torch.nn.Module):
+    """
+    2d convolution with style modulation.
+
+    Args:
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        kernel_size (int): Width and height of the convolution kernel.
+        style_dim (int): dimension of the style code
+        demodulate (bool, optional): perfrom demodulation. (default: True)
+        up (int, optional): Integer upsampling factor. (default: 1)
+        down (int, optional): Integer downsampling factor. (default: 1)
+        resample_filter (List[int, int, int, int], optional): Low-pass filter to apply when resampling activations. (default: [1, 3, 3, 1])
+        conv_clamp (Union[float, None], optional): Clamp the output to +-X, None = disable clamping. (default: None)
+
+    Inherited from torch.nn.Module
+    """
+
     def __init__(
         self,
-        in_channels,  # Number of input channels.
-        out_channels,  # Number of output channels.
-        kernel_size,  # Width and height of the convolution kernel.
-        style_dim,  # dimension of the style code
-        demodulate=True,  # perfrom demodulation
-        up=1,  # Integer upsampling factor.
-        down=1,  # Integer downsampling factor.
-        resample_filter=[
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int,
+        style_dim: int,
+        demodulate: bool = True,
+        up: int = 1,
+        down: int = 1,
+        resample_filter: List[int] = [
             1,
             3,
             3,
             1,
-        ],  # Low-pass filter to apply when resampling activations.
-        conv_clamp=None,  # Clamp the output to +-X, None = disable clamping.
-    ):
+        ],
+        conv_clamp: Union[float, None] = None,
+    ) -> None:
+        """
+        Constructor for ModulatedConv2d class.
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            kernel_size (int): Width and height of the convolution kernel.
+            style_dim (int): dimension of the style code
+            demodulate (bool, optional): perfrom demodulation. (default: True)
+            up (int, optional): Integer upsampling factor. (default: 1)
+            down (int, optional): Integer downsampling factor. (default: 1)
+            resample_filter (List[int, int, int, int], optional): Low-pass filter to apply when resampling activations. (default: [1, 3, 3, 1])
+            conv_clamp (Union[float, None], optional): Clamp the output to +-X, None = disable clamping. (default: None)
+
+        Returns:
+            None
+        """
         super().__init__()
         self.demodulate = demodulate
 
@@ -60,7 +95,17 @@ class ModulatedConv2d(nn.Module):
 
         self.affine = FullyConnectedLayer(style_dim, in_channels, bias_init=1)
 
-    def forward(self, x, style):
+    def forward(self, x: torch.Tensor, style: torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass of ModulatedConv2d.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (N, C, H, W).
+            style (torch.Tensor): Style tensor of shape (N, style_dim).
+
+        Returns:
+            torch.Tensor: Output tensor of shape (N, C, H, W).
+        """
         batch, in_channels, height, width = x.shape
         style = self.affine(style).view(batch, 1, in_channels, 1, 1)
         weight = self.weight * self.weight_gain * style
@@ -88,25 +133,58 @@ class ModulatedConv2d(nn.Module):
 
 
 class StyleConv(torch.nn.Module):
+    """
+    Style convolution layer.
+
+    Args:
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        style_dim (int): Intermediate latent (W) dimensionality.
+        resolution (int): Resolution of this layer.
+        kernel_size (int, optional): Convolution kernel size. (default: 3)
+        up (int, optional): Integer upsampling factor. (default: 1)
+        use_noise (bool, optional): Enable noise input? (default: False)
+        activation (str, optional): Activation function: 'relu', 'lrelu', etc. (default: 'lrelu')
+        resample_filter (List[int], optional): Low-pass filter to apply when resampling activations. (default: [1, 3, 3, 1])
+        conv_clamp (Union[float, None], optional): Clamp the output of convolution layers to +-X, None = disable clamping. (default: None)
+        demodulate (bool, optional): perform demodulation. (default: True)
+
+    Inherited from torch.nn.Module
+    """
+
     def __init__(
         self,
-        in_channels,  # Number of input channels.
-        out_channels,  # Number of output channels.
-        style_dim,  # Intermediate latent (W) dimensionality.
-        resolution,  # Resolution of this layer.
-        kernel_size=3,  # Convolution kernel size.
-        up=1,  # Integer upsampling factor.
-        use_noise=False,  # Enable noise input?
-        activation="lrelu",  # Activation function: 'relu', 'lrelu', etc.
-        resample_filter=[
-            1,
-            3,
-            3,
-            1,
-        ],  # Low-pass filter to apply when resampling activations.
-        conv_clamp=None,  # Clamp the output of convolution layers to +-X, None = disable clamping.
-        demodulate=True,  # perform demodulation
+        in_channels: int,
+        out_channels: int,
+        style_dim: int,
+        resolution: int,
+        kernel_size: int = 3,
+        up: int = 1,
+        use_noise: bool = False,
+        activation: str = "lrelu",
+        resample_filter: List[int] = [1, 3, 3, 1],
+        conv_clamp: Union[float, None] = None,
+        demodulate: bool = True,
     ):
+        """
+        Constructor for StyleConv class.
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            style_dim (int): Intermediate latent (W) dimensionality.
+            resolution (int): Resolution of this layer.
+            kernel_size (int, optional): Convolution kernel size. (default: 3)
+            up (int, optional): Integer upsampling factor. (default: 1)
+            use_noise (bool, optional): Enable noise input? (default: False)
+            activation (str, optional): Activation function: 'relu', 'lrelu', etc. (default: 'lrelu')
+            resample_filter (List[int], optional): Low-pass filter to apply when resampling activations. (default: [1, 3, 3, 1])
+            conv_clamp (Union[float, None], optional): Clamp the output of convolution layers to +-X, None = disable clamping. (default: None)
+            demodulate (bool, optional): perform demodulation. (default: True)
+
+        Returns:
+            None
+        """
         super().__init__()
 
         self.conv = ModulatedConv2d(
@@ -131,7 +209,25 @@ class StyleConv(torch.nn.Module):
         self.act_gain = activation_funcs[activation].def_gain
         self.conv_clamp = conv_clamp
 
-    def forward(self, x, style, noise_mode="random", gain=1):
+    def forward(
+        self,
+        x: torch.Tensor,
+        style: torch.Tensor,
+        noise_mode: str = "random",
+        gain: float = 1.0,
+    ) -> torch.Tensor:
+        """
+        Forward pass of StyleConv.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (N, C, H, W).
+            style (torch.Tensor): Style tensor of shape (N, style_dim).
+            noise_mode (str, optional): Noise mode: 'random', 'const', 'none'. (default: 'random')
+            gain (float, optional): Overall scaling factor. (default: 1.0)
+
+        Returns:
+            torch.Tensor: Output tensor of shape (N, C, H, W).
+        """
         x = self.conv(x, style)
 
         assert noise_mode in ["random", "const", "none"]
@@ -157,16 +253,47 @@ class StyleConv(torch.nn.Module):
 
 
 class ToRGB(torch.nn.Module):
+    """
+    ToRGB layer. Converts convolution output to RGB image.
+
+    Args:
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        style_dim (int): Intermediate latent (W) dimensionality.
+        kernel_size (int, optional): Convolution kernel size. (default: 1)
+        resample_filter (List[int, int, int, int], optional): Low-pass filter to apply when resampling activations. (default: [1, 3, 3, 1])
+        conv_clamp (Union[float, None], optional): Clamp the output of convolution layers to +-X, None = disable clamping. (default: None)
+        demodulate (bool, optional): perform demodulation. (default: False)
+
+    Inherited from torch.nn.Module
+    """
+
     def __init__(
         self,
-        in_channels,
-        out_channels,
-        style_dim,
-        kernel_size=1,
-        resample_filter=[1, 3, 3, 1],
+        in_channels: int,
+        out_channels: int,
+        style_dim: int,
+        kernel_size: int = 1,
+        resample_filter: List[int] = [1, 3, 3, 1],
         conv_clamp=None,
         demodulate=False,
-    ):
+    ) -> None:
+        """
+        Constructor for ToRGB class.
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            style_dim (int): Intermediate latent (W) dimensionality.
+            kernel_size (int, optional): Convolution kernel size. (default: 1)
+            resample_filter (List[int, int, int, int], optional): Low-pass filter to apply when resampling activations. (default: [1, 3, 3, 1])
+            conv_clamp (Union[float, None], optional): Clamp the output of convolution layers to +-X, None = disable clamping. (default: None)
+            demodulate (bool, optional): perform demodulation. (default: False)
+
+        Returns:
+            None
+        """
+
         super().__init__()
 
         self.conv = ModulatedConv2d(
@@ -182,7 +309,23 @@ class ToRGB(torch.nn.Module):
         self.register_buffer("resample_filter", setup_filter(resample_filter))
         self.conv_clamp = conv_clamp
 
-    def forward(self, x, style, skip=None):
+    def forward(
+        self,
+        x: torch.Tensor,
+        style: torch.Tensor,
+        skip: Union[torch.Tensor, None] = None,
+    ) -> torch.Tensor:
+        """
+        Forward pass of ToRGB.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (N, C, H, W).
+            style (torch.Tensor): Style tensor of shape (N, style_dim).
+            skip (torch.Tensor, optional): Skip tensor of shape (N, C, H, W). (default: None)
+
+        Returns:
+            torch.Tensor: Output tensor of shape (N, C, H, W).
+        """
         x = self.conv(x, style)
         out = bias_act(x, self.bias, clamp=self.conv_clamp)
 
@@ -194,21 +337,55 @@ class ToRGB(torch.nn.Module):
         return out
 
 
-def get_style_code(a, b):
+def get_style_code(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
+    """
+    Get style code from two images.
+
+    Args:
+        a (torch.Tensor): Image tensor of shape (N, C, H, W).
+        b (torch.Tensor): Image tensor of shape (N, C, H, W).
+
+    Returns:
+        torch.Tensor: Style code tensor of shape (N, style_dim).
+    """
     return torch.cat([a, b], dim=1)
 
 
-class DecBlockFirst(nn.Module):
+class DecBlockFirst(torch.nn.Module):
+    """
+    Decoder block for the first block.
+
+    Args:
+
+
+    Inherited from torch.nn.Module
+    """
+
     def __init__(
         self,
-        in_channels,
-        out_channels,
-        activation,
-        style_dim,
-        use_noise,
-        demodulate,
-        img_channels,
-    ):
+        in_channels: int,
+        out_channels: int,
+        activation: str,
+        style_dim: int,
+        use_noise: bool,
+        demodulate: bool,
+        img_channels: int,
+    ) -> None:
+        """
+        Constructor for DecBlockFirst class.
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            activation (str): Activation function: 'relu', 'lrelu'.
+            style_dim (int): Intermediate latent (W) dimensionality.
+            use_noise (bool): Enable noise input.
+            demodulate (bool): perform demodulation.
+            img_channels (int): Number of output image channels.
+
+        Returns:
+            None
+        """
         super().__init__()
         self.fc = FullyConnectedLayer(
             in_features=in_channels * 2,
@@ -233,7 +410,27 @@ class DecBlockFirst(nn.Module):
             demodulate=False,
         )
 
-    def forward(self, x, ws, gs, E_features, noise_mode="random"):
+    def forward(
+        self,
+        x: torch.Tensor,
+        ws: torch.Tensor,
+        gs: torch.Tensor,
+        E_features: torch.Tensor,
+        noise_mode: str = "random",
+    ) -> torch.Tensor:
+        """
+        Forward pass of DecBlockFirst.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (N, C, H, W).
+            ws (torch.Tensor): Style tensor of shape (N, num_layers, style_dim).
+            gs (torch.Tensor): Style tensor of shape (N, num_layers, style_dim).
+            E_features (torch.Tensor): Style tensor of shape (N, num_layers, style_dim).
+            noise_mode (str, optional): Noise mode: 'random', 'const'. (default: 'random')
+
+        Returns:
+            torch.Tensor: Output tensor of shape (N, C, H, W).
+        """
         x = self.fc(x).view(x.shape[0], -1, 4, 4)
         x = x + E_features[2]
         style = get_style_code(ws[:, 0], gs)
@@ -244,17 +441,48 @@ class DecBlockFirst(nn.Module):
         return x, img
 
 
-class DecBlockFirstV2(nn.Module):
+class DecBlockFirstV2(torch.nn.Module):
+    """
+    Decoder block for the first block.
+
+    Args:
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        activation (str): Activation function: 'relu', 'lrelu'.
+        style_dim (int): Intermediate latent (W) dimensionality.
+        use_noise (bool): Enable noise input.
+        demodulate (bool): perform demodulation.
+        img_channels (int): Number of output image channels.
+
+    Inherited from torch.nn.Module
+
+    """
+
     def __init__(
         self,
-        in_channels,
-        out_channels,
-        activation,
-        style_dim,
-        use_noise,
-        demodulate,
-        img_channels,
-    ):
+        in_channels: int,
+        out_channels: int,
+        activation: str,
+        style_dim: int,
+        use_noise: bool,
+        demodulate: bool,
+        img_channels: int,
+    ) -> None:
+        """
+        Constructor for DecBlockFirst class.
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            activation (str): Activation function: 'relu', 'lrelu'.
+            style_dim (int): Intermediate latent (W) dimensionality.
+            use_noise (bool): Enable noise input.
+            demodulate (bool): perform demodulation.
+            img_channels (int): Number of output image channels.
+
+        Returns:
+            None
+        """
         super().__init__()
         self.conv0 = Conv2dLayer(
             in_channels=in_channels,
@@ -280,7 +508,27 @@ class DecBlockFirstV2(nn.Module):
             demodulate=False,
         )
 
-    def forward(self, x, ws, gs, E_features, noise_mode="random"):
+    def forward(
+        self,
+        x: torch.Tensor,
+        ws: torch.Tensor,
+        gs: torch.Tensor,
+        E_features: torch.Tensor,
+        noise_mode: str = "random",
+    ):
+        """
+        Forward pass of DecBlockFirst.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (N, C, H, W).
+            ws (torch.Tensor): Style tensor of shape (N, num_layers, style_dim).
+            gs (torch.Tensor): Style tensor of shape (N, num_layers, style_dim).
+            E_features (torch.Tensor): Style tensor of shape (N, num_layers, style_dim).
+            noise_mode (str, optional): Noise mode: 'random', 'const'. (default: 'random')
+
+        Returns:
+            torch.Tensor: Output tensor of shape (N, C, H, W).
+        """
         # x = self.fc(x).view(x.shape[0], -1, 4, 4)
         x = self.conv0(x)
         x = x + E_features[2]
@@ -292,18 +540,51 @@ class DecBlockFirstV2(nn.Module):
         return x, img
 
 
-class DecBlock(nn.Module):
+class DecBlock(torch.nn.Module):
+    """
+    Class for decoder block.
+
+    Args:
+        res (int): Resolution of the block.
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        activation (str): Activation function: 'relu', 'lrelu'.
+        style_dim (int): Intermediate latent (W) dimensionality.
+        use_noise (bool): Enable noise input.
+        demodulate (bool): perform demodulation.
+        img_channels (int): Number of output image channels.
+
+    Inherited from `torch.nn.Module`.
+    """
+
     def __init__(
         self,
-        res,
-        in_channels,
-        out_channels,
-        activation,
-        style_dim,
-        use_noise,
-        demodulate,
-        img_channels,
-    ):  # res = 2, ..., resolution_log2
+        res: int,
+        in_channels: int,
+        out_channels: int,
+        activation: str,
+        style_dim: int,
+        use_noise: bool,
+        demodulate: bool,
+        img_channels: int,
+    ) -> None:
+        """
+        Constructor for DecBlock class.
+
+        Args:
+            res (int): Resolution of the block.
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            activation (str): Activation function: 'relu', 'lrelu'.
+            style_dim (int): Intermediate latent (W) dimensionality.
+            use_noise (bool): Enable noise input.
+            demodulate (bool): perform demodulation.
+            img_channels (int): Number of output image channels.
+
+        Returns:
+            None
+        """
+        # res = 2, ..., resolution_log2
         super().__init__()
         self.res = res
 
@@ -336,7 +617,29 @@ class DecBlock(nn.Module):
             demodulate=False,
         )
 
-    def forward(self, x, img, ws, gs, E_features, noise_mode="random"):
+    def forward(
+        self,
+        x: torch.Tensor,
+        img: torch.Tensor,
+        ws: torch.Tensor,
+        gs: torch.Tensor,
+        E_features: torch.Tensor,
+        noise_mode: str = "random",
+    ):
+        """
+        Fopward pass of DecBlock.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (N, C, H, W).
+            img (torch.Tensor): Input tensor of shape (N, C, H, W).
+            ws (torch.Tensor): Style tensor of shape (N, num_layers, style_dim).
+            gs (torch.Tensor): Style tensor of shape (N, num_layers, style_dim).
+            E_features (torch.Tensor): Style tensor of shape (N, num_layers, style_dim).
+            noise_mode (str, optional): Noise mode: 'random', 'const'. (default: 'random')
+
+        Returns:
+            torch.Tensor: Output tensor of shape (N, C, H, W).
+        """
         style = get_style_code(ws[:, self.res * 2 - 5], gs)
         x = self.conv0(x, style, noise_mode=noise_mode)
         x = x + E_features[self.res]
@@ -349,19 +652,55 @@ class DecBlock(nn.Module):
 
 
 class MappingNet(torch.nn.Module):
+    """
+    Class for mapping network.
+
+    Args:
+        z_dim (int): Input latent (Z) dimensionality, 0 = no latent.
+        c_dim (int): Conditioning label (C) dimensionality, 0 = no label.
+        w_dim (int): Intermediate latent (W) dimensionality.
+        num_ws (int): Number of intermediate latents to output, None = do not broadcast.
+        num_layers (int, optional): Number of mapping layers. (default: 8)
+        embed_features (Union[int, None], optional): Label embedding dimensionality, None = same as w_dim. (default: None)
+        layer_features (Union[int, None], optional): Number of intermediate features in the mapping layers, None = same as w_dim. (default: None) (unused)
+        activation (str, optional): Activation function: 'relu', 'lrelu', etc. (default: 'lrelu')
+        lr_multiplier (float, optional): Learning rate multiplier for the mapping layers. (default: 0.01)
+        w_avg_beta (Union[float, None], optional): Decay for tracking the moving average of W during training, None = do not track. (default: 0.995)
+
+    Inherited from `torch.nn.Module`.
+    """
+
     def __init__(
         self,
-        z_dim,  # Input latent (Z) dimensionality, 0 = no latent.
-        c_dim,  # Conditioning label (C) dimensionality, 0 = no label.
-        w_dim,  # Intermediate latent (W) dimensionality.
-        num_ws,  # Number of intermediate latents to output, None = do not broadcast.
-        num_layers=8,  # Number of mapping layers.
-        embed_features=None,  # Label embedding dimensionality, None = same as w_dim.
-        layer_features=None,  # Number of intermediate features in the mapping layers, None = same as w_dim.
-        activation="lrelu",  # Activation function: 'relu', 'lrelu', etc.
-        lr_multiplier=0.01,  # Learning rate multiplier for the mapping layers.
-        w_avg_beta=0.995,  # Decay for tracking the moving average of W during training, None = do not track.
-    ):
+        z_dim: int,
+        c_dim: int,
+        w_dim: int,
+        num_ws: int,
+        num_layers: int = 8,
+        embed_features: Union[int, None] = None,
+        layer_features: Union[int, None] = None,
+        activation: str = "lrelu",
+        lr_multiplier: float = 0.01,
+        w_avg_beta: Union[float, None] = 0.995,
+    ) -> None:
+        """
+        Constructor for MappingNet class.
+
+        Args:
+            z_dim (int): Input latent (Z) dimensionality, 0 = no latent.
+            c_dim (int): Conditioning label (C) dimensionality, 0 = no label.
+            w_dim (int): Intermediate latent (W) dimensionality.
+            num_ws (int): Number of intermediate latents to output, None = do not broadcast.
+            num_layers (int, optional): Number of mapping layers. (default: 8)
+            embed_features (Union[int, None], optional): Label embedding dimensionality, None = same as w_dim. (default: None)
+            layer_features (Union[int, None], optional): Number of intermediate features in the mapping layers, None = same as w_dim. (default: None)
+            activation (str, optional): Activation function: 'relu', 'lrelu', etc. (default: 'lrelu')
+            lr_multiplier (float, optional): Learning rate multiplier for the mapping layers. (default: 0.01)
+            w_avg_beta (Union[float, None], optional): Decay for tracking the moving average of W during training, None = do not track. (default: 0.995)
+
+        Returns:
+            None
+        """
         super().__init__()
         self.z_dim = z_dim
         self.c_dim = c_dim
@@ -397,8 +736,27 @@ class MappingNet(torch.nn.Module):
             self.register_buffer("w_avg", torch.zeros([w_dim]))
 
     def forward(
-        self, z, c, truncation_psi=1, truncation_cutoff=None, skip_w_avg_update=False
-    ):
+        self,
+        z: torch.Tensor,
+        c: torch.Tensor,
+        truncation_psi: float = 1,
+        truncation_cutoff: Union[int, None] = None,
+        skip_w_avg_update: bool = False,
+    ) -> torch.Tensor:
+        """
+        Forward pass of MappingNet.
+
+        Args:
+            z (torch.Tensor): Input tensor of shape (N, z_dim).
+            c (torch.Tensor): Input tensor of shape (N, c_dim).
+            truncation_psi (float, optional): Truncation psi. (default: 1.0)
+            truncation_cutoff (Union[int, None], optional): Truncation cutoff. (default: None)
+            skip_w_avg_update (bool, optional): Skip w_avg update. (default: False)
+
+        Returns:
+            torch.Tensor: Output tensor of shape (N, num_ws, w_dim).
+
+        """
         # Embed, normalize, and concat inputs.
         x = None
         with torch.autograd.profiler.record_function("input"):
@@ -439,10 +797,31 @@ class MappingNet(torch.nn.Module):
         return x
 
 
-class DisFromRGB(nn.Module):
-    def __init__(
-        self, in_channels, out_channels, activation
-    ):  # res = 2, ..., resolution_log2
+class DisFromRGB(torch.nn.Module):
+    """
+    Class for the fromRGB layer of the discriminator.
+
+    Args:
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        activation (str): Activation function: 'relu', 'lrelu', etc.
+
+    Inherits from `torch.nn.Module`.
+    """
+
+    def __init__(self, in_channels: int, out_channels: int, activation: str) -> None:
+        """
+        Constructor for DisFromRGB class.
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            activation (str): Activation function: 'relu', 'lrelu', etc.
+
+        Returns:
+            None
+        """
+        # res = 2, ..., resolution_log2
         super().__init__()
         self.conv = Conv2dLayer(
             in_channels=in_channels,
@@ -451,14 +830,44 @@ class DisFromRGB(nn.Module):
             activation=activation,
         )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass of DisFromRGB.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (N, in_channels, H, W).
+
+        Returns:
+            torch.Tensor: Output tensor of shape (N, out_channels, H, W).
+        """
         return self.conv(x)
 
 
-class DisBlock(nn.Module):
-    def __init__(
-        self, in_channels, out_channels, activation
-    ):  # res = 2, ..., resolution_log2
+class DisBlock(torch.nn.Module):
+    """
+    Class for a block of the discriminator.
+
+    Args:
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        activation (str): Activation function: 'relu', 'lrelu', etc.
+
+    Inherits from `torch.nn.Module`.
+    """
+
+    def __init__(self, in_channels: int, out_channels: int, activation: str) -> None:
+        """
+        Constructor for DisBlock class.
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            activation (str): Activation function: 'relu', 'lrelu', etc.
+
+        Returns:
+            None
+        """
+        # res = 2, ..., resolution_log2
         super().__init__()
         self.conv0 = Conv2dLayer(
             in_channels=in_channels,
@@ -481,7 +890,16 @@ class DisBlock(nn.Module):
             bias=False,
         )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass of DisBlock.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (N, in_channels, H, W).
+
+        Returns:
+            torch.Tensor: Output tensor of shape (N, out_channels, H, W).
+        """
         skip = self.skip(x, gain=np.sqrt(0.5))
         x = self.conv0(x)
         x = self.conv1(x, gain=np.sqrt(0.5))
@@ -491,19 +909,55 @@ class DisBlock(nn.Module):
 
 
 class Discriminator(torch.nn.Module):
+    """
+    Class for the discriminator.
+
+    Args:
+        c_dim (int): Conditioning label (C) dimensionality.
+        img_resolution (int): Input resolution.
+        img_channels (int): Number of input color channels.
+        channel_base (int): Overall multiplier for the number of channels. (default: 32768)
+        channel_max (int): Maximum number of channels in any layer. (default: 512)
+        channel_decay (int): Log2 channel reduction when doubling the resolution. (default: 1)
+        cmap_dim (Union[int, None]): Dimensionality of mapped conditioning label, None = default. (default: None)
+        activation (str): Activation function: 'relu', 'lrelu', etc. (default: 'lrelu')
+        mbstd_group_size (int): Group size for the minibatch standard deviation layer, None = entire minibatch. (default: 4)
+        mbstd_num_channels (int): Number of features for the minibatch standard deviation layer, 0 = disable. (default: 1)
+
+    Inherits from `torch.nn.Module`.
+    """
+
     def __init__(
         self,
-        c_dim,  # Conditioning label (C) dimensionality.
-        img_resolution,  # Input resolution.
-        img_channels,  # Number of input color channels.
-        channel_base=32768,  # Overall multiplier for the number of channels.
-        channel_max=512,  # Maximum number of channels in any layer.
-        channel_decay=1,
-        cmap_dim=None,  # Dimensionality of mapped conditioning label, None = default.
-        activation="lrelu",
-        mbstd_group_size=4,  # Group size for the minibatch standard deviation layer, None = entire minibatch.
-        mbstd_num_channels=1,  # Number of features for the minibatch standard deviation layer, 0 = disable.
-    ):
+        c_dim: int,
+        img_resolution: int,
+        img_channels: int,
+        channel_base: int = 32768,
+        channel_max: int = 512,
+        channel_decay: int = 1,
+        cmap_dim: Union[int, None] = None,
+        activation: str = "lrelu",
+        mbstd_group_size: int = 4,
+        mbstd_num_channels: int = 1,
+    ) -> None:
+        """
+        Constructor for Discriminator class.
+
+        Args:
+            c_dim (int): Conditioning label (C) dimensionality.
+            img_resolution (int): Input resolution.
+            img_channels (int): Number of input color channels.
+            channel_base (int): Overall multiplier for the number of channels. (default: 32768)
+            channel_max (int): Maximum number of channels in any layer. (default: 512)
+            channel_decay (int): Log2 channel reduction when doubling the resolution. (default: 1)
+            cmap_dim (Union[int, None]): Dimensionality of mapped conditioning label, None = default. (default: None)
+            activation (str): Activation function: 'relu', 'lrelu', etc. (default: 'lrelu')
+            mbstd_group_size (int): Group size for the minibatch standard deviation layer, None = entire minibatch. (default: 4)
+            mbstd_num_channels (int): Number of features for the minibatch standard deviation layer, 0 = disable. (default: 1)
+
+        Returns:
+            None
+        """
         super().__init__()
         self.c_dim = c_dim
         self.img_resolution = img_resolution
@@ -549,7 +1003,20 @@ class Discriminator(torch.nn.Module):
         self.fc0 = FullyConnectedLayer(nf(2) * 4**2, nf(2), activation=activation)
         self.fc1 = FullyConnectedLayer(nf(2), 1 if cmap_dim == 0 else cmap_dim)
 
-    def forward(self, images_in, masks_in, c):
+    def forward(
+        self, images_in: torch.Tensor, masks_in: torch.Tensor, c: torch.Tensor
+    ) -> torch.Tensor:
+        """
+        Forward pass of Discriminator.
+
+        Args:
+            images_in (torch.Tensor): Input tensor of shape (N, img_channels, H, W).
+            masks_in (torch.Tensor): Input tensor of shape (N, 1, H, W).
+            c (torch.Tensor): Input tensor of shape (N, c_dim).
+
+        Returns:
+            torch.Tensor: Output tensor of shape (N, 1) if cmap_dim == 0 else (N, cmap_dim).
+        """
         x = torch.cat([masks_in - 0.5, images_in], dim=1)
         x = self.Dis(x)
         x = self.fc1(self.fc0(x.flatten(start_dim=1)))
@@ -563,20 +1030,63 @@ class Discriminator(torch.nn.Module):
         return x
 
 
-def nf(stage, channel_base=32768, channel_decay=1.0, channel_max=512):
+def nf(
+    stage: int,
+    channel_base: int = 32768,
+    channel_decay: float = 1.0,
+    channel_max: int = 512,
+) -> int:
+    """
+    Number of filters in a given stage.
+
+    Args:
+        stage (int): Stage.
+        channel_base (int, optional): Overall multiplier for the number of channels. (default: 32768) (unused)
+        channel_decay (float, optional): log2 channel reduction when doubling the resolution. (default: 1.0) (unused)
+        channel_max (int, optional): Maximum number of channels in any layer. (default: 512) (unused)
+
+    Returns:
+        int: Number of filters.
+    """
     NF = {512: 64, 256: 128, 128: 256, 64: 512, 32: 512, 16: 512, 8: 512, 4: 512}
     return NF[2**stage]
 
 
-class Mlp(nn.Module):
+class Mlp(torch.nn.Module):
+    """
+    Class for MLP. (Multi-layer perceptron)
+
+    Args:
+        in_features (int): Number of input features.
+        hidden_features (Union[int, None], optional): Number of hidden features. (default: None)
+        out_features (Union[int, None], optional): Number of output features. (default: None)
+        act_layer (torch.nn.Module, optional): Activation layer. (default: nn.GELU) (unused)
+        drop (float, optional): Dropout probability. (default: 0.0) (unused)
+
+    Inherits from `torch.nn.Module`.
+    """
+
     def __init__(
         self,
-        in_features,
-        hidden_features=None,
-        out_features=None,
-        act_layer=nn.GELU,
-        drop=0.0,
-    ):
+        in_features: int,
+        hidden_features: Union[int, None] = None,
+        out_features: Union[int, None] = None,
+        act_layer: torch.nn.Module = nn.GELU,
+        drop: float = 0.0,
+    ) -> None:
+        """
+        Constructor for Mlp class.
+
+        Args:
+            in_features (int): Number of input features.
+            hidden_features (Union[int, None], optional): Number of hidden features. (default: None)
+            out_features (Union[int, None], optional): Number of output features. (default: None)
+            act_layer (torch.nn.Module, optional): Activation layer. (default: nn.GELU) (unused)
+            drop (float, optional): Dropout probability. (default: 0.0) (unused)
+
+        Returns:
+            None
+        """
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
@@ -587,7 +1097,16 @@ class Mlp(nn.Module):
             in_features=hidden_features, out_features=out_features
         )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass of Mlp.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (N, in_features).
+
+        Returns:
+            torch.Tensor: Output tensor of shape (N, out_features).
+        """
         x = self.fc1(x)
         x = self.fc2(x)
         return x
@@ -628,25 +1147,61 @@ def window_reverse(windows, window_size: int, H: int, W: int):
     return x
 
 
-class Conv2dLayerPartial(nn.Module):
+class Conv2dLayerPartial(torch.nn.Module):
+    """
+    Conv2d layer with partial convolution.
+
+    Args:
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        kernel_size (int): Width and height of the convolution kernel.
+        bias (bool, optional): Apply additive bias before the activation function? (default: True)
+        activation (str, optional): Activation function: 'relu', 'lrelu', etc. (default: 'linear')
+        up (int, optional): Integer upsampling factor. (default: 1)
+        down (int, optional): Integer downsampling factor. (default: 1)
+        resample_filter (List[int], optional): Low-pass filter to apply when resampling activations. (default: [1, 3, 3, 1])
+        conv_clamp (Union[float, None], optional): Clamp the output to +-X, None = disable clamping. (default: None)
+        trainable (bool, optional): Update the weights of this layer during training? (default: True)
+
+    Inherited from `torch.nn.Module`
+    """
+
     def __init__(
         self,
-        in_channels,  # Number of input channels.
-        out_channels,  # Number of output channels.
-        kernel_size,  # Width and height of the convolution kernel.
-        bias=True,  # Apply additive bias before the activation function?
-        activation="linear",  # Activation function: 'relu', 'lrelu', etc.
-        up=1,  # Integer upsampling factor.
-        down=1,  # Integer downsampling factor.
-        resample_filter=[
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int,
+        bias: bool = True,
+        activation: str = "linear",
+        up: int = 1,
+        down: int = 1,
+        resample_filter: List[int] = [
             1,
             3,
             3,
             1,
-        ],  # Low-pass filter to apply when resampling activations.
-        conv_clamp=None,  # Clamp the output to +-X, None = disable clamping.
-        trainable=True,  # Update the weights of this layer during training?
+        ],
+        conv_clamp: Union[float, None] = None,
+        trainable: bool = True,
     ):
+        """
+        Construct a Conv2dLayer object.
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            kernel_size (int): Width and height of the convolution kernel.
+            bias (bool, optional): Apply additive bias before the activation function? (default: True)
+            activation (str, optional): Activation function: 'relu', 'lrelu', etc. (default: 'linear')
+            up (int, optional): Integer upsampling factor. (default: 1)
+            down (int, optional): Integer downsampling factor. (default: 1)
+            resample_filter (List[int], optional): Low-pass filter to apply when resampling activations. (default: [1, 3, 3, 1])
+            conv_clamp (Union[float, None], optional): Clamp the output to +-X, None = disable clamping. (default: None)
+            trainable (bool, optional): Update the weights of this layer during training? (default: True)
+
+        Returns:
+            None
+        """
         super().__init__()
         self.conv = Conv2dLayer(
             in_channels,
@@ -666,7 +1221,20 @@ class Conv2dLayerPartial(nn.Module):
         self.stride = down
         self.padding = kernel_size // 2 if kernel_size % 2 == 1 else 0
 
-    def forward(self, x, mask=None):
+    def forward(
+        self, x: torch.Tensor, mask: Union[torch.Tensor, None] = None
+    ) -> torch.Tensor:
+        """
+        Forward pass of Conv2dLayerPartial.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (N, in_channels, H, W).
+            mask (Union[torch.Tensor, None], optional): Mask tensor of shape (N, 1, H, W). (default: None)
+
+        Returns:
+            torch.Tensor: Output tensor of shape (N, out_channels, H, W).
+        """
+
         if mask is not None:
             with torch.no_grad():
                 if self.weight_maskUpdater.type() != x.type():
@@ -689,30 +1257,51 @@ class Conv2dLayerPartial(nn.Module):
             return x, None
 
 
-class WindowAttention(nn.Module):
-    r"""Window based multi-head self attention (W-MSA) module with relative position bias.
+class WindowAttention(torch.nn.Module):
+    """
+    Window based multi-head self attention (W-MSA) module with relative position bias.
     It supports both of shifted and non-shifted window.
+
     Args:
         dim (int): Number of input channels.
         window_size (tuple[int]): The height and width of the window.
         num_heads (int): Number of attention heads.
-        qkv_bias (bool, optional):  If True, add a learnable bias to query, key, value. Default: True
-        qk_scale (float | None, optional): Override default qk scale of head_dim ** -0.5 if set
-        attn_drop (float, optional): Dropout ratio of attention weight. Default: 0.0
-        proj_drop (float, optional): Dropout ratio of output. Default: 0.0
+        down_ratio (int, optional): Downsample the feature map by a factor of down_ratio (default: 1). (unused)
+        qkv_bias (bool, optional):  If True, add a learnable bias to query, key, value. (default: True) (unused)
+        qk_scale ([Union[float, None]], optional): Override default qk scale of head_dim ** -0.5 if set. (default: None)
+        attn_drop (float, optional): Dropout ratio of attention weight. (default: 0.0) (unused)
+        proj_drop (float, optional): Dropout ratio of output. (default: 0.0) (unused)
+
+    Inherited from torch.nn.Module.
     """
 
     def __init__(
         self,
-        dim,
-        window_size,
-        num_heads,
-        down_ratio=1,
-        qkv_bias=True,
-        qk_scale=None,
-        attn_drop=0.0,
-        proj_drop=0.0,
-    ):
+        dim: int,
+        window_size: Tuple[int, int],
+        num_heads: int,
+        down_ratio: int = 1,
+        qkv_bias: bool = True,
+        qk_scale: Union[float, None] = None,
+        attn_drop: float = 0.0,
+        proj_drop: float = 0.0,
+    ) -> None:
+        """
+        Constructor method for WindowAttention.
+
+        Args:
+            dim (int): Number of input channels.
+            window_size (tuple[int]): The height and width of the window.
+            num_heads (int): Number of attention heads.
+            down_ratio (int, optional): Downsample the feature map by a factor of down_ratio (default: 1). (unused)
+            qkv_bias (bool, optional):  If True, add a learnable bias to query, key, value. (default: True) (unused)
+            qk_scale ([Union[float, None]], optional): Override default qk scale of head_dim ** -0.5 if set. (default: None)
+            attn_drop (float, optional): Dropout ratio of attention weight. (default: 0.0) (unused)
+            proj_drop (float, optional): Dropout ratio of output. (default: 0.0) (unused)
+
+        Returns:
+            None
+        """
 
         super().__init__()
         self.dim = dim
@@ -728,11 +1317,23 @@ class WindowAttention(nn.Module):
 
         self.softmax = nn.Softmax(dim=-1)
 
-    def forward(self, x, mask_windows=None, mask=None):
+    def forward(
+        self,
+        x: torch.Tensor,
+        mask_windows: Union[torch.Tensor, None] = None,
+        mask: Union[torch.Tensor, None] = None,
+    ) -> torch.Tensor:
         """
+        Forward function for W-MSA.
+
         Args:
-            x: input features with shape of (num_windows*B, N, C)
-            mask: (0/-inf) mask with shape of (num_windows, Wh*Ww, Wh*Ww) or None
+            x (torch.Tensor): Input feature with shape of (num_windows*B, N, C)
+            mask_windows (Union[torch.Tensor, None], optional): 2D mask with shape of (num_windows, window_size*window_size),
+                value should be between (-inf, 0]. Only non-zero values are allowed. (default: None)
+            mask (Union[torch.Tensor, None], optional):(0/-inf) 2D mask with shape of (num_windows*B, Wh*Ww) (default: None)
+
+        Returns:
+            torch.Tensor: Output feature with shape of (num_windows*B, N, C)
         """
         B_, N, C = x.shape
         norm_x = F.normalize(x, p=2.0, dim=-1)
@@ -778,41 +1379,66 @@ class WindowAttention(nn.Module):
         return x, mask_windows
 
 
-class SwinTransformerBlock(nn.Module):
-    r"""Swin Transformer Block.
+class SwinTransformerBlock(torch.nn.Module):
+    """
+    Swin Transformer Block.
+
     Args:
         dim (int): Number of input channels.
-        input_resolution (tuple[int]): Input resulotion.
+        input_resolution (tuple[int]): Input resolution.
         num_heads (int): Number of attention heads.
-        window_size (int): Window size.
-        shift_size (int): Shift size for SW-MSA.
-        mlp_ratio (float): Ratio of mlp hidden dim to embedding dim.
-        qkv_bias (bool, optional): If True, add a learnable bias to query, key, value. Default: True
-        qk_scale (float | None, optional): Override default qk scale of head_dim ** -0.5 if set.
-        drop (float, optional): Dropout rate. Default: 0.0
-        attn_drop (float, optional): Attention dropout rate. Default: 0.0
-        drop_path (float, optional): Stochastic depth rate. Default: 0.0
-        act_layer (nn.Module, optional): Activation layer. Default: nn.GELU
-        norm_layer (nn.Module, optional): Normalization layer.  Default: nn.LayerNorm
+        down_ratio (int, optional): Down ratio for patch merging. (default: 1)
+        window_size (int, optional): Window size. (default: 7)
+        shift_size (int, optional): Shift size for SW-MSA. (default: 0)
+        mlp_ratio (float, optional): Ratio of mlp hidden dim to embedding dim. (default: 4.0)
+        qkv_bias (bool, optional): If True, add a learnable bias to query, key, value. (default: True)
+        qk_scale (Union[float, None], optional): Override default qk scale of head_dim ** -0.5 if set. (default: None)
+        drop (float, optional): Dropout rate. (default: 0.0)
+        attn_drop (float, optional): Attention dropout rate. (default: 0.0)
+        drop_path (float, optional): Stochastic depth rate. (default: 0.0) (unused)
+        act_layer (torch.nn.Module, optional): Activation layer. (default: nn.GELU)
+        norm_layer (torch.nn.Module, optional): Normalization layer. (default: nn.LayerNorm)
     """
 
     def __init__(
         self,
-        dim,
-        input_resolution,
-        num_heads,
-        down_ratio=1,
-        window_size=7,
-        shift_size=0,
-        mlp_ratio=4.0,
-        qkv_bias=True,
-        qk_scale=None,
-        drop=0.0,
-        attn_drop=0.0,
-        drop_path=0.0,
-        act_layer=nn.GELU,
-        norm_layer=nn.LayerNorm,
-    ):
+        dim: int,
+        input_resolution: Tuple[int, int],
+        num_heads: int,
+        down_ratio: int = 1,
+        window_size: int = 7,
+        shift_size: int = 0,
+        mlp_ratio: float = 4.0,
+        qkv_bias: bool = True,
+        qk_scale: Union[float, None] = None,
+        drop: float = 0.0,
+        attn_drop: float = 0.0,
+        drop_path: float = 0.0,
+        act_layer: torch.nn.Module = nn.GELU,
+        norm_layer: torch.nn.Module = nn.LayerNorm,
+    ) -> None:
+        """
+        Constructor method for SwinTransformerBlock class.
+
+        Args:
+            dim (int): Number of input channels.
+            input_resolution (tuple[int]): Input resulotion.
+            num_heads (int): Number of attention heads.
+            down_ratio (int, optional): Down ratio for patch merging. (default: 1)
+            window_size (int, optional): Window size. (default: 7)
+            shift_size (int, optional): Shift size for SW-MSA. (default: 0)
+            mlp_ratio (float, optional): Ratio of mlp hidden dim to embedding dim. (default: 4.0)
+            qkv_bias (bool, optional): If True, add a learnable bias to query, key, value. (default: True)
+            qk_scale (Union[float, None], optional): Override default qk scale of head_dim ** -0.5 if set. (default: None)
+            drop (float, optional): Dropout rate. (default: 0.0)
+            attn_drop (float, optional): Attention dropout rate. (default: 0.0)
+            drop_path (float, optional): Stochastic depth rate. (default: 0.0) (unused)
+            act_layer (torch.nn.Module, optional): Activation layer. (default: nn.GELU)
+            norm_layer (torch.nn.Module, optional): Normalization layer. (default: nn.LayerNorm)
+
+        Returns:
+            None
+        """
         super().__init__()
         self.dim = dim
         self.input_resolution = input_resolution
@@ -860,7 +1486,16 @@ class SwinTransformerBlock(nn.Module):
 
         self.register_buffer("attn_mask", attn_mask)
 
-    def calculate_mask(self, x_size):
+    def calculate_mask(self, x_size: Tuple[int, int]) -> torch.Tensor:
+        """
+        Calculate 2D attention mask for SW-MSA.
+
+        Args:
+            x_size (Tuple[int, int]): Input resulotion.
+
+        Returns:
+            torch.Tensor: 2D attention mask.
+        """
         # calculate attention mask for SW-MSA
         H, W = x_size
         img_mask = torch.zeros((1, H, W, 1))  # 1 H W 1
@@ -891,11 +1526,26 @@ class SwinTransformerBlock(nn.Module):
 
         return attn_mask
 
-    def forward(self, x, x_size, mask=None):
-        # H, W = self.input_resolution
+    def forward(
+        self,
+        x: torch.Tensor,
+        x_size: Tuple[int, int],
+        mask: Union[torch.Tensor, None] = None,
+    ) -> torch.Tensor:
+        """
+        Forward function for `SwinTransformerBlock`.
+
+        Args:
+            x (torch.Tensor): Input tensor with shape (B, N, C).
+            x_size (Tuple[int, int]): Input resulotion.
+            mask (Union[torch.Tensor, None], optional): Attention mask. (default: None)
+
+        Returns:
+            torch.Tensor: Output of this block.
+        """
+
         H, W = x_size
         B, L, C = x.shape
-        # assert L == H * W, "input feature has wrong size"
 
         shortcut = x
         x = x.view(B, H, W, C)
@@ -970,8 +1620,30 @@ class SwinTransformerBlock(nn.Module):
         return x, mask
 
 
-class PatchMerging(nn.Module):
-    def __init__(self, in_channels, out_channels, down=2):
+class PatchMerging(torch.nn.Module):
+    """
+    Class for patch merging.
+
+    Args:
+        in_channels (int): Input channels.
+        out_channels (int): Output channels.
+        down (int, optional): Downsample factor. (default: 2)
+
+    Inherited from `torch.nn.Module`.
+    """
+
+    def __init__(self, in_channels: int, out_channels: int, down: int = 2) -> None:
+        """
+        Constructor for `PatchMerging`.
+
+        Args:
+            in_channels (int): Input channels.
+            out_channels (int): Output channels.
+            down (int, optional): Downsample factor. (default: 2)
+
+        Returns:
+            None
+        """
         super().__init__()
         self.conv = Conv2dLayerPartial(
             in_channels=in_channels,
@@ -982,7 +1654,23 @@ class PatchMerging(nn.Module):
         )
         self.down = down
 
-    def forward(self, x, x_size, mask=None):
+    def forward(
+        self,
+        x: torch.Tensor,
+        x_size: Tuple[int, int],
+        mask: Union[torch.Tensor, None] = None,
+    ) -> torch.Tensor:
+        """
+        Forward function for `PatchMerging`.
+
+        Args:
+            x (torch.Tensor): Input tensor with shape (B, N, C).
+            x_size (Tuple[int, int]): Input resulotion.
+            mask (Union[torch.Tensor, None], optional): Attention mask. (default: None)
+
+        Returns:
+            torch.Tensor: Output of this block.
+        """
         x = token2feature(x, x_size)
         if mask is not None:
             mask = token2feature(mask, x_size)
@@ -996,8 +1684,30 @@ class PatchMerging(nn.Module):
         return x, x_size, mask
 
 
-class PatchUpsampling(nn.Module):
-    def __init__(self, in_channels, out_channels, up=2):
+class PatchUpsampling(torch.nn.Module):
+    """
+    Class for patch upsampling.
+
+    Args:
+        in_channels (int): Input channels.
+        out_channels (int): Output channels.
+        up (int, optional): Upsample factor. (default: 2)
+
+    Inherited from `torch.nn.Module`.
+    """
+
+    def __init__(self, in_channels: int, out_channels: int, up: int = 2) -> None:
+        """
+        Constructor for `PatchUpsampling`.
+
+        Args:
+            in_channels (int): Input channels.
+            out_channels (int): Output channels.
+            up (int, optional): Upsample factor. (default: 2)
+
+        Returns:
+            None
+        """
         super().__init__()
         self.conv = Conv2dLayerPartial(
             in_channels=in_channels,
@@ -1008,7 +1718,23 @@ class PatchUpsampling(nn.Module):
         )
         self.up = up
 
-    def forward(self, x, x_size, mask=None):
+    def forward(
+        self,
+        x: torch.Tensor,
+        x_size: Tuple[int, int],
+        mask: Union[torch.Tensor, None] = None,
+    ) -> torch.Tensor:
+        """
+        Forward function for `PatchUpsampling`.
+
+        Args:
+            x (torch.Tensor): Input tensor with shape (B, N, C).
+            x_size (Tuple[int, int]): Input resulotion.
+            mask (Union[torch.Tensor, None], optional): Attention mask. (default: None)
+
+        Returns:
+            torch.Tensor: Output of this block.
+        """
         x = token2feature(x, x_size)
         if mask is not None:
             mask = token2feature(mask, x_size)
@@ -1021,8 +1747,10 @@ class PatchUpsampling(nn.Module):
         return x, x_size, mask
 
 
-class BasicLayer(nn.Module):
-    """A basic Swin Transformer layer for one stage.
+class BasicLayer(torch.nn.Module):
+    """
+    A basic Swin Transformer layer for one stage.
+
     Args:
         dim (int): Number of input channels.
         input_resolution (tuple[int]): Input resolution.
@@ -1031,13 +1759,15 @@ class BasicLayer(nn.Module):
         window_size (int): Local window size.
         mlp_ratio (float): Ratio of mlp hidden dim to embedding dim.
         qkv_bias (bool, optional): If True, add a learnable bias to query, key, value. Default: True
-        qk_scale (float | None, optional): Override default qk scale of head_dim ** -0.5 if set.
-        drop (float, optional): Dropout rate. Default: 0.0
-        attn_drop (float, optional): Attention dropout rate. Default: 0.0
-        drop_path (float | tuple[float], optional): Stochastic depth rate. Default: 0.0
-        norm_layer (nn.Module, optional): Normalization layer. Default: nn.LayerNorm
-        downsample (nn.Module | None, optional): Downsample layer at the end of the layer. Default: None
-        use_checkpoint (bool): Whether to use checkpointing to save memory. Default: False.
+        qk_scale (Union[float, None], optional): Override default qk scale of head_dim ** -0.5 if set.
+        drop (float, optional): Dropout rate. (default: 0.0)
+        attn_drop (float, optional): Attention dropout rate. (default: 0.0)
+        drop_path (Union[float, tuple[float]], optional): Stochastic depth rate. (default: 0.0)
+        norm_layer (torch.nn.Module, optional): Normalization layer. (default: nn.LayerNorm)
+        downsample (Union[torch.nn.Module, None, optional): Downsample layer at the end of the layer. (default: None)
+        use_checkpoint (bool): Whether to use checkpointing to save memory. (default: False)
+
+    Inherited from `torch.nn.Module`.
     """
 
     def __init__(
@@ -1057,7 +1787,29 @@ class BasicLayer(nn.Module):
         norm_layer=nn.LayerNorm,
         downsample=None,
         use_checkpoint=False,
-    ):
+    ) -> None:
+        """
+        Constructor for `BasicLayer`.
+
+        Args:
+            dim (int): Number of input channels.
+            input_resolution (tuple[int]): Input resolution.
+            depth (int): Number of blocks.
+            num_heads (int): Number of attention heads.
+            window_size (int): Local window size.
+            mlp_ratio (float): Ratio of mlp hidden dim to embedding dim.
+            qkv_bias (bool, optional): If True, add a learnable bias to query, key, value. Default: True
+            qk_scale (Union[float, None], optional): Override default qk scale of head_dim ** -0.5 if set.
+            drop (float, optional): Dropout rate. (default: 0.0)
+            attn_drop (float, optional): Attention dropout rate. (default: 0.0)
+            drop_path (Union[float, tuple[float]], optional): Stochastic depth rate. (default: 0.0)
+            norm_layer (torch.nn.Module, optional): Normalization layer. (default: nn.LayerNorm)
+            downsample (Union[torch.nn.Module, None, optional): Downsample layer at the end of the layer. (default: None)
+            use_checkpoint (bool): Whether to use checkpointing to save memory. (default: False)
+
+        Returns:
+            None
+        """
 
         super().__init__()
         self.dim = dim
@@ -1100,7 +1852,23 @@ class BasicLayer(nn.Module):
             in_channels=dim, out_channels=dim, kernel_size=3, activation="lrelu"
         )
 
-    def forward(self, x, x_size, mask=None):
+    def forward(
+        self,
+        x: torch.Tensor,
+        x_size: Tuple[int, int],
+        mask: Union[torch.Tensor, None] = None,
+    ):
+        """
+        Forward function for `BasicLayer`.
+
+        Args:
+            x (torch.Tensor): Input tensor with shape (B, N, C).
+            x_size (Tuple[int, int]): Input resulotion.
+            mask (Union[torch.Tensor, None], optional): Attention mask. (default: None)
+
+        Returns:
+            torch.Tensor: Output of this block.
+        """
         if self.downsample is not None:
             x, x_size, mask = self.downsample(x, x_size, mask)
         identity = x
@@ -1118,8 +1886,38 @@ class BasicLayer(nn.Module):
         return x, x_size, mask
 
 
-class ToToken(nn.Module):
-    def __init__(self, in_channels=3, dim=128, kernel_size=5, stride=1):
+class ToToken(torch.nn.Module):
+    """
+    Class to convert feature map to tokens.
+
+    Args:
+        in_channels (int, optional): Number of input channels. (default: 3)
+        dim (int, optional): Number of output channels. (default: 128)
+        kernel_size (int, optional): Kernel size of the conv layer. (default: 5)
+        stride (int, optional): Stride of the conv layer. (default: 1) (unused)
+
+    Inherited from `torch.nn.Module`.
+    """
+
+    def __init__(
+        self,
+        in_channels: int = 3,
+        dim: int = 128,
+        kernel_size: int = 5,
+        stride: int = 1,
+    ) -> None:
+        """
+        Convert image to tokens.
+
+        Args:
+            in_channels (int, optional): Number of input channels. (default: 3)
+            dim (int, optional): Number of output channels. (default: 128)
+            kernel_size (int, optional): Kernel size of the conv layer. (default: 5)
+            stride (int, optional): Stride of the conv layer. (default: 1) (unused)
+
+        Returns:
+            None
+        """
         super().__init__()
 
         self.proj = Conv2dLayerPartial(
@@ -1129,16 +1927,49 @@ class ToToken(nn.Module):
             activation="lrelu",
         )
 
-    def forward(self, x, mask):
+    def forward(
+        self, x: torch.Tensor, mask: Union[torch.Tensor, None] = None
+    ) -> Tuple[torch.Tensor, Tuple[int, int]]:
+        """
+        Forward function for `ToToken`.
+
+        Args:
+            x (torch.Tensor): Input tensor with shape (B, C, H, W).
+            mask (Union[torch.Tensor, None], optional): Attention mask. (default: None)
+
+        Returns:
+            Tuple[torch.Tensor, Tuple[int, int]]: Output of this block.
+        """
         x, mask = self.proj(x, mask)
 
         return x, mask
 
 
-class EncFromRGB(nn.Module):
-    def __init__(
-        self, in_channels, out_channels, activation
-    ):  # res = 2, ..., resolution_log2
+class EncFromRGB(torch.nn.Module):
+    """
+    Class for encoding image to tokens from RGB.
+
+    Args:
+        in_channels (int): Number of input channels.
+        dim (int): Number of output channels.
+        activation (str, optional): Activation function.
+
+    Inherited from `torch.nn.Module`.
+    """
+
+    def __init__(self, in_channels: int, out_channels: int, activation: str) -> None:
+        """
+        Convert RGB image to feature map.
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            activation (str): Activation function.
+
+        Returns:
+            None.
+        """
+        # res = 2, ..., resolution_log2
         super().__init__()
         self.conv0 = Conv2dLayer(
             in_channels=in_channels,
@@ -1153,17 +1984,47 @@ class EncFromRGB(nn.Module):
             activation=activation,
         )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward function for `EncFromRGB`.
+
+        Args:
+            x (torch.Tensor): Input tensor with shape (B, C, H, W).
+
+        Returns:
+            torch.Tensor: Output of this block.
+        """
         x = self.conv0(x)
         x = self.conv1(x)
 
         return x
 
 
-class ConvBlockDown(nn.Module):
-    def __init__(
-        self, in_channels, out_channels, activation
-    ):  # res = 2, ..., resolution_log
+class ConvBlockDown(torch.nn.Module):
+    """
+    Class for convolutional block with downsampling.
+
+    Args:
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        activation (str): Activation function.
+
+    Inherited from `torch.nn.Module`.
+    """
+
+    def __init__(self, in_channels: int, out_channels: int, activation: str):
+        """
+        Convolutional block for downsampling.
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            activation (str): Activation function.
+
+        Returns:
+            torch.Tensor: Output of this block.
+        """
+        # res = 2, ..., resolution_log
         super().__init__()
 
         self.conv0 = Conv2dLayer(
@@ -1180,36 +2041,92 @@ class ConvBlockDown(nn.Module):
             activation=activation,
         )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward function for `ConvBlockDown`.
+
+        Args:
+            x (torch.Tensor): Input tensor with shape (B, C, H, W).
+
+        Returns:
+            torch.Tensor: Output of this block.
+        """
         x = self.conv0(x)
         x = self.conv1(x)
 
         return x
 
 
-def token2feature(x, x_size):
+def token2feature(x: torch.Tensor, x_size: Tuple[int, int]) -> torch.Tensor:
+    """
+    Transform token to feature map.
+
+    Args:
+        x (torch.Tensor): Input tensor with shape (B, N, C).
+        x_size (Tuple[int, int]): Input resulotion.
+
+    Returns:
+        torch.Tensor: Output of this block.
+    """
     B, N, C = x.shape
     h, w = x_size
     x = x.permute(0, 2, 1).reshape(B, C, h, w)
     return x
 
 
-def feature2token(x):
+def feature2token(x: torch.Tensor) -> torch.Tensor:
+    """
+    Transform feature map to token.
+
+    Args:
+        x (torch.Tensor): Input tensor with shape (B, C, H, W).
+
+    Returns:
+        torch.Tensor: Output of this block.
+    """
     B, C, H, W = x.shape
     x = x.view(B, C, -1).transpose(1, 2)
     return x
 
 
-class Encoder(nn.Module):
+class Encoder(torch.nn.Module):
+    """
+    Class for Encoder.
+
+    Args:
+        res_log2 (int): Resolution of the input image.
+        img_channels (int): Number of channels of the input image.
+        activation (str): Activation function.
+        patch_size (int, optional): Patch size. (default: 5) (unused)
+        channels (int, optional): Number of channels. (default: 16) (unused)
+        drop_path_rate (float, optional): Drop path rate. (default: 0.1) (unused)
+
+    Inherited from `torch.nn.Module`.
+    """
+
     def __init__(
         self,
-        res_log2,
-        img_channels,
-        activation,
-        patch_size=5,
-        channels=16,
-        drop_path_rate=0.1,
-    ):
+        res_log2: int,
+        img_channels: int,
+        activation: str,
+        patch_size: int = 5,
+        channels: int = 16,
+        drop_path_rate: float = 0.1,
+    ) -> None:
+        """
+        Constructor for `Encoder`.
+
+        Args:
+            res_log2 (int): Resolution of the input image.
+            img_channels (int): Number of channels of the input image.
+            activation (str): Activation function.
+            patch_size (int, optional): Patch size. (default: 5) (unused)
+            channels (int, optional): Number of channels. (default: 16) (unused)
+            drop_path_rate (float, optional): Drop path rate. (default: 0.1) (unused)
+
+        Returns:
+            None
+        """
         super().__init__()
 
         self.resolution = []
@@ -1223,7 +2140,16 @@ class Encoder(nn.Module):
                 block = ConvBlockDown(nf(i + 1), nf(i), activation)
             setattr(self, "EncConv_Block_%dx%d" % (res, res), block)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward function for `Encoder`.
+
+        Args:
+            x (torch.Tensor): Input tensor with shape (B, C, H, W).
+
+        Returns:
+            torch.Tensor: Output of this block.
+        """
         out = {}
         for res in self.resolution:
             res_log2 = int(np.log2(res))
@@ -1233,8 +2159,34 @@ class Encoder(nn.Module):
         return out
 
 
-class ToStyle(nn.Module):
-    def __init__(self, in_channels, out_channels, activation, drop_rate):
+class ToStyle(torch.nn.Module):
+    """
+    Class for `ToStyle` block. This block is used to transform token to style.
+
+    Args:
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        activation (str): Activation function.
+        drop_rate (float): Dropout rate. (unused)
+
+    Inherited from `torch.nn.Module`.
+    """
+
+    def __init__(
+        self, in_channels: int, out_channels: int, activation: str, drop_rate: float
+    ) -> None:
+        """
+        Constructor method for `ToStyle`.
+
+        Args:
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            activation (str): Activation function.
+            drop_rate (float): Dropout rate. (unused)
+
+        Returns:
+            None
+        """
         super().__init__()
         self.conv = nn.Sequential(
             Conv2dLayer(
@@ -1264,29 +2216,69 @@ class ToStyle(nn.Module):
         self.fc = FullyConnectedLayer(
             in_features=in_channels, out_features=out_channels, activation=activation
         )
-        # self.dropout = nn.Dropout(drop_rate)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward function for `ToStyle`.
+
+        Args:
+            x (torch.Tensor): Input tensor with shape (B, C, H, W).
+
+        Returns:
+            torch.Tensor: Output of this block.
+        """
+
         x = self.conv(x)
         x = self.pool(x)
         x = self.fc(x.flatten(start_dim=1))
-        # x = self.dropout(x)
 
         return x
 
 
-class DecBlockFirstV2(nn.Module):
+class DecBlockFirstV2(torch.nn.Module):
+    """
+    Class for the first block of the decoder.
+
+    Args:
+        res (int): Resolution of this block.
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        activation (str): Activation function.
+        style_dim (int): Style dimension.
+        use_noise (bool): Whether to use noise.
+        demodulate (bool): Whether to demodulate.
+        img_channels (int): Number of image channels.
+
+    Inherited from `torch.nn.Module`.
+    """
+
     def __init__(
         self,
-        res,
-        in_channels,
-        out_channels,
-        activation,
-        style_dim,
-        use_noise,
-        demodulate,
-        img_channels,
+        res: int,
+        in_channels: int,
+        out_channels: int,
+        activation: str,
+        style_dim: int,
+        use_noise: bool,
+        demodulate: bool,
+        img_channels: int,
     ):
+        """
+        Constructor for `DecBlockFirstV2`.
+
+        Args:
+            res (int): Resolution of this block.
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            activation (str): Activation function.
+            style_dim (int): Style dimension.
+            use_noise (bool): Whether to use noise.
+            demodulate (bool): Whether to demodulate.
+            img_channels (int): Number of image channels.
+
+        Returns:
+            None
+        """
         super().__init__()
         self.res = res
 
@@ -1314,8 +2306,27 @@ class DecBlockFirstV2(nn.Module):
             demodulate=False,
         )
 
-    def forward(self, x, ws, gs, E_features, noise_mode="random"):
-        # x = self.fc(x).view(x.shape[0], -1, 4, 4)
+    def forward(
+        self,
+        x: torch.Tensor,
+        ws: torch.Tensor,
+        gs: torch.Tensor,
+        E_features: torch.Tensor,
+        noise_mode: str = "random",
+    ) -> torch.Tensor:
+        """
+        Forward function for `DecBlockFirstV2`.
+
+        Args:
+            x (torch.Tensor): Input tensor with shape (B, C, H, W).
+            ws (torch.Tensor): Style tensor with shape (B, num_ws, C).
+            gs (torch.Tensor): Style tensor with shape (B, num_gs, C).
+            E_features (torch.Tensor): Feature tensor from encoder with shape (B, C, H, W).
+            noise_mode (str): Noise mode. Defaults to "random".
+
+        Returns:
+            torch.Tensor: Output of this block.
+        """
         x = self.conv0(x)
         x = x + E_features[self.res]
         style = get_style_code(ws[:, 0], gs)
@@ -1326,18 +2337,50 @@ class DecBlockFirstV2(nn.Module):
         return x, img
 
 
-class DecBlock(nn.Module):
+class DecBlock(torch.nn.Module):
+    """
+    Class for decoder block. It is used to upsample the image.
+
+    Args:
+        res (int): Resolution of this block.
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        activation (str): Activation function.
+        style_dim (int): Style dimension.
+        use_noise (bool): Whether to use noise.
+        demodulate (bool): Whether to demodulate.
+
+    Inherited from `torch.nn.Module`.
+    """
+
     def __init__(
         self,
-        res,
-        in_channels,
-        out_channels,
-        activation,
-        style_dim,
-        use_noise,
-        demodulate,
-        img_channels,
-    ):  # res = 4, ..., resolution_log2
+        res: int,
+        in_channels: int,
+        out_channels: int,
+        activation: str,
+        style_dim: int,
+        use_noise: bool,
+        demodulate: bool,
+        img_channels: int,
+    ) -> None:
+        """
+        Constructor for `DecBlock`.
+
+        Args:
+            res (int): Resolution of this block.
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            activation (str): Activation function.
+            style_dim (int): Style dimension.
+            use_noise (bool): Whether to use noise.
+            demodulate (bool): Whether to demodulate.
+
+        Returns:
+            None
+        """
+
+        # res = 4, ..., resolution_log2
         super().__init__()
         self.res = res
 
@@ -1370,7 +2413,29 @@ class DecBlock(nn.Module):
             demodulate=False,
         )
 
-    def forward(self, x, img, ws, gs, E_features, noise_mode="random"):
+    def forward(
+        self,
+        x: torch.Tensor,
+        img: torch.Tensor,
+        ws: torch.Tensor,
+        gs: torch.Tensor,
+        E_features: torch.Tensor,
+        noise_mode: str = "random",
+    ) -> torch.Tensor:
+        """
+        Forward function for `DecBlock`.
+
+        Args:
+            x (torch.Tensor): Input tensor with shape (B, C, H, W).
+            img (torch.Tensor): Input tensor with shape (B, C, H, W).
+            ws (torch.Tensor): Style tensor with shape (B, num_ws, C).
+            gs (torch.Tensor): Style tensor with shape (B, num_gs, C).
+            E_features (torch.Tensor): Feature tensor from encoder with shape (B, C, H, W).
+            noise_mode (str): Noise mode. Defaults to "random".
+
+        Returns:
+            torch.Tensor: Output of this block.
+        """
         style = get_style_code(ws[:, self.res * 2 - 9], gs)
         x = self.conv0(x, style, noise_mode=noise_mode)
         x = x + E_features[self.res]
@@ -1382,10 +2447,44 @@ class DecBlock(nn.Module):
         return x, img
 
 
-class Decoder(nn.Module):
+class Decoder(torch.nn.Module):
+    """
+    Class for the decoder
+
+    Args:
+        res_log2 (int): Resolution log2.
+        activation (str): Activation function.
+        style_dim (int): Style dimension.
+        use_noise (bool): Whether to use noise.
+        demodulate (bool): Whether to demodulate.
+        img_channels (int): Number of image channels.
+
+    Inherits from `torch.nn.Module`.
+    """
+
     def __init__(
-        self, res_log2, activation, style_dim, use_noise, demodulate, img_channels
-    ):
+        self,
+        res_log2: int,
+        activation: str,
+        style_dim: int,
+        use_noise: bool,
+        demodulate: bool,
+        img_channels: int,
+    ) -> None:
+        """
+        Constructor for `Decoder`.
+
+        Args:
+            res_log2 (int): Resolution log2.
+            activation (str): Activation function.
+            style_dim (int): Style dimension.
+            use_noise (bool): Whether to use noise.
+            demodulate (bool): Whether to demodulate.
+            img_channels (int): Number of image channels.
+
+        Returns:
+            None
+        """
         super().__init__()
         self.Dec_16x16 = DecBlockFirstV2(
             4, nf(4), nf(4), activation, style_dim, use_noise, demodulate, img_channels
@@ -1407,7 +2506,27 @@ class Decoder(nn.Module):
             )
         self.res_log2 = res_log2
 
-    def forward(self, x, ws, gs, E_features, noise_mode="random"):
+    def forward(
+        self,
+        x: torch.Tensor,
+        ws: torch.Tensor,
+        gs: torch.Tensor,
+        E_features: torch.Tensor,
+        noise_mode: str = "random",
+    ) -> torch.Tensor:
+        """
+        Forward function for `Decoder`.
+
+        Args:
+            x (torch.Tensor): Input tensor with shape (B, C, H, W).
+            ws (torch.Tensor): Style tensor with shape (B, num_ws, C).
+            gs (torch.Tensor): Style tensor with shape (B, num_gs, C).
+            E_features (torch.Tensor): Feature tensor from encoder with shape (B, C, H, W).
+            noise_mode (str): Noise mode. Defaults to "random".
+
+        Returns:
+            torch.Tensor: Output of this block.
+        """
         x, img = self.Dec_16x16(x, ws, gs, E_features, noise_mode=noise_mode)
         for res in range(5, self.res_log2 + 1):
             block = getattr(self, "Dec_%dx%d" % (2**res, 2**res))
@@ -1416,18 +2535,51 @@ class Decoder(nn.Module):
         return img
 
 
-class DecStyleBlock(nn.Module):
+class DecStyleBlock(torch.nn.Module):
+    """
+    Class for decoder style block. This block is used to generate style codes for the decoder.
+
+    Args:
+        res (int): Resolution.
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        activation (str): Activation function.
+        style_dim (int): Style dimension.
+        use_noise (bool): Whether to use noise.
+        demodulate (bool): Whether to demodulate.
+        img_channels (int): Number of image channels.
+
+    Inherits from `torch.nn.Module`.
+    """
+
     def __init__(
         self,
-        res,
-        in_channels,
-        out_channels,
-        activation,
-        style_dim,
-        use_noise,
-        demodulate,
-        img_channels,
-    ):
+        res: int,
+        in_channels: int,
+        out_channels: int,
+        activation: str,
+        style_dim: int,
+        use_noise: bool,
+        demodulate: bool,
+        img_channels: int,
+    ) -> None:
+        """
+        Constructor for `DecStyleBlock`.
+
+
+        Args:
+            res (int): Resolution.
+            in_channels (int): Number of input channels.
+            out_channels (int): Number of output channels.
+            activation (str): Activation function.
+            style_dim (int): Style dimension.
+            use_noise (bool): Whether to use noise.
+            demodulate (bool): Whether to demodulate.
+            img_channels (int): Number of image channels.
+
+        Returns:
+            None
+        """
         super().__init__()
         self.res = res
 
@@ -1460,7 +2612,28 @@ class DecStyleBlock(nn.Module):
             demodulate=False,
         )
 
-    def forward(self, x, img, style, skip, noise_mode="random"):
+    def forward(
+        self,
+        x: torch.Tensor,
+        img: torch.Tensor,
+        style: torch.Tensor,
+        skip: torch.Tensor,
+        noise_mode: str = "random",
+    ) -> torch.Tensor:
+        """
+        Forward function for `DecBlock`.
+
+        Args:
+            x (torch.Tensor): Input tensor with shape (B, C, H, W).
+            img (torch.Tensor): Input tensor with shape (B, C, H, W).
+            style (torch.Tensor): Style tensor with shape (B, num_ws, C).
+            skip (torch.Tensor): Skip tensor with shape (B, C, H, W).
+            noise_mode (str): Noise mode. Defaults to "random".
+
+        Returns:
+            torch.Tensor: Output of this block.
+        """
+
         x = self.conv0(x, style, noise_mode=noise_mode)
         x = x + skip
         x = self.conv1(x, style, noise_mode=noise_mode)
@@ -1469,17 +2642,45 @@ class DecStyleBlock(nn.Module):
         return x, img
 
 
-class FirstStage(nn.Module):
+class FirstStage(torch.nn.Module):
+    """
+    Class for the first stage of the generator.
+
+    Args:
+        img_channels (int): Number of channels in the image.
+        img_resolution (int): Resolution of the image. (default: 256)
+        dim (int): Dimension of the style code. (default: 180)
+        w_dim (int): Dimension of the style code. (default: 512)
+        use_noise (bool): Whether to use noise in the convolution. (default: False)
+        demodulate (bool): Whether to use demodulation in the convolution. (default: True)
+        activation (str): Activation function. (default: "lrelu")
+    """
+
     def __init__(
         self,
-        img_channels,
-        img_resolution=256,
-        dim=180,
-        w_dim=512,
-        use_noise=False,
-        demodulate=True,
-        activation="lrelu",
-    ):
+        img_channels: int,
+        img_resolution: int = 256,
+        dim: int = 180,
+        w_dim: int = 512,
+        use_noise: bool = False,
+        demodulate: bool = True,
+        activation: str = "lrelu",
+    ) -> None:
+        """
+        Constructor for `FirstStage`.
+
+        Args:
+            img_channels (int): Number of channels in the image.
+            img_resolution (int): Resolution of the image. (default: 256)
+            dim (int): Dimension of the style code. (default: 180)
+            w_dim (int): Dimension of the style code. (default: 512)
+            use_noise (bool): Whether to use noise in the convolution. (default: False)
+            demodulate (bool): Whether to use demodulation in the convolution. (default: True)
+            activation (str): Activation function. (default: "lrelu")
+
+        Returns:
+            None
+        """
         super().__init__()
         res = 64
 
@@ -1573,7 +2774,25 @@ class FirstStage(nn.Module):
                 )
             )
 
-    def forward(self, images_in, masks_in, ws, noise_mode="random"):
+    def forward(
+        self,
+        images_in: torch.Tensor,
+        masks_in: torch.Tensor,
+        ws: torch.Tensor,
+        noise_mode: str = "random",
+    ) -> torch.Tensor:
+        """
+        Forward function for `FirstStage`.
+
+        Args:
+            images_in (torch.Tensor): Input tensor with shape (B, C, H, W).
+            masks_in (torch.Tensor): Input tensor with shape (B, C, H, W).
+            ws (torch.Tensor): Style tensor with shape (B, num_ws, C).
+            noise_mode (str): Noise mode. Defaults to "random".
+
+        Returns:
+            torch.Tensor: Output of this block.
+        """
         x = torch.cat([masks_in - 0.5, images_in * masks_in], dim=1)
 
         skips = []
@@ -1628,20 +2847,55 @@ class FirstStage(nn.Module):
         return img
 
 
-class SynthesisNet(nn.Module):
+class SynthesisNet(torch.nn.Module):
+    """
+    Class for synthesis network. This network is used to generate images from
+    style codes.
+
+    Args:
+        w_dim (int): Intermediate latent (W) dimensionality.
+        img_resolution (int): Output image resolution.
+        img_channels (int, optional): Number of color channels. (default: 3)
+        channel_base (int, optional): Overall multiplier for the number of channels. (default: 32768)
+        channel_decay (float, optional): log2 channel multiplier decay per resolution. (default: 1.0)
+        channel_max (int, optional): Maximum number of channels in any layer. (default: 512)
+        activation (str, optional): Activation function: 'relu', 'lrelu', etc. (default: "lrelu")
+        drop_rate (float, optional): Dropout rate. (default: 0.5)
+        use_noise (bool, optional): Whether to use noise. (default: False)
+        demodulate (bool, optional): Whether to use demodulation. (default: True)
+    """
+
     def __init__(
         self,
-        w_dim,  # Intermediate latent (W) dimensionality.
-        img_resolution,  # Output image resolution.
-        img_channels=3,  # Number of color channels.
-        channel_base=32768,  # Overall multiplier for the number of channels.
-        channel_decay=1.0,
-        channel_max=512,  # Maximum number of channels in any layer.
-        activation="lrelu",  # Activation function: 'relu', 'lrelu', etc.
-        drop_rate=0.5,
-        use_noise=False,
-        demodulate=True,
+        w_dim: int,
+        img_resolution: int,
+        img_channels: int = 3,
+        channel_base: int = 32768,
+        channel_decay: float = 1.0,
+        channel_max: int = 512,
+        activation: str = "lrelu",
+        drop_rate: float = 0.5,
+        use_noise: bool = False,
+        demodulate: bool = True,
     ):
+        """
+        Constructor for `SynthesisNet`.
+
+        Args:
+            w_dim (int): Intermediate latent (W) dimensionality.
+            img_resolution (int): Output image resolution.
+            img_channels (int, optional): Number of color channels. (default: 3)
+            channel_base (int, optional): Overall multiplier for the number of channels. (default: 32768)
+            channel_decay (float, optional): log2 channel multiplier decay per resolution. (default: 1.0)
+            channel_max (int, optional): Maximum number of channels in any layer. (default: 512)
+            activation (str, optional): Activation function: 'relu', 'lrelu', etc. (default: "lrelu")
+            drop_rate (float, optional): Dropout rate. (default: 0.5)
+            use_noise (bool, optional): Whether to use noise. (default: False)
+            demodulate (bool, optional): Whether to use demodulation. (default: True)
+
+        Returns:
+            None
+        """
         super().__init__()
         resolution_log2 = int(np.log2(img_resolution))
         assert img_resolution == 2**resolution_log2 and img_resolution >= 4
@@ -1677,7 +2931,27 @@ class SynthesisNet(nn.Module):
             resolution_log2, activation, style_dim, use_noise, demodulate, img_channels
         )
 
-    def forward(self, images_in, masks_in, ws, noise_mode="random", return_stg1=False):
+    def forward(
+        self,
+        images_in: torch.Tensor,
+        masks_in: torch.Tensor,
+        ws: torch.Tensor,
+        noise_mode: str = "random",
+        return_stg1: bool = False,
+    ) -> torch.Tensor:
+        """
+        Forward function for `SynthesisNet`.
+
+        Args:
+            images_in (torch.Tensor): Input tensor with shape (B, C, H, W).
+            masks_in (torch.Tensor): Input tensor with shape (B, C, H, W).
+            ws (torch.Tensor): Style tensor with shape (B, num_ws, C).
+            noise_mode (str): Noise mode. Defaults to "random".
+            return_stg1 (bool): Whether to return the output of the first stage. Defaults to False.
+
+        Returns:
+            torch.Tensor: Output of this block.
+        """
         out_stg1 = self.first_stage(images_in, masks_in, ws, noise_mode=noise_mode)
 
         # encoder
@@ -1710,17 +2984,45 @@ class SynthesisNet(nn.Module):
             return img, out_stg1
 
 
-class Generator(nn.Module):
+class Generator(torch.nn.Module):
+    """
+    Class Generator.
+
+    Args:
+        z_dim (int): Input latent (Z) dimensionality, 0 = no latent.
+        c_dim (int): Conditioning label (C) dimensionality, 0 = no label.
+        w_dim (int): Intermediate latent (W) dimensionality.
+        img_resolution (int): resolution of generated image
+        img_channels (int): Number of input color channels.
+        synthesis_kwargs (dict, optional): Arguments for SynthesisNetwork. (default: {})
+        mapping_kwargs (dict, optional): Arguments for MappingNetwork. (default: {})
+    """
+
     def __init__(
         self,
-        z_dim,  # Input latent (Z) dimensionality, 0 = no latent.
-        c_dim,  # Conditioning label (C) dimensionality, 0 = no label.
-        w_dim,  # Intermediate latent (W) dimensionality.
-        img_resolution,  # resolution of generated image
-        img_channels,  # Number of input color channels.
-        synthesis_kwargs={},  # Arguments for SynthesisNetwork.
-        mapping_kwargs={},  # Arguments for MappingNetwork.
-    ):
+        z_dim: int,
+        c_dim: int,
+        w_dim: int,
+        img_resolution: int,
+        img_channels: int,
+        synthesis_kwargs: dict = {},
+        mapping_kwargs: dict = {},
+    ) -> None:
+        """
+        Constructor for `Generator`.
+
+        Args:
+            z_dim (int): Input latent (Z) dimensionality, 0 = no latent.
+            c_dim (int): Conditioning label (C) dimensionality, 0 = no label.
+            w_dim (int): Intermediate latent (W) dimensionality.
+            img_resolution (int): resolution of generated image
+            img_channels (int): Number of input color channels.
+            synthesis_kwargs (dict, optional): Arguments for SynthesisNetwork. (default: {})
+            mapping_kwargs (dict, optional): Arguments for MappingNetwork. (default: {})
+
+        Returns:
+            None
+        """
         super().__init__()
         self.z_dim = z_dim
         self.c_dim = c_dim
@@ -1744,16 +3046,31 @@ class Generator(nn.Module):
 
     def forward(
         self,
-        images_in,
-        masks_in,
-        z,
-        c,
-        truncation_psi=1,
-        truncation_cutoff=None,
-        skip_w_avg_update=False,
-        noise_mode="none",
+        images_in: torch.Tensor,
+        masks_in: torch.Tensor,
+        z: torch.Tensor,
+        c: torch.Tensor,
+        truncation_psi: float = 10,
+        truncation_cutoff: Union[int, None] = None,
+        skip_w_avg_update: bool = False,
+        noise_mode: str = "none",
         return_stg1=False,
-    ):
+    ) -> torch.Tensor:
+        """
+        Forward function for `Generator`.
+
+        Args:
+            images_in (torch.Tensor): Input tensor with shape (B, C, H, W).
+            masks_in (torch.Tensor): Input tensor with shape (B, C, H, W).
+            z (torch.Tensor): Input tensor with shape (B, z_dim).
+            c (torch.Tensor): Input tensor with shape (B, c_dim).
+            truncation_psi (float, optional): Truncation psi. (default: 1)
+            truncation_cutoff (Union[int, None], optional): Truncation cutoff. (default: None)
+            skip_w_avg_update (bool, optional): Whether to skip w_avg update. (default: False)
+            noise_mode (str, optional): Noise mode. (default: "none")
+            return_stg1 (bool, optional): Whether to return the output of the first stage. (default: False) (unused)
+
+        """
         ws = self.mapping(
             z,
             c,
@@ -1766,19 +3083,54 @@ class Generator(nn.Module):
 
 
 class Discriminator(torch.nn.Module):
+    """
+    Class for the discriminator.
+
+
+    Args:
+        c_dim (int): Conditioning label (C) dimensionality.
+        img_resolution (int): Input resolution.
+        img_channels (int): Number of input color channels.
+        channel_base (int, optional): Overall multiplier for the number of channels. (default: 32768) (unused)
+        channel_max (int, optional): Maximum number of channels in any layer. (default: 512) (unused)
+        channel_decay (int, optional): Channel decay. (default: 1) (unused)
+        cmap_dim ([Union[int, None]], optional): Dimensionality of mapped conditioning label, None = default. (default: None)
+        activation (str, optional): Activation function. (default: "lrelu")
+        mbstd_group_size (int, optional): Group size for the minibatch standard deviation layer, None = entire minibatch. (default: 4)
+        mbstd_num_channels (int, optional): Number of features for the minibatch standard deviation layer, 0 = disable. (default: 1)
+    """
+
     def __init__(
         self,
-        c_dim,  # Conditioning label (C) dimensionality.
-        img_resolution,  # Input resolution.
-        img_channels,  # Number of input color channels.
-        channel_base=32768,  # Overall multiplier for the number of channels.
-        channel_max=512,  # Maximum number of channels in any layer.
-        channel_decay=1,
-        cmap_dim=None,  # Dimensionality of mapped conditioning label, None = default.
-        activation="lrelu",
-        mbstd_group_size=4,  # Group size for the minibatch standard deviation layer, None = entire minibatch.
-        mbstd_num_channels=1,  # Number of features for the minibatch standard deviation layer, 0 = disable.
-    ):
+        c_dim: int,
+        img_resolution: int,
+        img_channels: int,
+        channel_base: int = 32768,
+        channel_max: int = 512,
+        channel_decay: int = 1,
+        cmap_dim: Union[int, None] = None,
+        activation: str = "lrelu",
+        mbstd_group_size: int = 4,
+        mbstd_num_channels: int = 1,
+    ) -> None:
+        """
+        Constructor for `Discriminator`.
+
+        Args:
+            c_dim (int): Conditioning label (C) dimensionality.
+            img_resolution (int): Input resolution.
+            img_channels (int): Number of input color channels.
+            channel_base (int, optional): Overall multiplier for the number of channels. (default: 32768) (unused)
+            channel_max (int, optional): Maximum number of channels in any layer. (default: 512) (unused)
+            channel_decay (int, optional): Channel decay. (default: 1) (unused)
+            cmap_dim ([Union[int, None]], optional): Dimensionality of mapped conditioning label, None = default. (default: None)
+            activation (str, optional): Activation function. (default: "lrelu")
+            mbstd_group_size (int, optional): Group size for the minibatch standard deviation layer, None = entire minibatch. (default: 4)
+            mbstd_num_channels (int, optional): Number of features for the minibatch standard deviation layer, 0 = disable. (default: 1)
+
+        Returns:
+            None
+        """
         super().__init__()
         self.c_dim = c_dim
         self.img_resolution = img_resolution
@@ -1847,7 +3199,26 @@ class Discriminator(torch.nn.Module):
             nf(2) // 2, 1 if cmap_dim == 0 else cmap_dim
         )
 
-    def forward(self, images_in, masks_in, images_stg1, c):
+    def forward(
+        self,
+        images_in: torch.Tensor,
+        masks_in: torch.Tensor,
+        images_stg1: torch.Tensor,
+        c: torch.Tensor,
+    ) -> torch.Tensor:
+        """
+        Forward function for `Discriminator`.
+
+        Args:
+            images_in (torch.Tensor): Input tensor with shape (B, C, H, W).
+            masks_in (torch.Tensor): Input tensor with shape (B, C, H, W).
+            images_stg1 (torch.Tensor): Input tensor with shape (B, C, H, W).
+            c (torch.Tensor): Input tensor with shape (B, c_dim).
+
+        Returns:
+            torch.Tensor: Output tensor with shape (B, 1) or (B, c_dim).
+
+        """
         x = self.Dis(torch.cat([masks_in - 0.5, images_in], dim=1))
         x = self.fc1(self.fc0(x.flatten(start_dim=1)))
 
@@ -1873,11 +3244,29 @@ MAT_MODEL_URL = os.environ.get(
 
 
 class MAT(InpaintModel):
+    """
+    MAT model for image inpainting.
+
+    Args:
+        device (torch.device): Device to load the model on.
+
+    Inherited from `InpaintModel`.
+    """
+
     min_size = 512
     pad_mod = 512
     pad_to_square = True
 
-    def init_model(self, device):
+    def init_model(self, device: torch.device) -> None:
+        """
+        Construct the model and load the pretrained weights.
+
+        Args:
+            device (torch.device): Device to load the model on.
+
+        Returns:
+            None
+        """
         seed = 240  # pick up a random number
         random.seed(seed)
         np.random.seed(seed)
@@ -1890,13 +3279,29 @@ class MAT(InpaintModel):
 
     @staticmethod
     def is_downloaded() -> bool:
+        """
+        Check if the model is downloaded and implemented.
+
+        Args:
+            None
+
+        Returns:
+            bool: True if the model is downloaded and implemented.
+        """
         return os.path.exists(get_cache_path_by_url(MAT_MODEL_URL))
 
     def forward(self, image, mask, config: Config):
-        """Input images and output images have same size
-        images: [H, W, C] RGB
-        masks: [H, W] mask area == 255
-        return: BGR IMAGE
+        """
+        Forward function for `MAT`.
+        Input images and output images have same size
+
+        Args:
+            image (torch.Tensor): Input tensor with shape (H, W, C) RGB.
+            mask (torch.Tensor): Input tensor with shape (H, W) => 0 or 255
+            config (Config): Config object see schema.py
+
+        Returns:
+            torch.Tensor: Output tensor with shape (H, W, C) RGB.
         """
 
         image = norm_img(image)  # [0, 1]
