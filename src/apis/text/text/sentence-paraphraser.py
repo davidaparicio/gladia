@@ -18,5 +18,5 @@ TaskRouter(
     router=router,
     input=inputs,
     output=output,
-    default_model="ramsrigouthamg-t5_sentence_paraphraser",
+    default_model="ramsrigouthamg-t5-large-paraphraser-diverse-high-quality",
 )
