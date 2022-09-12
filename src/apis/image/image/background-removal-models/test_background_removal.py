@@ -1,13 +1,12 @@
 import os
+
 import pytest
-
 from fastapi.testclient import TestClient
-from apis.image.image.IBasicTestsImageToImage import IBasicTestsImageToImage
 
+from apis.image.image.IBasicTestsImageToImage import IBasicTestsImageToImage
 from main import app
 from tests.constants import HOST_TO_EXAMPLE_STORAGE, PATH_TO_EXAMPLE_FILES
 from tests.utils import get_models_to_test
-
 
 client = TestClient(app)
 models = get_models_to_test(os.path.split(__file__)[0])

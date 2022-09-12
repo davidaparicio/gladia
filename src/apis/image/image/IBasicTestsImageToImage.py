@@ -19,7 +19,7 @@ class IBasicTestsImageToImage(metaclass=abc.ABCMeta):
         Returns:
             bool: True if the test passed, False otherwise
         """
-        
+
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -33,7 +33,7 @@ class IBasicTestsImageToImage(metaclass=abc.ABCMeta):
         Returns:
             bool: True if the test passed, False otherwise
         """
-        
+
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -47,7 +47,7 @@ class IBasicTestsImageToImage(metaclass=abc.ABCMeta):
         Returns:
             bool: True if the test passed, False otherwise
         """
-        
+
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -61,7 +61,7 @@ class IBasicTestsImageToImage(metaclass=abc.ABCMeta):
         Returns:
             bool: True if the test passed, False otherwise
         """
-        
+
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -75,7 +75,7 @@ class IBasicTestsImageToImage(metaclass=abc.ABCMeta):
         Returns:
             bool: True if the test passed, False otherwise
         """
-        
+
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -89,7 +89,7 @@ class IBasicTestsImageToImage(metaclass=abc.ABCMeta):
         Returns:
             bool: True if the test passed, False otherwise
         """
-        
+
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -103,5 +103,5 @@ class IBasicTestsImageToImage(metaclass=abc.ABCMeta):
         Returns:
             bool: True if the test passed, False otherwise
         """
-        
+
         raise NotImplementedError
