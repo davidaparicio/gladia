@@ -12,9 +12,12 @@ models = get_models_to_test(os.path.split(__file__)[0])
 
 
 class TestBackgroundRemoval:
-  """
-  Class to test the background removal endpoint
-  """
+    """
+    Class to test the background removal endpoint
+    """
+
+    target_url = "/image/image/background-removal/"
+
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)
     def test_jpg_image_input_task(self, model: str) -> bool:
@@ -28,7 +31,7 @@ class TestBackgroundRemoval:
             bool: True if the test passed, False otherwise
         """
         response = client.post(
-            url=f"/image/image/background-removal/",
+            url=self.target_url,
             params={"model": model} if model else {},
             files={
                 "image": open(os.path.join(PATH_TO_EXAMPLE_FILES, "test.jpg"), "rb")
@@ -49,7 +52,7 @@ class TestBackgroundRemoval:
             bool: True if the test passed, False otherwise
         """
         response = client.post(
-            url=f"/image/image/background-removal/",
+            url=self.target_url,
             params={"model": model} if model else {},
             files={
                 "image": open(os.path.join(PATH_TO_EXAMPLE_FILES, "test.png"), "rb")
@@ -71,7 +74,7 @@ class TestBackgroundRemoval:
             bool: True if the test passed, False otherwise
         """
         response = client.post(
-            url=f"/image/image/background-removal/",
+            url=self.target_url,
             params={"model": model} if model else {},
             data={
                 "image_url": f"{HOST_TO_EXAMPLE_STORAGE}/examples/image/image/background-removal/owl2.jpg"
@@ -92,7 +95,7 @@ class TestBackgroundRemoval:
             bool: True if the test passed, False otherwise
         """
         response = client.post(
-            url=f"/image/image/background-removal/",
+            url=self.target_url,
             params={"model": model} if model else {},
             data={
                 "image_url": f"{HOST_TO_EXAMPLE_STORAGE}/examples/image/image/background-removal/owl2.png"
@@ -114,7 +117,7 @@ class TestBackgroundRemoval:
         """
         with pytest.raises(Exception):
             response = client.post(
-                url=f"/image/image/background-removal/",
+                url=self.target_url,
                 params={"model": model} if model else {},
                 files={
                     "image": (
@@ -140,7 +143,7 @@ class TestBackgroundRemoval:
         """
         with pytest.raises(Exception):
             response = client.post(
-                url=f"/image/image/background-removal/",
+                url=self.target_url,
                 params={"model": model} if model else {},
                 data={"image_url": f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp4"},
             )
@@ -159,7 +162,7 @@ class TestBackgroundRemoval:
             bool: True if the test passed, False otherwise
         """
         response = client.post(
-            url=f"/image/image/background-removal/",
+            url=self.target_url,
             params={"model": model} if model else {},
             data={},
         )
