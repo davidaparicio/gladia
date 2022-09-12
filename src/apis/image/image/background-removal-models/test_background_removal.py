@@ -17,7 +17,16 @@ class TestBackgroundRemoval:
   """
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)
-    def test_jpg_image_input_task(self, model):
+    def test_jpg_image_input_task(self, model: str) -> bool:
+        """
+        Test the background removal endpoint with a jpg image input
+
+        Args:
+            model (str): model to test
+
+        Returns:
+            bool: True if the test passed, False otherwise
+        """
         response = client.post(
             url=f"/image/image/background-removal/",
             params={"model": model} if model else {},
