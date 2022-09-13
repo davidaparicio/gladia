@@ -1,12 +1,12 @@
 import io
 from logging import getLogger
+from typing import List, Union
 
 import stability_sdk.interfaces.gooseai.generation.generation_pb2 as generation
 from gladia_api_utils import SECRETS
 from gladia_api_utils.image_management import Image_to_b64
 from PIL import Image
 from stability_sdk import client
-from typing import Union,List
 
 logger = getLogger(__name__)
 
@@ -46,11 +46,7 @@ def predict(
         verbose=True,
     )
 
-    answers = stability_api.generate(
-        prompt=prompt, 
-        samples=samples, 
-        steps=steps
-        )
+    answers = stability_api.generate(prompt=prompt, samples=samples, steps=steps)
 
     output_base64_list = list()
     for resp in answers:
@@ -59,7 +55,7 @@ def predict(
                 logger.warning(
                     "Your request activated the API's safety filters and could not be processed."
                     "Please modify the prompt and try again."
-                )                
+                )
                 img = Image.open("unsafe.png")
 
             if artifact.type == generation.ARTIFACT_IMAGE:
@@ -67,9 +63,8 @@ def predict(
                 img = Image.open(bytes_img)
 
             output_base64_list.append(Image_to_b64(img))
-    
+
     if samples == 1:
         return img
     else:
         return output_base64_list
-

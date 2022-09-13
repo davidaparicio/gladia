@@ -1,11 +1,12 @@
 import base64
-from io import BytesIO
 import os
+from io import BytesIO
 
 import cv2
 import numpy as np
 from PIL import Image
 from skimage.filters import gaussian
+
 
 def Image_to_b64(image: Image) -> str:
     """
@@ -21,7 +22,6 @@ def Image_to_b64(image: Image) -> str:
     image.save(buffered, format="PNG")
     img_str = base64.b64encode(buffered.getvalue())
     return "data:image/jpeg;base64," + img_str.decode()
-
 
 
 def compress_jpg_image(image: Image, path_original: str, size=(1920, 1080)) -> str:
