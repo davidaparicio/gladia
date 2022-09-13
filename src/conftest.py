@@ -7,7 +7,7 @@ def pytest_addoption(parser: Parser) -> None:
 
     Args:
         parser (Parser): parser used by pytest to retrieve command line arguments
-        
+
     Returns:
         None
     """
