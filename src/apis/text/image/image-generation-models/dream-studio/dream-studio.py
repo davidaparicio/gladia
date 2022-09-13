@@ -10,8 +10,6 @@ from stability_sdk import client
 
 logger = getLogger(__name__)
 
-logger = getLogger(__name__)
-
 
 def predict(
     prompt="A high tech solarpunk utopia in the Amazon rainforest",
