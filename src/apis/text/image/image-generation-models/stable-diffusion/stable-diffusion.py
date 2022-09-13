@@ -4,6 +4,7 @@ from gladia_api_utils import SECRETS
 from PIL import Image
 from torch import autocast
 from gladia_api_utils.image_management import Image_to_base64
+from typing import Union, List
 from logging import getLogger
 
 logger = getLogger(__name__)
@@ -14,20 +15,21 @@ def predict(
     steps=40,
     scale=7.5,
     seed=396916372,
-) -> Image:
+) -> Union[Image.Image, List[Image.Image]]:
     """
     Generate an image using the the stable diffusion model.
     NSFW filter not implemented yet.
+    /!\ If samples > 1, the output will be a list of base 64 images instead of a single Pil Image.
 
     Args:
         prompt (str): The prompt to use for the generation
-        samples (int): The number of samples to generate. >1 Not supported so far (default: 1)
+        samples (int): The number of samples to generate. (default: 1)
         steps (int): The number of steps to use for the generation (higher is better)
         scale (float): The scale to use for the generation (recommended between 0.0 and 15.0)
         seed (int): The seed to use for the generation (default: 396916372)
 
     Returns:
-        Image: The generated image
+        Union[Image.Image, List[Image.Image]]: The generated image if samples=1, else a list of generated images in a base64 format
     """
 
     model_id = "CompVis/stable-diffusion-v1-4"
