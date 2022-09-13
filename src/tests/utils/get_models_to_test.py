@@ -6,7 +6,7 @@ from _pytest import config as __pytest_config
 PYTEST_CONFIG = __pytest_config._prepareconfig()
 
 
-def get_models_to_test(path_to_task: str, pytestconfig=None) -> List[str]:
+def get_models_to_test(path_to_task: str) -> List[str]:
     """
     Get a list of models to test for a given task. The list is obtained by
     looking for all the directories in the task directory that contain a
