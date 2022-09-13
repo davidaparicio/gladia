@@ -1,15 +1,16 @@
+from asyncio.log import logger
 import io
 from logging import getLogger
+from typing import List, Union
 
 import stability_sdk.interfaces.gooseai.generation.generation_pb2 as generation
 from gladia_api_utils import SECRETS
 from gladia_api_utils.image_management import Image_to_base64
 from PIL import Image
 from stability_sdk import client
-from typing import Union,List
+
 
 logger = getLogger(__name__)
-
 
 def predict(
     prompt="A high tech solarpunk utopia in the Amazon rainforest",
@@ -44,11 +45,7 @@ def predict(
         verbose=True,
     )
 
-    answers = stability_api.generate(
-        prompt=prompt, 
-        samples=samples, 
-        steps=steps
-        )
+    answers = stability_api.generate(prompt=prompt, samples=samples, steps=steps)
 
     output_base64_list = list()
     for resp in answers:
@@ -57,7 +54,7 @@ def predict(
                 logger.warning(
                     "Your request activated the API's safety filters and could not be processed."
                     "Please modify the prompt and try again."
-                )                
+                )
                 img = Image.open("unsafe.png")
 
             if artifact.type == generation.ARTIFACT_IMAGE:
@@ -70,4 +67,3 @@ def predict(
         return img
     else:
         return output_base64_list
-
