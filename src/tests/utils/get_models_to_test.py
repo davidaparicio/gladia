@@ -1,9 +1,10 @@
 import os
+
 from typing import List
+from _pytest.config import _prepareconfig
 
-from _pytest import config as __pytest_config
 
-PYTEST_CONFIG = __pytest_config._prepareconfig()
+PYTEST_CONFIG = None
 
 
 def get_models_to_test(path_to_task: str) -> List[str]:
@@ -21,8 +22,16 @@ def get_models_to_test(path_to_task: str) -> List[str]:
         List[str]: List of models to test.
     """
 
-    if PYTEST_CONFIG.getoption("--default-models-only"):
-        return set([""])
+    global PYTEST_CONFIG
+
+    # prevents overwriting gunicorn's command line parser
+    if "gunicorn" not in os.environ["_"]:
+
+        if PYTEST_CONFIG is None:
+            PYTEST_CONFIG = _prepareconfig()
+
+        if PYTEST_CONFIG.getoption("--default-models-only"):
+            return set([""])
 
     models = [model for model in os.listdir(path_to_task) if model[0] not in [".", "_"]]
     models = [
