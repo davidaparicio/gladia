@@ -15,7 +15,7 @@ def predict(
     steps=40,
     scale=7.5,
     seed=396916372,
-) -> Union[Image.Image, List[Image.Image]]:
+) -> Union[Image.Image, List[str]]:
     """
     Generate an image using the the stable diffusion model.
     NSFW filter not implemented yet.
