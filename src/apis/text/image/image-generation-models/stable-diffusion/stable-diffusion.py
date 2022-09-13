@@ -3,7 +3,10 @@ from diffusers import StableDiffusionPipeline
 from gladia_api_utils import SECRETS
 from PIL import Image
 from torch import autocast
+from gladia_api_utils.image_management import Image_to_base64
+from logging import getLogger
 
+logger = getLogger(__name__)
 
 def predict(
     prompt="A high tech solarpunk utopia in the Amazon rainforest",
@@ -49,6 +52,14 @@ def predict(
 
     # TODO implement NSFW filter
     # {'sample': [<PIL.Image.Image image mode=RGB size=512x512 at 0x7F546A97A070>], 'nsfw_content_detected': [False]}
-    # TODO implement multiple samples
 
-    return images_list["sample"][0]
+    if samples == 1:
+        return images_list["sample"][0]
+    else:
+        output = list()
+        for image in images_list["sample"]:
+            output.append(Image_to_base64(image))
+        return output
+        
+                
+    

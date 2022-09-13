@@ -3,12 +3,10 @@ from logging import getLogger
 
 import stability_sdk.interfaces.gooseai.generation.generation_pb2 as generation
 from gladia_api_utils import SECRETS
-from gladia_api_utils.image_management import Image_to_b64
+from gladia_api_utils.image_management import Image_to_base64
 from PIL import Image
 from stability_sdk import client
 from typing import Union,List
-
-logger = getLogger(__name__)
 
 logger = getLogger(__name__)
 
@@ -66,7 +64,7 @@ def predict(
                 bytes_img = io.BytesIO(artifact.binary)
                 img = Image.open(bytes_img)
 
-            output_base64_list.append(Image_to_b64(img))
+            output_base64_list.append(Image_to_base64(img))
     
     if samples == 1:
         return img
