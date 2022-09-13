@@ -67,9 +67,9 @@ jobs:
 
       - name: Promote *gladia* image to DH Registry
         run: |
-          docker pull ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia-base:${{ env.TAG_PROMOTE }} &&
-          docker tag ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia-base:${{ env.TAG_PROMOTE }} gladiaio/gladia-base:latest &&
-          docker push gladiaio/gladia-base:latest
+          docker pull ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{ env.TAG_PROMOTE }} &&
+          docker tag ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{ env.TAG_PROMOTE }} gladiaio/gladia:latest &&
+          docker push gladiaio/gladia:latest
     
   notify-release:
     needs: promote-gladia-to-DH
