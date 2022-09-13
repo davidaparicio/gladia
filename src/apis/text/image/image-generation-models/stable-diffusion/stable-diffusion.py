@@ -1,13 +1,15 @@
+from logging import getLogger
+from typing import List, Union
+
 import torch
 from diffusers import StableDiffusionPipeline
 from gladia_api_utils import SECRETS
+from gladia_api_utils.image_management import Image_to_base64
 from PIL import Image
 from torch import autocast
-from gladia_api_utils.image_management import Image_to_base64
-from typing import Union, List
-from logging import getLogger
 
 logger = getLogger(__name__)
+
 
 def predict(
     prompt="A high tech solarpunk utopia in the Amazon rainforest",
@@ -62,6 +64,3 @@ def predict(
         for image in images_list["sample"]:
             output.append(Image_to_base64(image))
         return output
-        
-                
-    

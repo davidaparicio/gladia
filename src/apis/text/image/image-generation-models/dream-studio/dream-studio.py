@@ -1,5 +1,5 @@
-from asyncio.log import logger
 import io
+from asyncio.log import logger
 from logging import getLogger
 from typing import List, Union
 
@@ -9,8 +9,8 @@ from gladia_api_utils.image_management import Image_to_base64
 from PIL import Image
 from stability_sdk import client
 
-
 logger = getLogger(__name__)
+
 
 def predict(
     prompt="A high tech solarpunk utopia in the Amazon rainforest",
@@ -62,7 +62,7 @@ def predict(
                 img = Image.open(bytes_img)
 
             output_base64_list.append(Image_to_base64(img))
-    
+
     if samples == 1:
         return img
     else:
