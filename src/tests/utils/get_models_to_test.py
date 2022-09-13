@@ -1,8 +1,7 @@
 import os
-
 from typing import List
-from _pytest.config import _prepareconfig
 
+from _pytest.config import _prepareconfig
 
 PYTEST_CONFIG = None
 
