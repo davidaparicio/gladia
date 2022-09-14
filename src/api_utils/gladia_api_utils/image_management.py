@@ -8,7 +8,7 @@ from PIL import Image
 from skimage.filters import gaussian
 
 
-def Image_to_base64(image: Image) -> str:
+def convert_image_to_base64(image: Image) -> str:
     """
     Convert image to base64
 
