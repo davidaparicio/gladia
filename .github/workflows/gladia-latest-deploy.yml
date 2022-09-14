@@ -108,6 +108,7 @@ jobs:
       - name: start docker gladia
         run: | 
             docker run -d --name gladia-aipi \
+            --restart unless-stopped \
             --gpus all --shm-size=5g \
             -p ${{ secrets.AIPI_SERVICE_PORT }}:8080 \
             -v /tmp/gladia:/tmp/gladia \
@@ -140,10 +141,9 @@ jobs:
 
       - name: start docker gladia
         run: | 
-            docker run -d \
-            --name gladia-aipi \
-            --gpus all \
-            --shm-size=5g \
+            docker run -d --name gladia-aipi \
+            --restart unless-stopped \
+            --gpus all --shm-size=5g \
             -p ${{ secrets.AIPI_SERVICE_PORT }}:8080 \
             -v /tmp/gladia:/tmp/gladia \
             -e TRITON_SERVER_PORT_HTTP=8000 \
