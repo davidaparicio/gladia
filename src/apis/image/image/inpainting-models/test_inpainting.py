@@ -1,18 +1,21 @@
 import os
 import tempfile
 from typing import Any, Dict
-import requests
+
 import pytest
+import requests
 from fastapi.testclient import TestClient
 
 from main import app
 from tests.constants import HOST_TO_EXAMPLE_STORAGE, PATH_TO_EXAMPLE_FILES
-from tests.utils import get_models_to_test, get_inputs_to_test
+from tests.utils import get_inputs_to_test, get_models_to_test
 
 client = TestClient(app)
 
 models = get_models_to_test(os.path.split(__file__)[0])
-inputs_to_test = get_inputs_to_test(os.path.split(__file__)[0], ["original_image_url", "mask_image_url"])
+inputs_to_test = get_inputs_to_test(
+    os.path.split(__file__)[0], ["original_image_url", "mask_image_url"]
+)
 
 
 class TestInpainting:
@@ -38,7 +41,9 @@ class TestInpainting:
         """
 
         tmp_original_image_file = tempfile.NamedTemporaryFile(mode="wb", delete=False)
-        tmp_original_image_file.write(requests.get(inputs["original_image_url"]).content)
+        tmp_original_image_file.write(
+            requests.get(inputs["original_image_url"]).content
+        )
 
         tmp_mask_image_file = tempfile.NamedTemporaryFile(mode="wb", delete=False)
         tmp_mask_image_file.write(requests.get(inputs["mask_image_url"]).content)
@@ -79,7 +84,7 @@ class TestInpainting:
 
         assert response.status_code == 200
 
-    @pytest.mark.skip # FIXME: Model neither crash nor return a non-200 status code
+    @pytest.mark.skip  # FIXME: Model neither crash nor return a non-200 status code
     @pytest.mark.parametrize("model", models)
     def test_invalid_original_image_input_task(self, model: str) -> bool:
         """
@@ -105,9 +110,9 @@ class TestInpainting:
                 },
             )
 
-            assert response.status_code != 200 # TODO
+            assert response.status_code != 200  # TODO
 
-    @pytest.mark.skip # FIXME: Model neither crash nor return a non-200 status code
+    @pytest.mark.skip  # FIXME: Model neither crash nor return a non-200 status code
     @pytest.mark.parametrize("model", models)
     def test_invalid_original_image_input_task(self, model: str) -> bool:
         """
@@ -133,9 +138,9 @@ class TestInpainting:
                 },
             )
 
-            assert response.status_code != 200 # TODO
+            assert response.status_code != 200  # TODO
 
-    @pytest.mark.skip # FIXME: Model neither crash nor return a non-200 status code
+    @pytest.mark.skip  # FIXME: Model neither crash nor return a non-200 status code
     @pytest.mark.parametrize("model", models)
     def test_invalid_original_image_url_input_task(self, model: str) -> bool:
         """
@@ -160,7 +165,7 @@ class TestInpainting:
 
             # assert response.status_code != 200 # TODO
 
-    @pytest.mark.skip # FIXME: Model neither crash nor return a non-200 status code
+    @pytest.mark.skip  # FIXME: Model neither crash nor return a non-200 status code
     @pytest.mark.parametrize("model", models)
     def test_invalid_mask_image_url_input_task(self, model: str) -> bool:
         """
