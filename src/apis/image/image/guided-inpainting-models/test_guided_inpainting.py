@@ -17,19 +17,19 @@ inputs_to_test = get_inputs_to_test(
 )
 
 
-class TestInpainting:
+class TestGuidedInpainting:
     """
-    Class to test the inpainting endpoint
+    Class to test the guided inpainting endpoint
     """
 
-    target_url = "/image/image/inpainting/"
+    target_url = "/image/image/guided-inpainting/"
 
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)
     @pytest.mark.parametrize("inputs", inputs_to_test)
     def test_local_inputs_task(self, model: str, inputs: Dict[str, Any]) -> bool:
         """
-        Test the inpainting endpoint with a jpg image input
+        Test the guided inpainting endpoint with a jpg image input
 
         Args:
             model (str): model to test
@@ -66,7 +66,7 @@ class TestInpainting:
     @pytest.mark.parametrize("inputs", inputs_to_test)
     def test_url_input_task(self, model: str, inputs) -> bool:
         """
-        Test the inpainting endpoint with a jpg image input retrieved from an url
+        Test the guided inpainting endpoint with a jpg image input retrieved from an url
 
         Args:
             model (str): model to test
@@ -87,11 +87,10 @@ class TestInpainting:
 
         assert response.status_code == 200
 
-    @pytest.mark.skip  # FIXME: Model neither crash nor return a non-200 status code
     @pytest.mark.parametrize("model", models)
     def test_invalid_original_image_input_task(self, model: str) -> bool:
         """
-        Test the inpainting endpoint with an invalid original image input
+        Test the guided inpainting endpoint with an invalid original image input
 
         Args:
             model (str): model to test
@@ -130,7 +129,7 @@ class TestInpainting:
     @pytest.mark.parametrize("model", models)
     def test_invalid_original_image_input_task(self, model: str) -> bool:
         """
-        Test the inpainting endpoint with an invalid mask image input
+        Test the guided inpainting endpoint with an invalid mask image input
 
         Args:
             model (str): model to test
@@ -164,12 +163,12 @@ class TestInpainting:
             tmp_local_mp3_file.close()
             os.unlink(tmp_local_mp3_file.name)
 
-            assert response.status_code != 200  # TODO
+            assert response.status_code != 200
 
     @pytest.mark.parametrize("model", models)
     def test_invalid_original_image_url_input_task(self, model: str) -> bool:
         """
-        Test the inpainting endpoint with an invalid original image url input
+        Test the guided inpainting endpoint with an invalid original image url input
 
         Args:
             model (str): model to test
@@ -189,13 +188,13 @@ class TestInpainting:
                 },
             )
 
-            # assert response.status_code != 200 # TODO
+            assert response.status_code != 200
 
     @pytest.mark.skip  # FIXME: Model neither crash nor return a non-200 status code
     @pytest.mark.parametrize("model", models)
     def test_invalid_mask_image_url_input_task(self, model: str) -> bool:
         """
-        Test the inpainting endpoint with an invalid mask image url input
+        Test the guided inpainting endpoint with an invalid mask image url input
 
         Args:
             model (str): model to test
@@ -215,12 +214,12 @@ class TestInpainting:
                 },
             )
 
-            # assert response.status_code != 200 # TODO
+            assert response.status_code != 200
 
     @pytest.mark.parametrize("model", models)
     def test_empty_input_task(self, model: str) -> bool:
         """
-        Test the inpainting endpoint with an empty input
+        Test the guided inpainting endpoint with an empty input
 
         Args:
             model (str): model to test
@@ -235,4 +234,4 @@ class TestInpainting:
             data={},
         )
 
-        assert response.status_code == 200  # TODO: change to != 200
+        assert response.status_code == 422
