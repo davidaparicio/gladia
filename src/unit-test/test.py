@@ -196,16 +196,19 @@ def get_task_inputs(task_details):
                     else:
                         examples_files = os.listdir(CURRENT_DIRECTORY)
 
-                    file = [file for file in examples_files if file.endswith(format)][0]
-                    if is_url(file):
-                        file_path = file
-                        file = file.split("/")[-1]
-                    else:
-                        file_path = os.path.join(CURRENT_DIRECTORY, file)
-                    # Add the file to the request
-                    for key, value in type_file.items():
-                        request_files.update({value[0]: (file, file_path)})
-                    task_inputs.append({"data": data, "files": request_files})
+                    files = [file for file in examples_files if file.endswith(format)]
+
+                    if files:
+                        file = files[0]
+                        if is_url(file):
+                            file_path = file
+                            file = file.split("/")[-1]
+                        else:
+                            file_path = os.path.join(CURRENT_DIRECTORY, file)
+                        # Add the file to the request
+                        for key, value in type_file.items():
+                            request_files.update({value[0]: (file, file_path)})
+                        task_inputs.append({"data": data, "files": request_files})
 
     else:
         task_inputs.append({"data": data, "files": {}})

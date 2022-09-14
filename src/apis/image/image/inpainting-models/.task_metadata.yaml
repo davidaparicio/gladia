@@ -10,7 +10,3 @@ inputs_example:
     default_example: "https://raw.githubusercontent.com/CompVis/latent-diffusion/main/data/inpainting_examples/overture-creations-5sI6fQgYIuo_mask.png"
     examples:
       - "https://raw.githubusercontent.com/CompVis/latent-diffusion/main/data/inpainting_examples/overture-creations-5sI6fQgYIuo_mask.png"
-  prompt:
-    default_example: "a cat sitting on a bench"
-    examples:
-      - "a cat sitting on a bench"
