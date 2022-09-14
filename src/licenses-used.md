@@ -114,7 +114,6 @@
 | gevent                            | 21.12.0     | MIT License                                        |
 | greenlet                          | 1.1.2       | MIT License                                        |
 | h11                               | 0.13.0      | MIT License                                        |
-| inflect                           | 5.6.2       | MIT License                                        |
 | jmespath                          | 0.10.0      | MIT License                                        |
 | keybert                           | 0.6.0       | MIT License                                        |
 | opencv-python                     | 4.6.0.66    | MIT License                                        |
