@@ -1,6 +1,7 @@
 import os
 import tempfile
 from typing import Any, Dict
+
 import pytest
 import requests
 from fastapi.testclient import TestClient
@@ -56,7 +57,7 @@ class TestGuidedInpainting:
             },
             data={
                 "prompt": inputs["prompt"],
-            }
+            },
         )
 
         assert response.status_code == 200
@@ -118,7 +119,7 @@ class TestGuidedInpainting:
                 },
                 data={
                     "prompt": inputs_to_test[0]["prompt"],
-                }
+                },
             )
 
             tmp_local_mp3_file.close()
@@ -157,7 +158,7 @@ class TestGuidedInpainting:
                 },
                 data={
                     "prompt": inputs_to_test[0]["prompt"],
-                }
+                },
             )
 
             tmp_local_mp3_file.close()
