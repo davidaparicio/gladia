@@ -25,7 +25,7 @@ class TestInpainting:
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)
     @pytest.mark.parametrize("inputs", inputs_to_test)
-    def test_png_image_input_task(self, model: str, inputs: Dict[str, Any]) -> bool:
+    def test_local_inputs_task(self, model: str, inputs: Dict[str, Any]) -> bool:
         """
         Test the inpainting endpoint with a jpg image input
 
@@ -57,7 +57,7 @@ class TestInpainting:
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)
     @pytest.mark.parametrize("inputs", inputs_to_test)
-    def test_image_url_input_task(self, model: str, inputs) -> bool:
+    def test_url_input_task(self, model: str, inputs) -> bool:
         """
         Test the inpainting endpoint with a jpg image input retrieved from an url
 
