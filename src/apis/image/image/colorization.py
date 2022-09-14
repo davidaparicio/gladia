@@ -1,16 +1,15 @@
 from fastapi import APIRouter
 from gladia_api_utils.submodules import TaskRouter
+from gladia_api_utils.task_management import get_task_metadata
+
+task_metadata = get_task_metadata(__file__)
 
 inputs = [
     {
         "type": "image",
         "name": "image",
-        "example": "http://files.gladia.io/examples/image/image/colorization/rsz_paris.jpg",
-        "examples": [
-            "http://files.gladia.io/examples/image/image/colorization/rsz_paris.gif",
-            "http://files.gladia.io/examples/image/image/colorization/rsz_paris.jpg",
-            "http://files.gladia.io/examples/image/image/colorization/rsz_paris.png",
-        ],
+        "example": task_metadata["inputs_example"]["image_url"]["default_example"],
+        "examples": task_metadata["inputs_example"]["image_url"]["examples"],
         "placeholder": "Image to colorize",
     }
 ]
