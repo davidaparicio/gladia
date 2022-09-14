@@ -1,10 +1,9 @@
 import os
-import yaml
-
-from typing import Any, Dict, List
-from _pytest.config import _prepareconfig
 from itertools import product
+from typing import Any, Dict, List
 
+import yaml
+from _pytest.config import _prepareconfig
 
 PYTEST_CONFIG = None
 
@@ -48,7 +47,9 @@ def get_models_to_test(path_to_task: str) -> List[str]:
     return set(models)
 
 
-def get_inputs_to_test(path_to_task: str, input_names: List[str]) -> List[Dict[str, Any]]:
+def get_inputs_to_test(
+    path_to_task: str, input_names: List[str]
+) -> List[Dict[str, Any]]:
     """
     Retrieve the test values for each input specified in `input_names`
 
@@ -75,8 +76,21 @@ def get_inputs_to_test(path_to_task: str, input_names: List[str]) -> List[Dict[s
     task_metadata = yaml.safe_load(open(task_metadata_file_path, "r"))
 
     if PYTEST_CONFIG.getoption("--default-inputs-only"):
-        return [{input_name : task_metadata["inputs_example"][input_name]["default_example"] for input_name in input_names}]
+        return [
+            {
+                input_name: task_metadata["inputs_example"][input_name][
+                    "default_example"
+                ]
+                for input_name in input_names
+            }
+        ]
 
-    possible_values_for_each_input = {input_name : task_metadata["inputs_example"][input_name]["examples"] for input_name in input_names}
+    possible_values_for_each_input = {
+        input_name: task_metadata["inputs_example"][input_name]["examples"]
+        for input_name in input_names
+    }
 
-    return [dict(zip(possible_values_for_each_input, v)) for v in product(*possible_values_for_each_input.values())]
+    return [
+        dict(zip(possible_values_for_each_input, v))
+        for v in product(*possible_values_for_each_input.values())
+    ]

@@ -1,15 +1,16 @@
 import os
-import pytest
-import requests
 import tempfile
-
 from typing import Any, Dict
 from urllib.request import urlretrieve
+
+import pytest
+import requests
 from fastapi.testclient import TestClient
+
 from apis.image.image.IBasicTestsImageToImage import IBasicTestsImageToImage
 from main import app
 from tests.constants import HOST_TO_EXAMPLE_STORAGE
-from tests.utils import get_models_to_test, get_inputs_to_test
+from tests.utils import get_inputs_to_test, get_models_to_test
 
 client = TestClient(app)
 
@@ -47,9 +48,7 @@ class TestBackgroundRemoval(IBasicTestsImageToImage):
         response = client.post(
             url=self.target_url,
             params={"model": model} if model else {},
-            files={
-                "image": open(tmp_local_image_file.name, "rb")
-            },
+            files={"image": open(tmp_local_image_file.name, "rb")},
         )
 
         tmp_local_image_file.close()
@@ -75,9 +74,7 @@ class TestBackgroundRemoval(IBasicTestsImageToImage):
         response = client.post(
             url=self.target_url,
             params={"model": model} if model else {},
-            data={
-                "image_url": inputs["image_url"]
-            },
+            data={"image_url": inputs["image_url"]},
         )
 
         assert response.status_code == 200
@@ -95,7 +92,9 @@ class TestBackgroundRemoval(IBasicTestsImageToImage):
         """
 
         tmp_local_video_file = tempfile.NamedTemporaryFile(mode="wb", delete=False)
-        urlretrieve(f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp4", tmp_local_video_file.name)
+        urlretrieve(
+            f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp4", tmp_local_video_file.name
+        )
 
         with pytest.raises(Exception):
             response = client.post(
@@ -114,7 +113,6 @@ class TestBackgroundRemoval(IBasicTestsImageToImage):
 
         tmp_local_video_file.close()
         os.unlink(tmp_local_video_file.name)
-
 
     @pytest.mark.parametrize("model", models)
     def test_invalid_image_url_input_task(self, model: str) -> bool:
