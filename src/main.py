@@ -340,7 +340,7 @@ def import_submodules(package: ModuleType, recursive: bool = True) -> None:
         )
 
         if (
-            __module_is_an_input_type
+            __module_is_an_input_type(module_split)
             or __module_is_a_modality(module_split, module_config)
             or __module_is_a_task(module_split, module_config)
             or __module_is_a_model(module_split)
