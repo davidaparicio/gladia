@@ -26,7 +26,7 @@ def get_models_to_test(path_to_task: str) -> List[str]:
     global PYTEST_CONFIG
 
     # prevents overwriting gunicorn's command line parser
-    if "gunicorn" not in os.environ["_"]:
+    if "gunicorn" not in os.environ.get("_", "gunicorn"):
 
         if PYTEST_CONFIG is None:
             PYTEST_CONFIG = _prepareconfig()
@@ -64,7 +64,7 @@ def get_inputs_to_test(
     global PYTEST_CONFIG
 
     # prevents overwriting gunicorn's command line parser
-    if "gunicorn" not in os.environ["_"]:
+    if "gunicorn" not in os.environ.get("_", "gunicorn"):
 
         if PYTEST_CONFIG is None:
             PYTEST_CONFIG = _prepareconfig()
