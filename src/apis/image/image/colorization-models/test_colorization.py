@@ -1,12 +1,13 @@
 import os
 import tempfile
 from typing import Any, Dict
+
 import pytest
 import requests
 from fastapi.testclient import TestClient
 
-from main import app
 from apis.image.image.IBasicTestsImageToImage import IBasicTestsImageToImage
+from main import app
 from tests.constants import HOST_TO_EXAMPLE_STORAGE
 from tests.utils import get_inputs_to_test, get_models_to_test
 
@@ -39,9 +40,7 @@ class TestColorization(IBasicTestsImageToImage):
         """
 
         tmp_original_image_file = tempfile.NamedTemporaryFile(mode="wb", delete=False)
-        tmp_original_image_file.write(
-            requests.get(inputs["image_url"]).content
-        )
+        tmp_original_image_file.write(requests.get(inputs["image_url"]).content)
 
         response = client.post(
             url=self.target_url,
@@ -108,7 +107,7 @@ class TestColorization(IBasicTestsImageToImage):
                 },
                 data={
                     "prompt": inputs_to_test[0]["prompt"],
-                }
+                },
             )
 
             tmp_local_mp3_file.close()
@@ -139,7 +138,9 @@ class TestColorization(IBasicTestsImageToImage):
 
             assert response.status_code != 200
 
-    @pytest.mark.skip("models currently doesn't returns an error when no data is provided") # FIXME
+    @pytest.mark.skip(
+        "models currently doesn't returns an error when no data is provided"
+    )  # FIXME
     @pytest.mark.parametrize("model", models)
     def test_empty_input_task(self, model: str) -> bool:
         """
