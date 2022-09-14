@@ -120,6 +120,8 @@ jobs:
             -e STABILITY_KEY=${{ secrets.STABILITY_KEY }} \
             -e MODE=server \
             ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{ env.TAG_PROMOTE }}
+      - name: sleep to let it start before deploying next worker
+        run: sleep 120
       # todo : healthcheck, notify failure
 
   deploy-aipi-2:
