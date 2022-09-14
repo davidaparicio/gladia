@@ -62,5 +62,5 @@ def predict(
     else:
         output = list()
         for image in images_list["sample"]:
-            output.append(Image_to_base64(image))
+            output.append(convert_image_to_base64(image))
         return output
