@@ -1,13 +1,12 @@
 import os
 import tempfile
 from typing import Any, Dict
-
 import pytest
 import requests
 from fastapi.testclient import TestClient
 
 from main import app
-from tests.constants import HOST_TO_EXAMPLE_STORAGE, PATH_TO_EXAMPLE_FILES
+from tests.constants import HOST_TO_EXAMPLE_STORAGE
 from tests.utils import get_inputs_to_test, get_models_to_test
 
 client = TestClient(app)
@@ -96,19 +95,28 @@ class TestInpainting:
         Returns:
             bool: True if the test passed, False otherwise
         """
+
+        tmp_local_mp3_file = tempfile.NamedTemporaryFile(mode="wb", delete=False)
+        tmp_local_mp3_file.write(
+            requests.get(f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp3").content
+        )
+
         with pytest.raises(Exception):
             response = client.post(
                 url=self.target_url,
                 params={"model": model} if model else {},
                 files={
                     "original_image": (
-                        "test.mp3",
-                        open(os.path.join(PATH_TO_EXAMPLE_FILES, "test.mp3"), "rb"),
+                        tmp_local_mp3_file.name,
+                        open(tmp_local_mp3_file.name, "rb"),
                         "audio/mpeg",
                     ),
                     "mask_image": self.default_local_mask_image,
                 },
             )
+
+            tmp_local_mp3_file.close()
+            os.unlink(tmp_local_mp3_file.name)
 
             assert response.status_code != 200  # TODO
 
@@ -124,6 +132,12 @@ class TestInpainting:
         Returns:
             bool: True if the test passed, False otherwise
         """
+
+        tmp_local_mp3_file = tempfile.NamedTemporaryFile(mode="wb", delete=False)
+        tmp_local_mp3_file.write(
+            requests.get(f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp3").content
+        )
+
         with pytest.raises(Exception):
             response = client.post(
                 url=self.target_url,
@@ -131,12 +145,15 @@ class TestInpainting:
                 files={
                     "original_image": self.default_local_mask_image,
                     "mask_image": (
-                        "test.mp3",
-                        open(os.path.join(PATH_TO_EXAMPLE_FILES, "test.mp3"), "rb"),
+                        tmp_local_mp3_file.name,
+                        open(tmp_local_mp3_file.name, "rb"),
                         "audio/mpeg",
                     ),
                 },
             )
+
+            tmp_local_mp3_file.close()
+            os.unlink(tmp_local_mp3_file.name)
 
             assert response.status_code != 200  # TODO
 
