@@ -13,3 +13,4 @@ def pytest_addoption(parser: Parser) -> None:
     """
 
     parser.addoption("--default-models-only", action="store_true", default=False)
+    parser.addoption("--default-inputs-only", action="store_true", default=False)
