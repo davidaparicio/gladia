@@ -79,10 +79,37 @@ Help us build the biggest treasure trove of State of the Arts AI models, one we 
 
 
 # Quickstart
-## Magic Start
+## :rocket: Instant Start
+
+When it comes to get hands on a product to test, nothing's better than a one liner ! Here is the magic: 
+
 ```sh
 $ docker run -d --gpus all --shm-size=5g -p 8080:8080 gladiaio/gladia:latest
+```
 
+Your Gladia service is now available at [http://localhost:8080/docs](http://localhost:8080/docs)
+
+
+## :mechanical_arm: Full Start 
+
+if you want to get a taste of Gladia full power, use it with the integrations !
+
+For advanced AI Image features, Gladia integrates with HuggingFace and DreamStudio API
+  
+HuggingFace is a reference when it comes to models sharing. Its hub is massive and helps AI community to build and share models on a daily basis. You will need a `HUGGING_FACE_ACCESS_TOKEN`, just proceed as follows:
+1. Create your free account https://huggingface.co/
+2. Access https://huggingface.co/settings/tokens
+3. Create a `READ` token  
+  
+DreamStudio is a tool suite namely providing stable diffusion features. They build great stuff and contribute to the AI creation ecosystem.
+You will also need an API key, it is available in only 2 steps:
+1. Create your free account https://beta.dreamstudio.ai/
+2. Get your token on https://beta.dreamstudio.ai/membership
+
+You're ready to go !  
+
+
+```sh
 # to test image generation for both stability API and the open source stable diffusion
 # you'll need STABILITY_KEY and HUGGINGFACE_ACCESS_TOKEN
 # getting STABILITY_KEY here https://beta.dreamstudio.ai/membership
