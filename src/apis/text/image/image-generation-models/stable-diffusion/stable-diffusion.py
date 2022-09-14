@@ -4,7 +4,7 @@ from typing import List, Union
 import torch
 from diffusers import StableDiffusionPipeline
 from gladia_api_utils import SECRETS
-from gladia_api_utils.image_management import Image_to_base64
+from gladia_api_utils.image_management import convert_image_to_base64
 from PIL import Image
 from torch import autocast
 
