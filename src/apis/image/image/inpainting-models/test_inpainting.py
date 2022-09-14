@@ -83,7 +83,6 @@ class TestInpainting:
 
         assert response.status_code == 200
 
-    @pytest.mark.skip  # FIXME: Model neither crash nor return a non-200 status code
     @pytest.mark.parametrize("model", models)
     def test_invalid_original_image_input_task(self, model: str) -> bool:
         """
@@ -120,7 +119,6 @@ class TestInpainting:
 
             assert response.status_code != 200  # TODO
 
-    @pytest.mark.skip  # FIXME: Model neither crash nor return a non-200 status code
     @pytest.mark.parametrize("model", models)
     def test_invalid_original_image_input_task(self, model: str) -> bool:
         """
@@ -157,7 +155,6 @@ class TestInpainting:
 
             assert response.status_code != 200  # TODO
 
-    @pytest.mark.skip  # FIXME: Model neither crash nor return a non-200 status code
     @pytest.mark.parametrize("model", models)
     def test_invalid_original_image_url_input_task(self, model: str) -> bool:
         """
