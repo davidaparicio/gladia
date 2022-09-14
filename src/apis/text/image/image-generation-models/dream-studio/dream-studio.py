@@ -1,5 +1,4 @@
 import io
-from asyncio.log import logger
 from logging import getLogger
 from typing import List, Union
 
