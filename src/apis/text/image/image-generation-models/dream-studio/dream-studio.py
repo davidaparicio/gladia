@@ -61,7 +61,7 @@ def predict(
                 bytes_img = io.BytesIO(artifact.binary)
                 img = Image.open(bytes_img)
 
-            output_base64_list.append(Image_to_base64(img))
+            output_base64_list.append(convert_image_to_base64(img))
 
     if samples == 1:
         return img
