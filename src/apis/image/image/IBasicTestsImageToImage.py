@@ -9,7 +9,7 @@ class IBasicTestsImageToImage(metaclass=abc.ABCMeta):
     target_url = None
 
     @abc.abstractmethod
-    def test_jpg_image_input_task(self, model: str) -> bool:
+    def test_image_input_task(self, model: str) -> bool:
         """
         Test the background removal endpoint with a jpg image input
 
@@ -23,37 +23,9 @@ class IBasicTestsImageToImage(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def test_png_image_input_task(self, model: str) -> bool:
-        """
-        Test the background removal endpoint with a png image input
-
-        Args:
-            model (str): model to test
-
-        Returns:
-            bool: True if the test passed, False otherwise
-        """
-
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def test_jpg_image_url_input_task(self, model: str) -> bool:
+    def test_image_url_input_task(self, model: str) -> bool:
         """
         Test the background removal endpoint with a jpg image input retrieved from an url
-
-        Args:
-            model (str): model to test
-
-        Returns:
-            bool: True if the test passed, False otherwise
-        """
-
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def test_png_image_url_input_task(self, model: str) -> bool:
-        """
-        Test the background removal endpoint with a png image input retrieved from an url
 
         Args:
             model (str): model to test
