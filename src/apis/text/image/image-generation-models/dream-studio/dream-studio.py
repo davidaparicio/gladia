@@ -4,7 +4,7 @@ from typing import List, Union
 
 import stability_sdk.interfaces.gooseai.generation.generation_pb2 as generation
 from gladia_api_utils import SECRETS
-from gladia_api_utils.image_management import Image_to_base64
+from gladia_api_utils.image_management import convert_image_to_base64
 from PIL import Image
 from stability_sdk import client
 
