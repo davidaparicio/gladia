@@ -1,0 +1,1 @@
+from .default_image_to_image_tests import create_default_image_to_image_tests
