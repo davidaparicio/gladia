@@ -12,10 +12,8 @@ from tests.utils import get_inputs_to_test, get_models_to_test
 
 client = TestClient(app)
 
-models = get_models_to_test(os.path.split(__file__)[0])
-inputs_to_test = get_inputs_to_test(
-    os.path.split(__file__)[0], ["original_image_url", "mask_image_url", "prompt"]
-)
+models = get_models_to_test()
+inputs_to_test = get_inputs_to_test(["original_image_url", "mask_image_url", "prompt"])
 
 
 class TestGuidedInpainting:
@@ -105,27 +103,26 @@ class TestGuidedInpainting:
             requests.get(f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp3").content
         )
 
-        with pytest.raises(Exception):
-            response = client.post(
-                url=self.target_url,
-                params={"model": model} if model else {},
-                files={
-                    "original_image": (
-                        tmp_local_mp3_file.name,
-                        open(tmp_local_mp3_file.name, "rb"),
-                        "audio/mpeg",
-                    ),
-                    "mask_image": self.default_local_mask_image,
-                },
-                data={
-                    "prompt": inputs_to_test[0]["prompt"],
-                },
-            )
+        response = client.post(
+            url=self.target_url,
+            params={"model": model} if model else {},
+            files={
+                "original_image": (
+                    tmp_local_mp3_file.name,
+                    open(tmp_local_mp3_file.name, "rb"),
+                    "audio/mpeg",
+                ),
+                "mask_image_url": inputs_to_test[0]["mask_image_url"],
+            },
+            data={
+                "prompt": inputs_to_test[0]["prompt"],
+            },
+        )
 
-            tmp_local_mp3_file.close()
-            os.unlink(tmp_local_mp3_file.name)
+        tmp_local_mp3_file.close()
+        os.unlink(tmp_local_mp3_file.name)
 
-            assert response.status_code != 200  # TODO
+        assert response.status_code == 500  # TODO
 
     @pytest.mark.parametrize("model", models)
     def test_invalid_original_image_input_task(self, model: str) -> bool:
@@ -144,27 +141,26 @@ class TestGuidedInpainting:
             requests.get(f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp3").content
         )
 
-        with pytest.raises(Exception):
-            response = client.post(
-                url=self.target_url,
-                params={"model": model} if model else {},
-                files={
-                    "original_image": self.default_local_mask_image,
-                    "mask_image": (
-                        tmp_local_mp3_file.name,
-                        open(tmp_local_mp3_file.name, "rb"),
-                        "audio/mpeg",
-                    ),
-                },
-                data={
-                    "prompt": inputs_to_test[0]["prompt"],
-                },
-            )
+        response = client.post(
+            url=self.target_url,
+            params={"model": model} if model else {},
+            files={
+                "original_image_url": inputs_to_test[0]["original_image_url"],
+                "mask_image": (
+                    tmp_local_mp3_file.name,
+                    open(tmp_local_mp3_file.name, "rb"),
+                    "audio/mpeg",
+                ),
+            },
+            data={
+                "prompt": inputs_to_test[0]["prompt"],
+            },
+        )
 
-            tmp_local_mp3_file.close()
-            os.unlink(tmp_local_mp3_file.name)
+        tmp_local_mp3_file.close()
+        os.unlink(tmp_local_mp3_file.name)
 
-            assert response.status_code != 200
+        assert response.status_code == 422
 
     @pytest.mark.parametrize("model", models)
     def test_invalid_original_image_url_input_task(self, model: str) -> bool:
@@ -178,18 +174,17 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        with pytest.raises(Exception):
-            response = client.post(
-                url=self.target_url,
-                params={"model": model} if model else {},
-                data={
-                    "original_image_url": f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp4",
-                    "mask_image_url": inputs_to_test[0]["mask_image_url"],
-                    "prompt": inputs_to_test[0]["prompt"],
-                },
-            )
+        response = client.post(
+            url=self.target_url,
+            params={"model": model} if model else {},
+            data={
+                "original_image_url": f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp4",
+                "mask_image_url": inputs_to_test[0]["mask_image_url"],
+                "prompt": inputs_to_test[0]["prompt"],
+            },
+        )
 
-            assert response.status_code != 200
+        assert response.status_code == 500
 
     @pytest.mark.skip  # FIXME: Model neither crash nor return a non-200 status code
     @pytest.mark.parametrize("model", models)
@@ -204,18 +199,17 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        with pytest.raises(Exception):
-            response = client.post(
-                url=self.target_url,
-                params={"model": model} if model else {},
-                data={
-                    "original_image_url": inputs_to_test[0]["original_image_url"],
-                    "mask_image": f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp4",
-                    "prompt": inputs_to_test[0]["prompt"],
-                },
-            )
+        response = client.post(
+            url=self.target_url,
+            params={"model": model} if model else {},
+            data={
+                "original_image_url": inputs_to_test[0]["original_image_url"],
+                "mask_image": f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp4",
+                "prompt": inputs_to_test[0]["prompt"],
+            },
+        )
 
-            assert response.status_code != 200
+        assert response.status_code == 500
 
     @pytest.mark.parametrize("model", models)
     def test_empty_input_task(self, model: str) -> bool:
