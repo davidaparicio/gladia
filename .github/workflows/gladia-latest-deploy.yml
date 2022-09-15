@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  REGISTRY_URL: https://${{ secrets.DOCKER_GLADIA_FQDN }}
+  REGISTRY_URL: https://${DOCKER_GLADIA_FQDN}
   TAG_PROMOTED: ci-${{ github.event.pull_request.number }}
   TAG_PROMOTE: latest
   CONTENT_TYPE: application/vnd.docker.distribution.manifest.v2+json
@@ -50,25 +50,18 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Login to Gladia Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ secrets.DOCKER_GLADIA_FQDN }}
-          username: ${{ secrets.DOCKER_GLADIA_USERNAME }}
-          password: ${{ secrets.DOCKER_GLADIA_ACCESS_TOKEN }}
-
       - name: Promote *gladia-base* image to DH Registry
         if: |
           contains(github.event.pull_request.labels.*.name, 'ci: build-base')
         run: |
-          docker pull ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia-base:${{ env.TAG_PROMOTE }} &&
-          docker tag ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia-base:${{ env.TAG_PROMOTE }} gladiaio/gladia-base:latest &&
+          docker pull ${DOCKER_GLADIA_FQDN}/gladia-base:${{ env.TAG_PROMOTE }} &&
+          docker tag ${DOCKER_GLADIA_FQDN}/gladia-base:${{ env.TAG_PROMOTE }} gladiaio/gladia-base:latest &&
           docker push gladiaio/gladia-base:latest
 
       - name: Promote *gladia* image to DH Registry
         run: |
-          docker pull ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{ env.TAG_PROMOTE }} &&
-          docker tag ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{ env.TAG_PROMOTE }} gladiaio/gladia:latest &&
+          docker pull ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }} &&
+          docker tag ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }} gladiaio/gladia:latest &&
           docker push gladiaio/gladia:latest
     
   notify-release:
@@ -92,15 +85,8 @@ jobs:
     needs: promote-gladia-image
     runs-on: [self-hosted, linux, aipi-1]
     steps:
-      - name: Login to Gladia Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ secrets.DOCKER_GLADIA_FQDN }}
-          username: ${{ secrets.DOCKER_GLADIA_USERNAME }}
-          password: ${{ secrets.DOCKER_GLADIA_ACCESS_TOKEN }}
-      
       - name: pull gladia image
-        run: docker pull ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{ env.TAG_PROMOTE }}
+        run: docker pull ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
 
       - name: stop docker gladia
         run: docker kill gladia-aipi && docker rm gladia-aipi
@@ -119,7 +105,7 @@ jobs:
             -e HUGGINGFACE_ACCESS_TOKEN=${{ secrets.HUGGINGFACE_ACCESS_TOKEN }} \
             -e STABILITY_KEY=${{ secrets.STABILITY_KEY }} \
             -e MODE=server \
-            ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{ env.TAG_PROMOTE }}
+            ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
       - name: sleep to let it start before deploying next worker
         run: sleep 120
       # todo : healthcheck, notify failure
@@ -128,15 +114,8 @@ jobs:
     needs: deploy-aipi-1
     runs-on: [self-hosted, linux, aipi-2]
     steps:
-      - name: Login to Gladia Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ secrets.DOCKER_GLADIA_FQDN }}
-          username: ${{ secrets.DOCKER_GLADIA_USERNAME }}
-          password: ${{ secrets.DOCKER_GLADIA_ACCESS_TOKEN }}
-      
       - name: pull gladia image
-        run: docker pull ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{ env.TAG_PROMOTE }}
+        run: docker pull ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
 
       - name: stop docker gladia
         run: docker kill gladia-aipi && docker rm gladia-aipi
@@ -155,7 +134,7 @@ jobs:
             -e HUGGINGFACE_ACCESS_TOKEN=${{ secrets.HUGGINGFACE_ACCESS_TOKEN }} \
             -e STABILITY_KEY=${{ secrets.STABILITY_KEY }} \
             -e MODE=server \
-            ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{ env.TAG_PROMOTE }}
+            ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
 
   notify-aipi-prod-deployment:
     needs: [deploy-aipi-1, deploy-aipi-2]
