@@ -662,8 +662,14 @@ class TaskRouter:
                     model, f"{self.root_package_path}/{model}/{model}.py"
                 ).load_module()
 
-                # This is where we launch the inference without custom env
-                result = getattr(this_module, f"predict")(*args, **kwargs)
+                try:
+                    # This is where we launch the inference without custom env
+                    result = getattr(this_module, f"predict")(*args, **kwargs)
+                except Exception as e:
+                    raise HTTPException(
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail=f"The following error occurred: {str(e)}",
+                    )
 
             try:
                 return cast_response(result, self.output)
