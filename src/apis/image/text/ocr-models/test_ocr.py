@@ -46,12 +46,15 @@ class TestOcr:
             params={"model": model} if model else {},
             files={
                 "image": open(tmp_image_file.name, "rb"),
-            }, data={
+            },
+            data={
                 "source_language": inputs["source_language"],
             },
         )
 
-        assert response.status_code == 200, f"non-200 status code: {response.status_code} error message: {response.content}"
+        assert (
+            response.status_code == 200
+        ), f"non-200 status code: {response.status_code} error message: {response.content}"
 
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)
@@ -76,7 +79,9 @@ class TestOcr:
             },
         )
 
-        assert response.status_code == 200, f"non-200 status code: {response.status_code} with the following message: {response.content}"
+        assert (
+            response.status_code == 200
+        ), f"non-200 status code: {response.status_code} with the following message: {response.content}"
 
     @pytest.mark.parametrize("model", models)
     def test_invalid_image_input_task(self, model: str) -> bool:
@@ -104,7 +109,8 @@ class TestOcr:
                     open(tmp_local_mp3_file.name, "rb"),
                     "audio/mpeg",
                 ),
-            }, data={
+            },
+            data={
                 "source_language": inputs_to_test[0]["source_language"],
             },
         )
@@ -137,7 +143,7 @@ class TestOcr:
 
         assert response.status_code == 500
 
-    @pytest.mark.skip("Model neither crash nor return a non-200 status code") #FIXME
+    @pytest.mark.skip("Model neither crash nor return a non-200 status code")  # FIXME
     @pytest.mark.parametrize("model", models)
     def test_empty_input_task(self, model: str) -> bool:
         """

@@ -49,7 +49,9 @@ class TestAsciify:
             },
         )
 
-        assert response.status_code == 200, f"non-200 status code: {response.status_code} error message: {response.content}"
+        assert (
+            response.status_code == 200
+        ), f"non-200 status code: {response.status_code} error message: {response.content}"
 
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)
@@ -73,7 +75,9 @@ class TestAsciify:
             },
         )
 
-        assert response.status_code == 200, f"non-200 status code: {response.status_code} with the following message: {response.content}"
+        assert (
+            response.status_code == 200
+        ), f"non-200 status code: {response.status_code} with the following message: {response.content}"
 
     @pytest.mark.parametrize("model", models)
     def test_invalid_image_input_task(self, model: str) -> bool:
@@ -129,7 +133,7 @@ class TestAsciify:
 
         assert response.status_code == 500
 
-    @pytest.mark.skip("Model neither crash nor return a non-200 status code") #FIXME
+    @pytest.mark.skip("Model neither crash nor return a non-200 status code")  # FIXME
     @pytest.mark.parametrize("model", models)
     def test_empty_input_task(self, model: str) -> bool:
         """

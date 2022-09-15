@@ -49,10 +49,12 @@ class TestClassification:
             },
             data={
                 "top_k": inputs["top_k"],
-            }
+            },
         )
 
-        assert response.status_code == 200, f"non-200 status code: {response.status_code} error message: {response.content}"
+        assert (
+            response.status_code == 200
+        ), f"non-200 status code: {response.status_code} error message: {response.content}"
         assert len(response.json()["prediction_raw"].keys()) == inputs["top_k"]
 
     @pytest.mark.mandatory
@@ -78,7 +80,9 @@ class TestClassification:
             },
         )
 
-        assert response.status_code == 200, f"non-200 status code: {response.status_code} with the following message: {response.content}"
+        assert (
+            response.status_code == 200
+        ), f"non-200 status code: {response.status_code} with the following message: {response.content}"
         assert len(response.json()["prediction_raw"].keys()) == inputs["top_k"]
 
     @pytest.mark.parametrize("model", models)
@@ -107,9 +111,10 @@ class TestClassification:
                     open(tmp_local_mp3_file.name, "rb"),
                     "audio/mpeg",
                 ),
-            }, data={
+            },
+            data={
                 "top_k": inputs_to_test[0]["top_k"],
-            }
+            },
         )
 
         tmp_local_mp3_file.close()
@@ -140,7 +145,7 @@ class TestClassification:
 
         assert response.status_code == 500
 
-    @pytest.mark.skip("Model neither crash nor return a non-200 status code") #FIXME
+    @pytest.mark.skip("Model neither crash nor return a non-200 status code")  # FIXME
     @pytest.mark.parametrize("model", models)
     def test_empty_input_task(self, model: str) -> bool:
         """
