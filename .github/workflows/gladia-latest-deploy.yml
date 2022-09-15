@@ -1,7 +1,6 @@
 name: Gladia Promote & deploy
 
 on:
-  workflow_dispatch:
   pull_request:
     branches:
       - main
@@ -13,16 +12,16 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  REGISTRY_URL: https://${DOCKER_GLADIA_FQDN}
   TAG_PROMOTED: ci-${{ github.event.pull_request.number }}
   TAG_PROMOTE: latest
-  CONTENT_TYPE: application/vnd.docker.distribution.manifest.v2+json
-
 jobs:
 
   promote-gladia-image:
     runs-on: [self-hosted, linux, STD]
     if: github.event.pull_request.merged == true
+    env:
+      REGISTRY_URL: https://${DOCKER_GLADIA_FQDN}
+      CONTENT_TYPE: application/vnd.docker.distribution.manifest.v2+json
     steps:
       - name: Promote *gladia-base* image to Gladia Registry
         if: |
@@ -30,26 +29,20 @@ jobs:
         env:
           REPOSITORY: gladia-base
         run: |
-          MANIFEST=$(curl -u ${{ secrets.DOCKER_GLADIA_USERNAME }}:${{ secrets.DOCKER_GLADIA_ACCESS_TOKEN }} -H "Accept: ${{ env.CONTENT_TYPE }}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTED }}")
-          curl -u ${{ secrets.DOCKER_GLADIA_USERNAME }}:${{ secrets.DOCKER_GLADIA_ACCESS_TOKEN }} -X PUT -H "Content-Type: ${{ env.CONTENT_TYPE }}" -d "${MANIFEST}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTE }}"
+          MANIFEST=$(curl -u ${DOCKER_GLADIA_USERNAME}:${DOCKER_GLADIA_ACCESS_TOKEN} -H "Accept: ${{ env.CONTENT_TYPE }}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTED }}")
+          curl -u ${DOCKER_GLADIA_USERNAME}:${DOCKER_GLADIA_ACCESS_TOKEN} -X PUT -H "Content-Type: ${{ env.CONTENT_TYPE }}" -d "${MANIFEST}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTE }}"
 
       - name: Promote *gladia* image to Gladia Registry
         env:
           REPOSITORY: gladia
         run: |
-          MANIFEST=$(curl -u ${{ secrets.DOCKER_GLADIA_USERNAME }}:${{ secrets.DOCKER_GLADIA_ACCESS_TOKEN }} -H "Accept: ${{ env.CONTENT_TYPE }}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTED }}")
-          curl -u ${{ secrets.DOCKER_GLADIA_USERNAME }}:${{ secrets.DOCKER_GLADIA_ACCESS_TOKEN }} -X PUT -H "Content-Type: ${{ env.CONTENT_TYPE }}" -d "${MANIFEST}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTE }}"
+          MANIFEST=$(curl -u ${DOCKER_GLADIA_USERNAME}:${DOCKER_GLADIA_ACCESS_TOKEN} -H "Accept: ${{ env.CONTENT_TYPE }}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTED }}")
+          curl -u ${DOCKER_GLADIA_USERNAME}:${DOCKER_GLADIA_ACCESS_TOKEN} -X PUT -H "Content-Type: ${{ env.CONTENT_TYPE }}" -d "${MANIFEST}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTE }}"
 
   promote-gladia-to-DH:
     needs: promote-gladia-image
     runs-on: [self-hosted, linux, STD]
     steps:
-      - name: Login to DockerHub Registry
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
       - name: Promote *gladia-base* image to DH Registry
         if: |
           contains(github.event.pull_request.labels.*.name, 'ci: build-base')
@@ -77,7 +70,7 @@ jobs:
           SLACK_USERNAME: gladia-ai-ci
           SLACK_TITLE: 'New Docker Hub Release :rocket:'
           SLACK_MESSAGE: ${{ github.event.pull_request.title }} by ${{ github.event.pull_request.user.login }}
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK: ${SLACK_WEBHOOK}
           SLACK_ICON_EMOJI: ':rocket:'
 
 
@@ -86,7 +79,7 @@ jobs:
     runs-on: [self-hosted, linux, aipi-1]
     steps:
       - name: pull gladia image
-        run: docker pull ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
+        run: docker pull ${{ secret.DOCKER_GLADIA_FQDN }}/gladia:${{ env.TAG_PROMOTE }}
 
       - name: stop docker gladia
         run: docker kill gladia-aipi && docker rm gladia-aipi
@@ -96,16 +89,16 @@ jobs:
             docker run -d --name gladia-aipi \
             --restart unless-stopped \
             --gpus all --shm-size=5g \
-            -p ${{ secrets.AIPI_SERVICE_PORT }}:8080 \
+            -p ${AIPI_SERVICE_PORT}:8080 \
             -v /tmp/gladia:/tmp/gladia \
             -e TRITON_SERVER_PORT_HTTP=8000 \
-            -e TRITON_SERVER_URL=${{ secrets.TRITON_SERVER_URL }} \
+            -e TRITON_SERVER_URL=${TRITON_SERVER_URL} \
             -e TRITON_LAZY_DOWNLOAD=false \
             -e TRITON_MODELS_PATH=/tmp/gladia/triton \
-            -e HUGGINGFACE_ACCESS_TOKEN=${{ secrets.HUGGINGFACE_ACCESS_TOKEN }} \
-            -e STABILITY_KEY=${{ secrets.STABILITY_KEY }} \
+            -e HUGGINGFACE_ACCESS_TOKEN=${HUGGINGFACE_ACCESS_TOKEN} \
+            -e STABILITY_KEY=${STABILITY_KEY} \
             -e MODE=server \
-            ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
+            ${{ secret.DOCKER_GLADIA_FQDN }}/gladia:${{ env.TAG_PROMOTE }}
       - name: sleep to let it start before deploying next worker
         run: sleep 120
       # todo : healthcheck, notify failure
@@ -115,7 +108,7 @@ jobs:
     runs-on: [self-hosted, linux, aipi-2]
     steps:
       - name: pull gladia image
-        run: docker pull ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
+        run: docker pull ${DOCKER_{ secret.DOCKER_GLADIA_FQDN }GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
 
       - name: stop docker gladia
         run: docker kill gladia-aipi && docker rm gladia-aipi
@@ -125,16 +118,16 @@ jobs:
             docker run -d --name gladia-aipi \
             --restart unless-stopped \
             --gpus all --shm-size=5g \
-            -p ${{ secrets.AIPI_SERVICE_PORT }}:8080 \
+            -p ${AIPI_SERVICE_PORT}:8080 \
             -v /tmp/gladia:/tmp/gladia \
             -e TRITON_SERVER_PORT_HTTP=8000 \
-            -e TRITON_SERVER_URL=${{ secrets.TRITON_SERVER_URL }} \
+            -e TRITON_SERVER_URL=${TRITON_SERVER_URL} \
             -e TRITON_LAZY_DOWNLOAD=false \
             -e TRITON_MODELS_PATH=/tmp/gladia/triton \
-            -e HUGGINGFACE_ACCESS_TOKEN=${{ secrets.HUGGINGFACE_ACCESS_TOKEN }} \
-            -e STABILITY_KEY=${{ secrets.STABILITY_KEY }} \
+            -e HUGGINGFACE_ACCESS_TOKEN=${HUGGINGFACE_ACCESS_TOKEN} \
+            -e STABILITY_KEY=${STABILITY_KEY} \
             -e MODE=server \
-            ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
+            ${{ secret.DOCKER_GLADIA_FQDN }}/gladia:${{ env.TAG_PROMOTE }}
 
   notify-aipi-prod-deployment:
     needs: [deploy-aipi-1, deploy-aipi-2]
@@ -149,5 +142,5 @@ jobs:
           SLACK_USERNAME: gladia-ai-ci
           SLACK_TITLE: 'Deployment done :rocket:'
           SLACK_MESSAGE: ${{ github.event.pull_request.title }} by ${{ github.event.pull_request.user.login }}
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK: ${SLACK_WEBHOOK}
           SLACK_ICON_EMOJI: ':rocket:'
