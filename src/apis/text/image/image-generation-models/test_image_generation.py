@@ -1,5 +1,3 @@
-import os
-import tempfile
 from typing import Any, Dict, List
 
 import pytest
@@ -49,7 +47,9 @@ class TestImageGeneration:
             },
         )
 
-        assert response.status_code == 200, f"non-200 status code: {response.status_code} with the following message: {response.content}"
+        assert (
+            response.status_code == 200
+        ), f"non-200 status code: {response.status_code} with the following message: {response.content}"
 
     @pytest.mark.parametrize("model", models)
     def test_invalid_prompt_input(self, model: str) -> bool:
