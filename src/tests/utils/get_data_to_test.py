@@ -1,4 +1,6 @@
 import os
+import pathlib
+import sys
 from itertools import product
 from typing import Any, Dict, List
 
@@ -8,7 +10,10 @@ from _pytest.config import _prepareconfig
 PYTEST_CONFIG = None
 
 
-def get_models_to_test(path_to_task: str) -> List[str]:
+# TODO: default value for path_to_task
+
+
+def get_models_to_test(path_to_task: str = None) -> List[str]:
     """
     Get a list of models to test for a given task. The list is obtained by
     looking for all the directories in the task directory that contain a
@@ -22,6 +27,11 @@ def get_models_to_test(path_to_task: str) -> List[str]:
     Returns:
         List[str]: List of models to test.
     """
+
+    if path_to_task is None:
+        path_to_task = str(
+            pathlib.Path(sys._getframe(1).f_globals["__file__"]).parents[0].absolute()
+        )
 
     global PYTEST_CONFIG
 
@@ -48,7 +58,7 @@ def get_models_to_test(path_to_task: str) -> List[str]:
 
 
 def get_inputs_to_test(
-    path_to_task: str, input_names: List[str]
+    input_names: List[str], path_to_task: str = None
 ) -> List[Dict[str, Any]]:
     """
     Retrieve the test values for each input specified in `input_names`
@@ -60,6 +70,11 @@ def get_inputs_to_test(
     Returns:
         List[Dict[str, Any]]: List of combinations of values to test
     """
+
+    if path_to_task is None:
+        path_to_task = str(
+            pathlib.Path(sys._getframe(1).f_globals["__file__"]).parents[0].absolute()
+        )
 
     global PYTEST_CONFIG
 
