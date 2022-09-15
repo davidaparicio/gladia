@@ -1,1 +1,9 @@
 summary: ''
+
+inputs_example:
+  image_url:
+    default_example: "http://files.gladia.io/examples/image/text/asciify/asciify.png"
+    examples:
+      - "http://files.gladia.io/examples/image/text/asciify/asciify.png"
+      - "http://files.gladia.io/examples/image/text/asciify/asciify.jpg"
+      - "http://files.gladia.io/examples/image/text/asciify/asciify.gif"
