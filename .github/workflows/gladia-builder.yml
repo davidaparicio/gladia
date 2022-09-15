@@ -200,8 +200,8 @@ jobs:
         id: gladia-ready
         uses: nick-fields/retry@v2
         with:
-          timeout_seconds: 10
-          max_attempts: 36
+          timeout_seconds: 5
+          max_attempts: 12
           retry_on: error
           command: curl http://localhost:${{steps.gpuid.outputs.gpuid}}8000/v2/health/ready --connect-timeout 5
 
