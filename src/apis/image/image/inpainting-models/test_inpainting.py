@@ -173,7 +173,7 @@ class TestInpainting:
             },
         )
 
-        assert response.status_code == 500 # TODO
+        assert response.status_code == 500  # TODO
 
     @pytest.mark.skip  # FIXME: Model neither crash nor return a non-200 status code
     @pytest.mark.parametrize("model", models)

@@ -1,7 +1,7 @@
 import os
-from itertools import product
 import pathlib
 import sys
+from itertools import product
 from typing import Any, Dict, List
 
 import yaml
@@ -11,6 +11,7 @@ PYTEST_CONFIG = None
 
 
 # TODO: default value for path_to_task
+
 
 def get_models_to_test(path_to_task: str = None) -> List[str]:
     """
@@ -29,9 +30,7 @@ def get_models_to_test(path_to_task: str = None) -> List[str]:
 
     if path_to_task is None:
         path_to_task = str(
-            pathlib.Path(sys._getframe(1).f_globals["__file__"])
-            .parents[0]
-            .absolute()
+            pathlib.Path(sys._getframe(1).f_globals["__file__"]).parents[0].absolute()
         )
 
     global PYTEST_CONFIG
@@ -74,9 +73,7 @@ def get_inputs_to_test(
 
     if path_to_task is None:
         path_to_task = str(
-            pathlib.Path(sys._getframe(1).f_globals["__file__"])
-            .parents[0]
-            .absolute()
+            pathlib.Path(sys._getframe(1).f_globals["__file__"]).parents[0].absolute()
         )
 
     global PYTEST_CONFIG
