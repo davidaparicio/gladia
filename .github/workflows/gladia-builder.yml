@@ -11,7 +11,7 @@ concurrency:
 env:
   DOCKER_BUILD_CACHE: ""
   DOCKER_BUILD_TAG: ci-${{ github.event.pull_request.number }}
-  DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE: ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia-base:latest
+  DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE: ${DOCKER_GLADIA_FQDN}/gladia-base:latest
   DOCKER_GLADIA_BUILD_NEEDED: false
   DOCKER_BASE_BUILD_NEEDED: false
 
@@ -36,34 +36,10 @@ jobs:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v2
-
-      - name: Login to DockerHub Registry
-        id: login-dockerhub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-      - name: Login to NVCR Registry
-        id: login-nvcr
-        uses: docker/login-action@v2
-        with:
-          registry: nvcr.io
-          username: ${{ secrets.NVCR_USERNAME }}
-          password: ${{ secrets.NVCR_ACCESS_TOKEN }}
-          
-      - name: Login to Gladia Registry
-        id: login-gladia
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ secrets.DOCKER_GLADIA_FQDN }}
-          username: ${{ secrets.DOCKER_GLADIA_USERNAME }}
-          password: ${{ secrets.DOCKER_GLADIA_ACCESS_TOKEN }}
          
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v29.0.3
-          
           
       # if base.Dockefile changed we need to rebuild the base image
       - name: Check if base.Dockerfile must be rebuilt
@@ -117,11 +93,11 @@ jobs:
         run: >-
           docker build --pull	
           ${{env.DOCKER_BUILD_CACHE}}
-          -t ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia-base:${{env.DOCKER_BUILD_TAG}}
+          -t ${DOCKER_GLADIA_FQDN}/gladia-base:${{env.DOCKER_BUILD_TAG}}
           -f base.Dockerfile
           . &&
-          docker push ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia-base:${{env.DOCKER_BUILD_TAG}} &&
-          echo "DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE=${{ secrets.DOCKER_GLADIA_FQDN }}/gladia-base:${{env.DOCKER_BUILD_TAG}}" >> $GITHUB_ENV
+          docker push ${DOCKER_GLADIA_FQDN}/gladia-base:${{env.DOCKER_BUILD_TAG}} &&
+          echo "DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE=${DOCKER_GLADIA_FQDN}/gladia-base:${{env.DOCKER_BUILD_TAG}}" >> $GITHUB_ENV
 
       # if label is force-build-gladia or gpu.Dockerfile or *env.yaml changed :
       # build the gladia image
@@ -137,10 +113,10 @@ jobs:
         run: >-
           docker build --pull	${{env.DOCKER_BUILD_CACHE}}
           --build-arg GLADIA_BASE_IMAGE=${{env.DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE}}
-          -t ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{env.DOCKER_BUILD_TAG}}
+          -t ${DOCKER_GLADIA_FQDN}/gladia:${{env.DOCKER_BUILD_TAG}}
           -f gpu.Dockerfile
           . &&
-          docker push ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{env.DOCKER_BUILD_TAG}}
+          docker push ${DOCKER_GLADIA_FQDN}/gladia:${{env.DOCKER_BUILD_TAG}}
 
       # if label is not force-build-gladia and gpu.Dockerfile nor *env.yaml changed :
       - name: Push and Tag Gladia image if label is not force-build-gladia nor gpu.Dockerfile nor env.yaml changed
@@ -152,13 +128,13 @@ jobs:
           DOCKER_BUILDKIT: 1
         working-directory: ./src
         run: |-
-          { docker build --pull ${{env.DOCKER_BUILD_CACHE}}	-t ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{env.DOCKER_BUILD_TAG}} -f - . <<-EOF
-              FROM ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:latest
+          { docker build --pull ${{env.DOCKER_BUILD_CACHE}}	-t ${DOCKER_GLADIA_FQDN}/gladia:${{env.DOCKER_BUILD_TAG}} -f - . <<-EOF
+              FROM ${DOCKER_GLADIA_FQDN}/gladia:latest
               COPY . /app/
               ENTRYPOINT ["micromamba", "run", "-n", "server"]
               CMD ["/app/run_server.sh"]
           EOF
-          } && docker push ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{env.DOCKER_BUILD_TAG}}
+          } && docker push ${DOCKER_GLADIA_FQDN}/gladia:${{env.DOCKER_BUILD_TAG}}
 
       - name: Set output for later jobs
         id: setoutput
@@ -181,14 +157,6 @@ jobs:
       - name: Retrieve image built in previous job
         id: retrieve-image
         run: echo ${{ needs.build.outputs.dockerimage }}
-         
-      - name: Login to Gladia Registry
-        id: login-gladia
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ secrets.DOCKER_GLADIA_FQDN }}
-          username: ${{ secrets.DOCKER_GLADIA_USERNAME }}
-          password: ${{ secrets.DOCKER_GLADIA_ACCESS_TOKEN }}
           
       # set the GPU device to use based on the runner label
       - name: Get GPU ID
@@ -217,16 +185,16 @@ jobs:
           --memory 32g
           --gpus all
           --shm-size=5g
-          -e HUGGINGFACE_ACCESS_TOKEN=${{ secrets.HUGGINGFACE_ACCESS_TOKEN }}
-          -e STABILITY_KEY=${{ secrets.STABILITY_KEY }}
+          -e HUGGINGFACE_ACCESS_TOKEN=${HUGGINGFACE_ACCESS_TOKEN}
+          -e STABILITY_KEY=${STABILITY_KEY}
           -e IS_CI="True"
           -e NVIDIA_VISIBLE_DEVICES=${{steps.gpuid.outputs.gpuid}}
           -e CUDA_VISIBLE_DEVICES=${{steps.gpuid.outputs.gpuid}}
           -p ${{steps.gpuid.outputs.gpuid}}8000:8000
           -v /data/volumes/:/tmp/gladia/
           --pull always
-          --name jlmagouille-${{ github.event.pull_request.number }}
-          ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{ needs.build.outputs.dockerimage }}
+          --name test-pr-${{ github.event.pull_request.number }}
+          ${DOCKER_GLADIA_FQDN}/gladia:${{ needs.build.outputs.dockerimage }}
 
       - name: Gladia container readiness
         id: gladia-ready
@@ -255,22 +223,21 @@ jobs:
         run: |
           echo "GLADIA_TEST_ALL_MODELS=-d" >> $GITHUB_ENV
         
-      - name: Tests
+      - name: Run Tests
         id: test
         run: >-
           docker exec -i
           -e PR=${{ github.event.pull_request.number }}
           -e GLADIA_TEST_CONTINUE_WHEN_FAILED=${{ env.GLADIA_TEST_CONTINUE_WHEN_FAILED }}
           -e GLADIA_TEST_ALL_MODELS=${{ env.GLADIA_TEST_ALL_MODELS }}
-          -e GHT=${{ secrets.GITHUB_TOKEN }}
-          jlmagouille-${{ github.event.pull_request.number }}
+          test-pr-${{ github.event.pull_request.number }}
           /bin/bash -c 'echo $PR; eval "$(micromamba shell hook --shell=bash)" && micromamba activate server && cd /app/unit-test/ && python3 test.py $GLADIA_TEST_CONTINUE_WHEN_FAILED $GLADIA_TEST_ALL_MODELS'
 
       - name: Logs
         id: logs
         if: always()
         run: |
-           docker logs jlmagouille-${{ github.event.pull_request.number }}
+           docker logs test-pr-${{ github.event.pull_request.number }}
 
       # we need to docker run to remove root artefact directories
       # this should be done better in the future.
@@ -279,6 +246,6 @@ jobs:
         if: always()
         continue-on-error: True
         run: >-
-          docker stop jlmagouille-${{ github.event.pull_request.number }} &&
-          docker run -d -v $PWD:/app ${{ secrets.DOCKER_GLADIA_FQDN }}/gladia:${{ needs.build.outputs.dockerimage }} bash -c 'rm -rf /app' &&
-          docker rm jlmagouille-${{ github.event.pull_request.number }}
+          docker stop test-pr-${{ github.event.pull_request.number }} &&
+          docker run -d -v $PWD:/app ${DOCKER_GLADIA_FQDN}/gladia:${{ needs.build.outputs.dockerimage }} bash -c 'rm -rf /app' &&
+          docker rm test-pr-${{ github.event.pull_request.number }}
