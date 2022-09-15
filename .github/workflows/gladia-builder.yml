@@ -223,7 +223,7 @@ jobs:
         run: |
           echo "GLADIA_TEST_ALL_MODELS=-d" >> $GITHUB_ENV
         
-      - name: Tests
+      - name: Run Tests
         id: test
         run: >-
           docker exec -i
