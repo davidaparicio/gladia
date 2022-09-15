@@ -12,10 +12,8 @@ from tests.utils import get_inputs_to_test, get_models_to_test
 
 client = TestClient(app)
 
-models = get_models_to_test(os.path.split(__file__)[0])
-inputs_to_test = get_inputs_to_test(
-    os.path.split(__file__)[0], ["original_image_url", "mask_image_url"]
-)
+models = get_models_to_test()
+inputs_to_test = get_inputs_to_test(["original_image_url", "mask_image_url"])
 
 
 class TestInpainting:
@@ -101,24 +99,23 @@ class TestInpainting:
             requests.get(f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp3").content
         )
 
-        with pytest.raises(Exception):
-            response = client.post(
-                url=self.target_url,
-                params={"model": model} if model else {},
-                files={
-                    "original_image": (
-                        tmp_local_mp3_file.name,
-                        open(tmp_local_mp3_file.name, "rb"),
-                        "audio/mpeg",
-                    ),
-                    "mask_image": self.default_local_mask_image,
-                },
-            )
+        response = client.post(
+            url=self.target_url,
+            params={"model": model} if model else {},
+            files={
+                "original_image": (
+                    tmp_local_mp3_file.name,
+                    open(tmp_local_mp3_file.name, "rb"),
+                    "audio/mpeg",
+                ),
+                "mask_image_url": inputs_to_test[0]["mask_image_url"],
+            },
+        )
 
-            tmp_local_mp3_file.close()
-            os.unlink(tmp_local_mp3_file.name)
+        tmp_local_mp3_file.close()
+        os.unlink(tmp_local_mp3_file.name)
 
-            assert response.status_code != 200  # TODO
+        assert response.status_code == 500
 
     @pytest.mark.parametrize("model", models)
     def test_invalid_original_image_input_task(self, model: str) -> bool:
@@ -137,24 +134,23 @@ class TestInpainting:
             requests.get(f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp3").content
         )
 
-        with pytest.raises(Exception):
-            response = client.post(
-                url=self.target_url,
-                params={"model": model} if model else {},
-                files={
-                    "original_image": self.default_local_mask_image,
-                    "mask_image": (
-                        tmp_local_mp3_file.name,
-                        open(tmp_local_mp3_file.name, "rb"),
-                        "audio/mpeg",
-                    ),
-                },
-            )
+        response = client.post(
+            url=self.target_url,
+            params={"model": model} if model else {},
+            files={
+                "original_image": inputs_to_test[0]["original_image_url"],
+                "mask_image": (
+                    tmp_local_mp3_file.name,
+                    open(tmp_local_mp3_file.name, "rb"),
+                    "audio/mpeg",
+                ),
+            },
+        )
 
-            tmp_local_mp3_file.close()
-            os.unlink(tmp_local_mp3_file.name)
+        tmp_local_mp3_file.close()
+        os.unlink(tmp_local_mp3_file.name)
 
-            assert response.status_code != 200  # TODO
+        assert response.status_code == 500
 
     @pytest.mark.parametrize("model", models)
     def test_invalid_original_image_url_input_task(self, model: str) -> bool:
@@ -168,17 +164,16 @@ class TestInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        with pytest.raises(Exception):
-            response = client.post(
-                url=self.target_url,
-                params={"model": model} if model else {},
-                data={
-                    "original_image_url": f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp4",
-                    "mask_image_url": inputs_to_test[0]["mask_image_url"],
-                },
-            )
+        response = client.post(
+            url=self.target_url,
+            params={"model": model} if model else {},
+            data={
+                "original_image_url": f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp4",
+                "mask_image_url": inputs_to_test[0]["mask_image_url"],
+            },
+        )
 
-            # assert response.status_code != 200 # TODO
+        assert response.status_code == 500 # TODO
 
     @pytest.mark.skip  # FIXME: Model neither crash nor return a non-200 status code
     @pytest.mark.parametrize("model", models)
@@ -193,17 +188,16 @@ class TestInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        with pytest.raises(Exception):
-            response = client.post(
-                url=self.target_url,
-                params={"model": model} if model else {},
-                data={
-                    "original_image_url": inputs_to_test[0]["original_image_url"],
-                    "mask_image": f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp4",
-                },
-            )
+        response = client.post(
+            url=self.target_url,
+            params={"model": model} if model else {},
+            data={
+                "original_image_url": inputs_to_test[0]["original_image_url"],
+                "mask_image": f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp4",
+            },
+        )
 
-            # assert response.status_code != 200 # TODO
+        assert response.status_code == 500
 
     @pytest.mark.parametrize("model", models)
     def test_empty_input_task(self, model: str) -> bool:
