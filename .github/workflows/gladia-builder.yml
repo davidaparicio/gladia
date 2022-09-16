@@ -14,6 +14,10 @@ env:
   DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE: ${DOCKER_GLADIA_FQDN}/gladia-base:latest
   DOCKER_GLADIA_BUILD_NEEDED: false
   DOCKER_BASE_BUILD_NEEDED: false
+  TEST_DEFAULT_MODELS_ONLY: '--default-models-only'
+  TEST_DEFAULT_TEST_ONLY: '--default-inputs-only'
+  TEST_STOP_AT_FAIL: '-x'
+  TEST_MARKERS: '-m mandatory'
 
 jobs:
   
@@ -176,8 +180,37 @@ jobs:
         run: >-
           sed -i 's/"log_level": "info",/"log_level": "debug",/' config.json
 
-      - name: Start Gladia Container
-        id: start-gladia
+      - name: Set env variables to select which tests to execute
+        if: |
+          contains(github.event.pull_request.labels.*.name, 'ci: force-execute-all-test')
+        id: set-test-env-continue
+        run: |
+          echo "TEST_MARKERS=" >> $GITHUB_ENV
+
+      - name: Set env variables to select inputs to test
+        if: |
+          contains(github.event.pull_request.labels.*.name, 'ci: force-test-all-inputs')
+        id: set-test-env-continue
+        run: |
+          echo "TEST_DEFAULT_INPUTS_ONLY=" >> $GITHUB_ENV
+
+      - name: Set env variables for tests break conditions
+        if: |
+          contains(github.event.pull_request.labels.*.name, 'ci: test-continue-when-fail')
+        id: set-test-env-continue
+        run: |
+          echo "TEST_STOP_AT_FAIL=" >> $GITHUB_ENV
+
+      - name: Set env variables to select which models to test
+        if: |
+          !contains(github.event.pull_request.labels.*.name, 'ci: force-test-all-models')
+        id: set-test-env-all
+        run: |
+          echo "TEST_DEFAULT_MODELS_ONLY=" >> $GITHUB_ENV
+
+      # TODO: make sure TRITON_SERVER_URL exists in runnenv
+      - name: Test Gladia Container
+        id: test-gladia
         working-directory: ./src
         run: >-
           docker run -d
@@ -187,52 +220,21 @@ jobs:
           --shm-size=5g
           -e HUGGINGFACE_ACCESS_TOKEN=${HUGGINGFACE_ACCESS_TOKEN}
           -e STABILITY_KEY=${STABILITY_KEY}
-          -e IS_CI="True"
           -e NVIDIA_VISIBLE_DEVICES=${{steps.gpuid.outputs.gpuid}}
           -e CUDA_VISIBLE_DEVICES=${{steps.gpuid.outputs.gpuid}}
+          -e TRITON_SERVER_PORT_HTTP=8000
+          -e TRITON_SERVER_URL=${TRITON_SERVER_URL}
+          -e TEST_DEFAULT_MODELS_ONLY=${{ env.TEST_DEFAULT_MODELS_ONLY }}
+          -e TEST_DEFAULT_INPUTS_ONLY=${{ env.TEST_DEFAULT_INPUTS_ONLY }}
+          -e TEST_STOP_AT_FAIL=${{ env.TEST_STOP_AT_FAIL }}
+          -e TEST_MARKERS=${{ env.TEST_MARKERS }}
           -p ${{steps.gpuid.outputs.gpuid}}8000:8000
           -v /data/volumes/:/tmp/gladia/
           --pull always
           --name test-pr-${{ github.event.pull_request.number }}
           ${DOCKER_GLADIA_FQDN}/gladia:${{ needs.build.outputs.dockerimage }}
-
-      - name: Gladia container readiness
-        id: gladia-ready
-        uses: nick-fields/retry@v2
-        with:
-          timeout_seconds: 5
-          max_attempts: 12
-          retry_on: error
-          command: curl http://localhost:${{steps.gpuid.outputs.gpuid}}8000/v2/health/ready --connect-timeout 5
-
-      - name: Give it 5s to make sure it is ready
-        id: wait-5s
-        run: sleep 5s
-
-      - name: Set env variables for tests break conditions
-        if: |
-          contains(github.event.pull_request.labels.*.name, 'ci: test-continue-when-fail')
-        id: set-test-env-continue
-        run: |
-          echo "GLADIA_TEST_CONTINUE_WHEN_FAILED=-c" >> $GITHUB_ENV
-
-      - name: Set env variables for depth of tests
-        if: |
-          !contains(github.event.pull_request.labels.*.name, 'ci: force-test-all-models')
-        id: set-test-env-all
-        run: |
-          echo "GLADIA_TEST_ALL_MODELS=-d" >> $GITHUB_ENV
+          /bin/bash -c 'cd /app/src/ && python -m pytest apis/ $TEST_DEFAULT_MODELS_ONLY $TEST_DEFAULT_TEST_ONLY $TEST_STOP_AT_FAIL $TEST_MARKERS'
         
-      - name: Run Tests
-        id: test
-        run: >-
-          docker exec -i
-          -e PR=${{ github.event.pull_request.number }}
-          -e GLADIA_TEST_CONTINUE_WHEN_FAILED=${{ env.GLADIA_TEST_CONTINUE_WHEN_FAILED }}
-          -e GLADIA_TEST_ALL_MODELS=${{ env.GLADIA_TEST_ALL_MODELS }}
-          test-pr-${{ github.event.pull_request.number }}
-          /bin/bash -c 'echo $PR; eval "$(micromamba shell hook --shell=bash)" && micromamba activate server && cd /app/unit-test/ && python3 test.py $GLADIA_TEST_CONTINUE_WHEN_FAILED $GLADIA_TEST_ALL_MODELS'
-
       - name: Logs
         id: logs
         if: always()
