@@ -8,15 +8,17 @@ from tests.utils import get_inputs_to_test, get_models_to_test
 models = get_models_to_test()
 inputs_to_test = get_inputs_to_test(["context", "question", "top_k"])
 
-class TestsQuestionAnswering(create_default_text_to_text_tests(
-    class_name="BasicTestsQuestionAnswering",
-    client=TestClient(app),
-    target_url="/text/text/question-answering/",
-    models_to_test=models,
-    inputs_to_test=inputs_to_test,
-)):
 
-    @pytest.mark.skip("Model neither crash nor returns a 422/500 status code") # FIXME
+class TestsQuestionAnswering(
+    create_default_text_to_text_tests(
+        class_name="BasicTestsQuestionAnswering",
+        client=TestClient(app),
+        target_url="/text/text/question-answering/",
+        models_to_test=models,
+        inputs_to_test=inputs_to_test,
+    )
+):
+    @pytest.mark.skip("Model neither crash nor returns a 422/500 status code")  # FIXME
     @pytest.mark.parametrize("model", models)
     def test_invalid_context_param(self, model):
         """
@@ -41,7 +43,7 @@ class TestsQuestionAnswering(create_default_text_to_text_tests(
 
         assert response.status_code == 422
 
-    @pytest.mark.skip("Model neither crash nor returns a 422/500 status code") # FIXME
+    @pytest.mark.skip("Model neither crash nor returns a 422/500 status code")  # FIXME
     @pytest.mark.parametrize("model", models)
     def test_invalid_question_param(self, model):
         """

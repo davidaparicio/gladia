@@ -17,7 +17,9 @@ inputs = [
     {
         "type": "string",
         "name": "source_language",
-        "example": task_metadata["inputs_example"]["source_language"]["default_example"],
+        "example": task_metadata["inputs_example"]["source_language"][
+            "default_example"
+        ],
         "examples": task_metadata["inputs_example"]["source_language"]["examples"],
         "placeholder": "Use the ISO 3 letters representation for source language",
     },
@@ -32,7 +34,7 @@ inputs = [
     {
         "type": "integer",
         "name": "max_length",
-        "default":task_metadata["inputs_example"]["max_length"]["default_example"],
+        "default": task_metadata["inputs_example"]["max_length"]["default_example"],
         "example": task_metadata["inputs_example"]["max_length"]["default_example"],
         "examples": task_metadata["inputs_example"]["max_length"]["examples"],
         "placeholder": "Maximum lenght of the summary",

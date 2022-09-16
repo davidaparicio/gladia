@@ -1,5 +1,3 @@
-import os
-import tempfile
 from typing import Any, Callable, Dict, List
 
 import pytest
@@ -16,7 +14,6 @@ def __apply_decorators(func, *decorators):
         return f
 
     return deco(func)
-
 
 
 def get_basic_input_test(
@@ -77,7 +74,9 @@ def get_invalid_input_test(
         Callable[[str, Dict[str, Any]], bool]: test function
     """
 
-    def __test_invalid_input(self, model: str, inputs: Dict[str, Any] = inputs_to_test[0]) -> bool:
+    def __test_invalid_input(
+        self, model: str, inputs: Dict[str, Any] = inputs_to_test[0]
+    ) -> bool:
         """
         Test the endpoint with a valid inputs
 
@@ -92,7 +91,7 @@ def get_invalid_input_test(
         response = self.client.post(
             url=self.target_url,
             params={"model": model} if model else {},
-            data={key: bytearray(b'\x00\x0F') for (key, _) in inputs.items()},
+            data={key: bytearray(b"\x00\x0F") for (key, _) in inputs.items()},
         )
 
         assert (
@@ -132,7 +131,9 @@ def get_test_empty_input(models_to_test: List[str]) -> Callable[[str], bool]:
             data={},
         )
 
-        assert response.status_code == 422, f"expected 422 but received {response.status_code}"  # TODO: change to != 200
+        assert (
+            response.status_code == 422
+        ), f"expected 422 but received {response.status_code}"  # TODO: change to != 200
 
     return __apply_decorators(
         __test_empty_input,

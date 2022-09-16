@@ -17,14 +17,18 @@ inputs = [
     {
         "type": "string",
         "name": "source_language",
-        "example": task_metadata["inputs_example"]["source_language"]["default_example"],
+        "example": task_metadata["inputs_example"]["source_language"][
+            "default_example"
+        ],
         "examples": task_metadata["inputs_example"]["source_language"]["examples"],
         "placeholder": "Use the ISO 3 letters (ISO 639-3) representation for source language",
     },
     {
         "type": "string",
         "name": "target_language",
-        "example": task_metadata["inputs_example"]["target_language"]["default_example"],
+        "example": task_metadata["inputs_example"]["target_language"][
+            "default_example"
+        ],
         "examples": task_metadata["inputs_example"]["target_language"]["examples"],
         "placeholder": "Use the ISO 3 letters (ISO 639-3) representation for target language",
     },

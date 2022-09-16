@@ -10,15 +10,23 @@ inputs = [
     {
         "type": "string",
         "name": "input_string_language_1",
-        "example": task_metadata["inputs_example"]["input_string_language_1"]["default_example"],
-        "examples": task_metadata["inputs_example"]["input_string_language_1"]["examples"],
+        "example": task_metadata["inputs_example"]["input_string_language_1"][
+            "default_example"
+        ],
+        "examples": task_metadata["inputs_example"]["input_string_language_1"][
+            "examples"
+        ],
         "placeholder": "Insert the Sentence from first language",
     },
     {
         "type": "string",
         "name": "input_string_language_2",
-        "example": task_metadata["inputs_example"]["input_string_language_2"]["default_example"],
-        "examples": task_metadata["inputs_example"]["input_string_language_2"]["examples"],
+        "example": task_metadata["inputs_example"]["input_string_language_2"][
+            "default_example"
+        ],
+        "examples": task_metadata["inputs_example"]["input_string_language_2"][
+            "examples"
+        ],
         "placeholder": "Insert the Sentence from second language",
     },
 ]
