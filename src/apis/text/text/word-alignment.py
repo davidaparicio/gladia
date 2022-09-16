@@ -1,5 +1,8 @@
 from fastapi import APIRouter
 from gladia_api_utils.submodules import TaskRouter
+from gladia_api_utils.task_management import get_task_metadata
+
+task_metadata = get_task_metadata(__file__)
 
 router = APIRouter()
 
@@ -7,13 +10,23 @@ inputs = [
     {
         "type": "string",
         "name": "input_string_language_1",
-        "example": "Sentence from first language",
+        "example": task_metadata["inputs_example"]["input_string_language_1"][
+            "default_example"
+        ],
+        "examples": task_metadata["inputs_example"]["input_string_language_1"][
+            "examples"
+        ],
         "placeholder": "Insert the Sentence from first language",
     },
     {
         "type": "string",
         "name": "input_string_language_2",
-        "example": "来自 第一 语言的 句子",
+        "example": task_metadata["inputs_example"]["input_string_language_2"][
+            "default_example"
+        ],
+        "examples": task_metadata["inputs_example"]["input_string_language_2"][
+            "examples"
+        ],
         "placeholder": "Insert the Sentence from second language",
     },
 ]

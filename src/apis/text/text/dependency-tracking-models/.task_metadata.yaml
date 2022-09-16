@@ -1,0 +1,8 @@
+summary: ''
+
+
+inputs_example:
+  input_string:
+    default_example: "Text to analyze."
+    examples:
+      - "Text to analyze."

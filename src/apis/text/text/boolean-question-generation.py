@@ -1,5 +1,8 @@
 from fastapi import APIRouter
 from gladia_api_utils.submodules import TaskRouter
+from gladia_api_utils.task_management import get_task_metadata
+
+task_metadata = get_task_metadata(__file__)
 
 router = APIRouter()
 
@@ -7,7 +10,8 @@ inputs = [
     {
         "type": "string",
         "name": "text",
-        "example": "I lSachin Ramesh Tendulkar is a former international cricketer from India and a former captain of the Indian national team. He is widely regarded as one of the greatest batsmen in the history of cricket. He is the highest run scorer of all time in International cricket.",
+        "example": task_metadata["inputs_example"]["text"]["default_example"],
+        "examples": task_metadata["inputs_example"]["text"]["examples"],
         "placeholder": "Insert the text to generate a question from",
     }
 ]

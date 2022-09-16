@@ -1,5 +1,8 @@
 from fastapi import APIRouter
 from gladia_api_utils.submodules import TaskRouter
+from gladia_api_utils.task_management import get_task_metadata
+
+task_metadata = get_task_metadata(__file__)
 
 router = APIRouter()
 
@@ -7,13 +10,15 @@ inputs = [
     {
         "type": "string",
         "name": "sentence_1",
-        "example": "I like you.",
+        "example": task_metadata["inputs_example"]["sentence_1"]["default_example"],
+        "examples": task_metadata["inputs_example"]["sentence_1"]["examples"],
         "placeholder": "Insert the first sentence",
     },
     {
         "type": "string",
         "name": "sentence_2",
-        "example": "But it's not about you.",
+        "example": task_metadata["inputs_example"]["sentence_2"]["default_example"],
+        "examples": task_metadata["inputs_example"]["sentence_2"]["examples"],
         "placeholder": "Insert the second sentence to estimate the probability from",
     },
 ]

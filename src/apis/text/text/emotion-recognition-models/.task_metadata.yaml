@@ -1,1 +1,8 @@
 summary: ''
+
+
+inputs_example:
+  text:
+    default_example: "I love you."
+    examples:
+      - "I love you."
