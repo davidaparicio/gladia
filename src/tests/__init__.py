@@ -1,1 +1,2 @@
 from .default_image_to_image_tests import create_default_image_to_image_tests
+from .default_text_to_text_tests import create_default_text_to_text_tests
