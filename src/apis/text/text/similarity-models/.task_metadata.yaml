@@ -1,1 +1,13 @@
 summary: ''
+
+
+inputs_example:
+  sentence_1:
+    default_example: "I like banana"
+    examples:
+      - "I like banana"
+
+  sentence_2:
+    default_example: "I hate banana"
+    examples:
+      - "I hate banana"

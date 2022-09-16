@@ -1,0 +1,8 @@
+summary: ''
+
+
+inputs_example:
+  text:
+    default_example: "I would like to find a flight from charlotte to las vegas that makes a stop in st. louis."
+    examples:
+      - "I would like to find a flight from charlotte to las vegas that makes a stop in st. louis."

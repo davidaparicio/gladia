@@ -1,1 +1,14 @@
 summary: ''
+
+inputs_example:
+  sentence:
+    default_example: "I think therefore I"
+    examples:
+      - "I think therefore I"
+
+  top_k:
+    default_example: 3
+    examples:
+      - 1
+      - 3
+      - 10

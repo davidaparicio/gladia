@@ -1,1 +1,19 @@
 summary: ''
+
+
+inputs_example:
+  context:
+    default_example: "My name is Clara and I live in Berkeley."
+    examples:
+      - "My name is Clara and I live in Berkeley."
+
+  question:
+    default_example: "What's my name?"
+    examples:
+      - "What's my name?"
+
+  top_k:
+    default_example: 1
+    examples:
+      - 1
+      - 10
