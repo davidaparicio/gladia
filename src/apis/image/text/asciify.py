@@ -2,7 +2,6 @@ from fastapi import APIRouter
 from gladia_api_utils.submodules import TaskRouter
 from gladia_api_utils.task_management import get_task_metadata
 
-
 task_metadata = get_task_metadata(__file__)
 
 inputs = [

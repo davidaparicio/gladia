@@ -15,8 +15,12 @@ inputs = [
     {
         "type": "string",
         "name": "source_language",
-        "default": task_metadata["inputs_example"]["source_language"]["default_example"],
-        "example": task_metadata["inputs_example"]["source_language"]["default_example"],
+        "default": task_metadata["inputs_example"]["source_language"][
+            "default_example"
+        ],
+        "example": task_metadata["inputs_example"]["source_language"][
+            "default_example"
+        ],
         "examples": task_metadata["inputs_example"]["source_language"]["examples"],
         "placeholder": "ISO 639-2 Source language (3 letters)",
     },
