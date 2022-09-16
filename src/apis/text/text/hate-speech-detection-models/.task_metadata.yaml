@@ -1,1 +1,8 @@
 summary: ''
+
+
+inputs_example:
+  text:
+    default_example: "I hate you piece of shit"
+    examples:
+      - "I hate you piece of shit"

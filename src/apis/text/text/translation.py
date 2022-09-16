@@ -1,5 +1,8 @@
 from fastapi import APIRouter
 from gladia_api_utils.submodules import TaskRouter
+from gladia_api_utils.task_management import get_task_metadata
+
+task_metadata = get_task_metadata(__file__)
 
 router = APIRouter()
 
@@ -7,19 +10,22 @@ inputs = [
     {
         "type": "string",
         "name": "input_string",
-        "example": "Text to translate",
+        "example": task_metadata["inputs_example"]["input_string"]["default_example"],
+        "examples": task_metadata["inputs_example"]["input_string"]["examples"],
         "placeholder": "Insert the text to translate here",
     },
     {
         "type": "string",
         "name": "source_language",
-        "example": "eng",
+        "example": task_metadata["inputs_example"]["source_language"]["default_example"],
+        "examples": task_metadata["inputs_example"]["source_language"]["examples"],
         "placeholder": "Use the ISO 3 letters (ISO 639-3) representation for source language",
     },
     {
         "type": "string",
         "name": "target_language",
-        "example": "fra",
+        "example": task_metadata["inputs_example"]["target_language"]["default_example"],
+        "examples": task_metadata["inputs_example"]["target_language"]["examples"],
         "placeholder": "Use the ISO 3 letters (ISO 639-3) representation for target language",
     },
 ]

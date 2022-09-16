@@ -1,1 +1,7 @@
 summary: ''
+
+inputs_example:
+  text:
+    default_example: "Hugging Face Inc. is a company based in New York City. Its headquarters are in DUMBO, therefore very close to the Manhattan Bridge."
+    examples:
+      - "Hugging Face Inc. is a company based in New York City. Its headquarters are in DUMBO, therefore very close to the Manhattan Bridge."

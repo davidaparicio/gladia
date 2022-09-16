@@ -1,1 +1,12 @@
 summary: ''
+
+inputs_example:
+  input_string_language_1:
+    default_example: "Sentence from first language"
+    examples:
+      - "Sentence from first language"
+
+  input_string_language_2:
+    default_example: "来自 第一 语言的 句子"
+    examples:
+      - "来自 第一 语言的 句子"

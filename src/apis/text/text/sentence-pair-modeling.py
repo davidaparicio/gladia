@@ -1,5 +1,8 @@
 from fastapi import APIRouter
 from gladia_api_utils.submodules import TaskRouter
+from gladia_api_utils.task_management import get_task_metadata
+
+task_metadata = get_task_metadata(__file__)
 
 router = APIRouter()
 
@@ -7,7 +10,8 @@ inputs = [
     {
         "type": "string",
         "name": "sentence",
-        "example": "Once, a group of frogs was roaming around the forest in search of water.",
+        "example": task_metadata["inputs_example"]["sentence"]["default_example"],
+        "examples": task_metadata["inputs_example"]["sentence"]["examples"],
         "placeholder": "Insert the sentence to perform the Pairwise Sentence Scoring Tasks",
     }
 ]
