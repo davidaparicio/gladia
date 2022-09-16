@@ -1,23 +1,23 @@
 from fastapi import APIRouter
 from gladia_api_utils.submodules import TaskRouter
+from gladia_api_utils.task_management import get_task_metadata
+
+task_metadata = get_task_metadata(__file__)
 
 inputs = [
     {
         "type": "image",
         "name": "image",
-        "example": "http://files.gladia.io/examples/image/text/ocr/testocr.png",
-        "examples": [
-            "http://files.gladia.io/examples/image/text/ocr/testocr.gif",
-            "http://files.gladia.io/examples/image/text/ocr/testocr.jpg",
-            "http://files.gladia.io/examples/image/text/ocr/testocr.png",
-        ],
+        "example": task_metadata["inputs_example"]["image_url"]["default_example"],
+        "examples": task_metadata["inputs_example"]["image_url"]["examples"],
         "placeholder": "Image to extract text from",
     },
     {
         "type": "string",
         "name": "source_language",
-        "default": "eng",
-        "example": "eng",
+        "default": task_metadata["inputs_example"]["source_language"]["default_example"],
+        "example": task_metadata["inputs_example"]["source_language"]["default_example"],
+        "examples": task_metadata["inputs_example"]["source_language"]["examples"],
         "placeholder": "ISO 639-2 Source language (3 letters)",
     },
 ]
