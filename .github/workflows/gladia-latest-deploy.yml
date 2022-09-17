@@ -14,6 +14,8 @@ concurrency:
 env:
   TAG_PROMOTED: ci-${{ github.event.pull_request.number }}
   TAG_PROMOTE: latest
+  SLACK_WEBHOOK: ${SLACK_WEBHOOK}
+  
 jobs:
 
   promote-gladia-image:
