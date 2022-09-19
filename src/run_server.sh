@@ -6,6 +6,9 @@ API_SERVER_WORKERS="${API_SERVER_WORKERS:-1}"
 API_SERVER_TIMEOUT="${API_SERVER_TIMEOUT:-1200}"
 
 # init nltk data used for truecase
+service supervisor stop
+service supervisor start
+
 micromamba run -n server python -c "import nltk; nltk.download('punkt')"
 
 if [ $MODE = "standalone" ]
