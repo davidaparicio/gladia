@@ -1,5 +1,8 @@
 from fastapi import APIRouter
 from gladia_api_utils.submodules import TaskRouter
+from gladia_api_utils.task_management import get_task_metadata
+
+task_metadata = get_task_metadata(__file__)
 
 router = APIRouter()
 
@@ -7,13 +10,15 @@ inputs = [
     {
         "type": "string",
         "name": "text",
-        "example": "Input text to generate the headline from",
+        "example": task_metadata["inputs_example"]["text"]["default_example"],
+        "examples": task_metadata["inputs_example"]["text"]["examples"],
         "placeholder": "Insert text here to generate the headline from",
     },
     {
         "type": "integer",
         "name": "max_length",
-        "example": "16",
+        "example": task_metadata["inputs_example"]["max_length"]["default_example"],
+        "examples": task_metadata["inputs_example"]["max_length"]["examples"],
         "placeholder": "Maximum length for the headline",
     },
 ]

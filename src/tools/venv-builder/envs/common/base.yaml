@@ -9,6 +9,8 @@ dependencies:
   - conda-forge::wheel
   - conda-forge::mkl
   - conda-forge::mkl-service
+  - conda-forge::uvicorn
+  - conda-forge::fastapi
   - pip:
     - -e /app/api_utils/
     - tritonclient[http]

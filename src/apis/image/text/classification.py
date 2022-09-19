@@ -1,23 +1,23 @@
 from fastapi import APIRouter
 from gladia_api_utils.submodules import TaskRouter
+from gladia_api_utils.task_management import get_task_metadata
+
+task_metadata = get_task_metadata(__file__)
 
 inputs = [
     {
         "type": "image",
         "name": "image",
-        "example": "http://files.gladia.io/examples/image/text/classification/image.png",
-        "examples": [
-            "http://files.gladia.io/examples/image/text/classification/image.gif",
-            "http://files.gladia.io/examples/image/text/classification/image.jpg",
-            "http://files.gladia.io/examples/image/text/classification/image.png",
-        ],
+        "example": task_metadata["inputs_example"]["image_url"]["default_example"],
+        "examples": task_metadata["inputs_example"]["image_url"]["examples"],
         "placeholder": "Image to classify",
     },
     {
         "type": "integer",
         "name": "top_k",
-        "default": 1,
-        "example": 1,
+        "default": task_metadata["inputs_example"]["top_k"]["default_example"],
+        "example": task_metadata["inputs_example"]["top_k"]["default_example"],
+        "examples": task_metadata["inputs_example"]["top_k"]["examples"],
         "placeholder": "Top K",
     },
 ]

@@ -32,7 +32,6 @@ if __name__ == "__main__":
         "LD_LIBRARY_PATH"
     ] = "/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/opt/conda/lib"
 
-    print(os.getcwd())
     # if module_path is not absolute
     # then prepend the PATH_TO_GLADIA_SRC
     if not os.path.isabs(module_path):

@@ -1,23 +1,23 @@
 from fastapi import APIRouter
 from gladia_api_utils.submodules import TaskRouter
+from gladia_api_utils.task_management import get_task_metadata
+
+task_metadata = get_task_metadata(__file__)
 
 inputs = [
     {
         "type": "audio",
         "name": "audio",
-        "example": "http://files.gladia.io/examples/audio/text/audio-transcription/audio.mp3",
-        "examples": [
-            "http://files.gladia.io/examples/audio/text/audio-transcription/audio.m4a",
-            "http://files.gladia.io/examples/audio/text/audio-transcription/audio.mp3",
-            "http://files.gladia.io/examples/audio/text/audio-transcription/audio.wav",
-        ],
+        "example": task_metadata["inputs_example"]["audio_url"]["default_example"],
+        "examples": task_metadata["inputs_example"]["audio_url"]["examples"],
         "placeholder": "Audio to transcribe",
     },
     {
         "type": "string",
         "name": "language",
-        "default": "en",
-        "example": "en",
+        "default": task_metadata["inputs_example"]["language"]["default_example"],
+        "example": task_metadata["inputs_example"]["language"]["default_example"],
+        "examples": task_metadata["inputs_example"]["language"]["examples"],
         "placeholder": "Language of the audio",
     },
 ]
