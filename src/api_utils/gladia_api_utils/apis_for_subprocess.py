@@ -1,7 +1,6 @@
 import json
 import os
 import socket
-import subprocess
 import time
 from asyncio.log import logger
 from logging import getLogger
