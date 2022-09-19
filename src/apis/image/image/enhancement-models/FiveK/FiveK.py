@@ -1,8 +1,7 @@
-from PIL import Image
 from gladia_api_utils.io import _open
-from gladia_api_utils.model_management import download_model
 from gladia_api_utils.model_architectures import Maxim
-
+from gladia_api_utils.model_management import download_model
+from PIL import Image
 
 PARAMS_PATH = download_model(
     url="https://storage.googleapis.com/gresearch/maxim/ckpt/Enhancement/FiveK/checkpoint.npz",
@@ -11,6 +10,7 @@ PARAMS_PATH = download_model(
 )
 
 model = Maxim(task="Enhancement", checkpoint=PARAMS_PATH)
+
 
 def predict(image: bytes) -> Image:
     image = _open(image)

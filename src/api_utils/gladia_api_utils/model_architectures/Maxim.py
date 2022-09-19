@@ -1,21 +1,21 @@
-import numpy as np
-
-from PIL import Image
 from importlib import import_module
+
+import numpy as np
+from PIL import Image
 
 
 class Maxim:
     def __init__(self, task, checkpoint) -> None:
+        from flax.core import freeze
         from maxim.run_eval import (
+            _MODEL_CONFIGS,
             _MODEL_FILENAME,
             _MODEL_VARIANT_DICT,
-            _MODEL_CONFIGS,
             get_params,
-            mod_padding_symmetric,
             make_shape_even,
+            mod_padding_symmetric,
         )
         from ml_collections import ConfigDict
-        from flax.core import freeze
 
         model_mod = import_module(f"maxim.models.{_MODEL_FILENAME}")
 
@@ -30,7 +30,7 @@ class Maxim:
         self.freeze = freeze
 
     def __call__(self, image):
-        input_img = (np.asarray(image.convert("RGB"), np.float32) / 255.0)
+        input_img = np.asarray(image.convert("RGB"), np.float32) / 255.0
 
         # Padding images to have even shapes
         height, width = input_img.shape[0], input_img.shape[1]
