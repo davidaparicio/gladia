@@ -200,7 +200,7 @@ jobs:
 
       - name: Set env variables to select which models to test
         if: |
-          !contains(github.event.pull_request.labels.*.name, 'ci: force-test-all-models')
+          contains(github.event.pull_request.labels.*.name, 'ci: force-test-all-models')
         run: |
           echo "TEST_DEFAULT_MODELS_ONLY=" >> $GITHUB_ENV
 
