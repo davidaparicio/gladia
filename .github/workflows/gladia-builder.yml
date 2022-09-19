@@ -17,7 +17,7 @@ env:
   TEST_DEFAULT_MODELS_ONLY: '--default-models-only'
   TEST_DEFAULT_INPUTS_ONLY: '--default-inputs-only'
   TEST_STOP_AT_FAIL: '-x'
-  TEST_MARKERS: '-m mandatory'
+  TEST_MARKERS: "'-m mandatory'"
 
 jobs:
   
