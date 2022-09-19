@@ -14,7 +14,6 @@ concurrency:
 env:
   TAG_PROMOTED: ci-${{ github.event.pull_request.number }}
   TAG_PROMOTE: latest
-  SLACK_WEBHOOK: ${{ SLACK_WEBHOOK }}
   
 jobs:
 
@@ -64,6 +63,9 @@ jobs:
     runs-on: [self-hosted, linux, STD]
     steps:
       - uses: actions/checkout@v2
+      - name: "Set Slack Webhook"
+        run: |
+          echo "SLACK_WEBHOOK=$SLACK_WEBHOOK" >> $GITHUB_ENV
       - name: Notify Slack DH Release
         uses: rtCamp/action-slack-notify@v2.2.0
         env: 
@@ -149,6 +151,9 @@ jobs:
     runs-on: [self-hosted, linux, STD]
     steps:
       - uses: actions/checkout@v2
+      - name: "Set Slack Webhook"
+        run: |
+          echo "SLACK_WEBHOOK=$SLACK_WEBHOOK" >> $GITHUB_ENV
       - name: Notify Slack Deployment done
         uses: rtCamp/action-slack-notify@v2.2.0
         env: 
