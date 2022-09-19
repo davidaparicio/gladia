@@ -14,7 +14,7 @@ concurrency:
 env:
   TAG_PROMOTED: ci-${{ github.event.pull_request.number }}
   TAG_PROMOTE: latest
-  SLACK_WEBHOOK: ${SLACK_WEBHOOK}
+  SLACK_WEBHOOK: ${{ SLACK_WEBHOOK }}
   
 jobs:
 
@@ -58,7 +58,7 @@ jobs:
           docker pull ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }} &&
           docker tag ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }} gladiaio/gladia:latest &&
           docker push gladiaio/gladia:latest
-    
+
   notify-release:
     needs: promote-gladia-to-DH
     runs-on: [self-hosted, linux, STD]
@@ -101,9 +101,14 @@ jobs:
             -e STABILITY_KEY=${STABILITY_KEY} \
             -e MODE=server \
             ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
-      - name: sleep to let it start before deploying next worker
-        run: sleep 120
-      # todo : healthcheck, notify failure
+
+      - name: Gladia AIPI-1 readiness
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 5
+          max_attempts: 60
+          retry_on: error
+          command: curl localhost:${AIPI_SERVICE_PORT}/${AIPI_READINESS_PATH} --connect-timeout 5
 
   deploy-aipi-2:
     needs: deploy-aipi-1
@@ -130,6 +135,14 @@ jobs:
             -e STABILITY_KEY=${STABILITY_KEY} \
             -e MODE=server \
             ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
+
+      - name: Gladia AIPI-2 readiness
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 5
+          max_attempts: 60
+          retry_on: error
+          command: curl localhost:${AIPI_SERVICE_PORT}/${AIPI_READINESS_PATH} --connect-timeout 5
 
   notify-aipi-prod-deployment:
     needs: [deploy-aipi-1, deploy-aipi-2]
