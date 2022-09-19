@@ -1,0 +1,8 @@
+summary: ''
+
+
+inputs_example:
+  image_url:
+    default_example: "http://files.gladia.io/test/test.png"
+    examples:
+      - "http://files.gladia.io/test/test.png"
