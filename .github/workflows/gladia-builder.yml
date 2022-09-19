@@ -219,7 +219,6 @@ jobs:
           -e NVIDIA_VISIBLE_DEVICES=${{steps.gpuid.outputs.gpuid}}
           -e CUDA_VISIBLE_DEVICES=${{steps.gpuid.outputs.gpuid}}
           -e MODE=standalone
-          -p ${{steps.gpuid.outputs.gpuid}}8000:8000
           -v /data/volumes/${{steps.gpuid.outputs.gpuid}}/:/tmp/gladia/
           --pull always
           --name test-pr-${{ github.event.pull_request.number }}
