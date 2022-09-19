@@ -218,6 +218,8 @@ jobs:
           -e STABILITY_KEY=${STABILITY_KEY}
           -e NVIDIA_VISIBLE_DEVICES=${{steps.gpuid.outputs.gpuid}}
           -e CUDA_VISIBLE_DEVICES=${{steps.gpuid.outputs.gpuid}}
+          -e MODE=standalone
+          -p ${{steps.gpuid.outputs.gpuid}}8000:8000
           -v /data/volumes/${{steps.gpuid.outputs.gpuid}}/:/tmp/gladia/
           --pull always
           --name test-pr-${{ github.event.pull_request.number }}
@@ -230,7 +232,7 @@ jobs:
           timeout_seconds: 5
           max_attempts: 12
           retry_on: error
-          command: curl http://localhost:${{steps.gpuid.outputs.gpuid}}8000/v2/health/ready --connect-timeout 5
+          command: docker exec -i test-pr-${{ github.event.pull_request.number }} curl http://localhost:8000/v2/health/ready --connect-timeout 5
 
       # Start test
       - name: Run Tests
@@ -238,12 +240,14 @@ jobs:
         run: >-
           docker exec -i
           -e PR=${{ github.event.pull_request.number }}
+          -e TRITON_SERVER_PORT_HTTP=8000
+          -e TRITON_SERVER_URL=localhost
           -e TEST_DEFAULT_MODELS_ONLY=${{ env.TEST_DEFAULT_MODELS_ONLY }}
           -e TEST_DEFAULT_INPUTS_ONLY=${{ env.TEST_DEFAULT_INPUTS_ONLY }}
           -e TEST_STOP_AT_FAIL=${{ env.TEST_STOP_AT_FAIL }}
           -e TEST_MARKERS=${{ env.TEST_MARKERS }}
           test-pr-${{ github.event.pull_request.number }}
-          /bin/bash -c 'python -m pytest apis/ $TEST_DEFAULT_MODELS_ONLY $TEST_DEFAULT_INPUTS_ONLY $TEST_STOP_AT_FAIL $TEST_MARKERS'
+          /bin/bash -c 'eval "$(micromamba shell hook --shell=bash)" && micromamba activate server &&python -m pytest apis/ $TEST_DEFAULT_MODELS_ONLY $TEST_DEFAULT_INPUTS_ONLY $TEST_STOP_AT_FAIL $TEST_MARKERS'
 
       - name: Logs
         id: logs
