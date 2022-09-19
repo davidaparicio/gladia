@@ -174,6 +174,7 @@ jobs:
             exit 1
           fi
           
+      # Set test parameters
       - name: Set log debug Level
         id: set-log-debug-lvl
         working-directory: ./src
@@ -208,7 +209,7 @@ jobs:
         run: |
           echo "TEST_DEFAULT_MODELS_ONLY=" >> $GITHUB_ENV
 
-      # TODO: make sure TRITON_SERVER_URL exists in runnenv
+      # Start container
       - name: Test Gladia Container
         id: test-gladia
         working-directory: ./src
@@ -222,19 +223,33 @@ jobs:
           -e STABILITY_KEY=${STABILITY_KEY}
           -e NVIDIA_VISIBLE_DEVICES=${{steps.gpuid.outputs.gpuid}}
           -e CUDA_VISIBLE_DEVICES=${{steps.gpuid.outputs.gpuid}}
-          -e TRITON_SERVER_PORT_HTTP=8000
-          -e TRITON_SERVER_URL=${TRITON_SERVER_URL}
+          -v /data/volumes/${{steps.gpuid.outputs.gpuid}}/:/tmp/gladia/
+          --pull always
+          --name test-pr-${{ github.event.pull_request.number }}
+          ${DOCKER_GLADIA_FQDN}/gladia:${{ needs.build.outputs.dockerimage }}
+
+      - name: Gladia container readiness
+        id: gladia-ready
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 5
+          max_attempts: 12
+          retry_on: error
+          command: curl http://localhost:${{steps.gpuid.outputs.gpuid}}8000/v2/health/ready --connect-timeout 5
+
+      # Start test
+      - name: Run Tests
+        id: test
+        run: >-
+          docker exec -i
+          -e PR=${{ github.event.pull_request.number }}
           -e TEST_DEFAULT_MODELS_ONLY=${{ env.TEST_DEFAULT_MODELS_ONLY }}
           -e TEST_DEFAULT_INPUTS_ONLY=${{ env.TEST_DEFAULT_INPUTS_ONLY }}
           -e TEST_STOP_AT_FAIL=${{ env.TEST_STOP_AT_FAIL }}
           -e TEST_MARKERS=${{ env.TEST_MARKERS }}
-          -p ${{steps.gpuid.outputs.gpuid}}8000:8000
-          -v /data/volumes/:/tmp/gladia/
-          --pull always
-          --name test-pr-${{ github.event.pull_request.number }}
-          ${DOCKER_GLADIA_FQDN}/gladia:${{ needs.build.outputs.dockerimage }}
-          /bin/bash -c 'cd /app/src/ && python -m pytest apis/ $TEST_DEFAULT_MODELS_ONLY $TEST_DEFAULT_TEST_ONLY $TEST_STOP_AT_FAIL $TEST_MARKERS'
-        
+          test-pr-${{ github.event.pull_request.number }}
+          /bin/bash -c 'cd /app/src/ && python -m pytest apis/ $TEST_DEFAULT_MODELS_ONLY $TEST_DEFAULT_TEST_ONLY $TEST_STOP_AT_FAIL $TEST_MARKERS''
+
       - name: Logs
         id: logs
         if: always()
