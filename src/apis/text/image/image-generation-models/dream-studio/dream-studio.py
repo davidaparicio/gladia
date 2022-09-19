@@ -44,9 +44,10 @@ def predict(
         verbose=True,
     )
 
-
     output_base64_list = list()
-    for resp in stability_api.generate(prompt=prompt, samples=samples, steps=steps, cfg_scale=scale):
+    for resp in stability_api.generate(
+        prompt=prompt, samples=samples, steps=steps, cfg_scale=scale
+    ):
         for artifact in resp.artifacts:
             if artifact.finish_reason == generation.FILTER:
                 logger.warning(
