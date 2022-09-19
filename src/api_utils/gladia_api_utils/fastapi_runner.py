@@ -1,20 +1,22 @@
-import os
 import sys
-import uvicorn
-from fastapi import FastAPI
 from importlib import import_module
 
+import uvicorn
+from fastapi import FastAPI
 
 app = FastAPI()
+
 
 @app.get("/status")
 def status():
     return 200
 
+
 @app.post("/predict")
-def apply(payload: dict={}):
+def apply(payload: dict = {}):
     prediction = model.predict(**payload)
     return prediction
+
 
 if __name__ == "__main__":
     port = int(sys.argv[1])
