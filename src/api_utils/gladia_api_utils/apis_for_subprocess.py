@@ -6,10 +6,12 @@ from asyncio.log import logger
 from logging import getLogger
 from typing import Any, Dict, Tuple, Union
 from urllib import request
+import subprocess
 
 logger = getLogger(__name__)
 
 SERVICE_PATH = "/etc/supervisor/conf.d/"
+LOGS_PATH = "/var/log/supervisor/"
 
 
 def __create_subprocess_api_config(api_name_to_build: str) -> Tuple[str, str, str, int]:
@@ -73,7 +75,9 @@ def __create_unit_file_for_api(api_name: str) -> str:
     service_file_path = os.path.join(SERVICE_PATH, f"{service_name}.conf")
     cwd_path = os.path.dirname(os.path.realpath(__file__))
     mamba_root_prefix = os.getenv("MAMBA_ROOT_PREFIX", "/opt/conda")
-    log_path = os.path.join("/tmp", "logs", f"{service_name}.log")
+    log_path = os.path.join(LOGS_PATH, f"{service_name}")
+
+    os.makedirs(log_path, exist_ok=True)
 
     # 3. create the unit file
     unit_file = f"""
@@ -302,6 +306,11 @@ def build_all_subprocesses_apis() -> Dict[int, bool]:
         Dict[int, bool]: Dict of subprocess apis to start along with their port
     """
     apis_to_start = __get_subprocess_apis_to_start_from_config()
+
+
+    # create a the folder to store the logs of the subprocess apis
+    # if not exists
+    os.makedirs(LOGS_PATH, exist_ok=True)
 
     apis_started = {}
     for api_name, api_port in apis_to_start.items():
