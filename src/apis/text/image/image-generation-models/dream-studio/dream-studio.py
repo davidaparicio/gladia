@@ -44,10 +44,10 @@ def predict(
         verbose=True,
     )
 
-    answers = stability_api.generate(prompt=prompt, samples=samples, steps=steps)
-
     output_base64_list = list()
-    for resp in answers:
+    for resp in stability_api.generate(
+        prompt=prompt, samples=samples, steps=steps, cfg_scale=scale
+    ):
         for artifact in resp.artifacts:
             if artifact.finish_reason == generation.FILTER:
                 logger.warning(
@@ -56,9 +56,12 @@ def predict(
                 )
                 img = Image.open("unsafe.png")
 
-            if artifact.type == generation.ARTIFACT_IMAGE:
+            elif artifact.type == generation.ARTIFACT_IMAGE:
                 bytes_img = io.BytesIO(artifact.binary)
                 img = Image.open(bytes_img)
+
+            else:
+                continue
 
             output_base64_list.append(convert_image_to_base64(img))
 

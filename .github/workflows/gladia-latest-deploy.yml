@@ -94,7 +94,7 @@ jobs:
             -p ${AIPI_SERVICE_PORT}:8080 \
             -v /tmp/gladia:/tmp/gladia \
             -e TRITON_SERVER_PORT_HTTP=8000 \
-            -e TRITON_SERVER_URL=${TRITON_SERVER_URL} \
+            -e TRITON_SERVER_URL=${env.TRITON_SERVER_URL} \
             -e TRITON_LAZY_DOWNLOAD=false \
             -e TRITON_MODELS_PATH=/tmp/gladia/triton \
             -e HUGGINGFACE_ACCESS_TOKEN=${HUGGINGFACE_ACCESS_TOKEN} \
