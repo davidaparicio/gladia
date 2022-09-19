@@ -1,12 +1,12 @@
 import json
 import os
 import socket
+import subprocess
 import time
 from asyncio.log import logger
 from logging import getLogger
 from typing import Any, Dict, Tuple, Union
 from urllib import request
-import subprocess
 
 logger = getLogger(__name__)
 
@@ -306,7 +306,6 @@ def build_all_subprocesses_apis() -> Dict[int, bool]:
         Dict[int, bool]: Dict of subprocess apis to start along with their port
     """
     apis_to_start = __get_subprocess_apis_to_start_from_config()
-
 
     # create a the folder to store the logs of the subprocess apis
     # if not exists
