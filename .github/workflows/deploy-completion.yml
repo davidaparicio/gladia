@@ -1,0 +1,34 @@
+on:
+  workflow_run:
+    workflows: [Gladia Promote & deploy]
+    types: [completed]
+
+jobs:
+  on-success:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Notify Slack - Successful deploy
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env: 
+          SLACK_CHANNEL: #releases
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_USERNAME: gladia-ai-ci
+          SLACK_TITLE: 'New Docker Hub Release :rocket:'
+          SLACK_MESSAGE: ${{ github.event.pull_request.title }} by ${{ github.event.pull_request.user.login }}
+          SLACK_WEBHOOK: ${{ secret.SLACK_WEBHOOK }}
+          SLACK_ICON_EMOJI: ':rocket:'
+  on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - name: Notify Slack - Failed deploy
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env: 
+          SLACK_CHANNEL: #releases
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_USERNAME: gladia-ai-ci
+          SLACK_TITLE: 'New Docker Hub Release :rocket:'
+          SLACK_MESSAGE: ${{ github.event.pull_request.title }} by ${{ github.event.pull_request.user.login }}
+          SLACK_WEBHOOK: ${{ secret.SLACK_WEBHOOK }}
+          SLACK_ICON_EMOJI: ':rocket:'
