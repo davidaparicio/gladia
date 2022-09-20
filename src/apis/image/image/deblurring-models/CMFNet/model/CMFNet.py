@@ -1,14 +1,14 @@
-import torch
-import torch.nn as nn
+from torch import cat, FloatTensor
+from torch.nn import Sequential, Module, Upsample, Conv2d, Parameter, Sigmoid, PReLU
 
-from .block import CAB, PAB, SAB, SAM, conv, conv3x3, conv_down
+from .block import CAB, PAB, SAB, SAM, conv
 
 ##########################################################################
 ## U-Net
 bn = 2  # block number-1
 
 
-class Encoder(nn.Module):
+class Encoder(Module):
     def __init__(
         self, n_feat, kernel_size, reduction, act, bias, scale_unetfeats, block
     ):
@@ -76,9 +76,9 @@ class Encoder(nn.Module):
                 )
                 for _ in range(bn)
             ]
-        self.encoder_level1 = nn.Sequential(*self.encoder_level1)
-        self.encoder_level2 = nn.Sequential(*self.encoder_level2)
-        self.encoder_level3 = nn.Sequential(*self.encoder_level3)
+        self.encoder_level1 = Sequential(*self.encoder_level1)
+        self.encoder_level2 = Sequential(*self.encoder_level2)
+        self.encoder_level3 = Sequential(*self.encoder_level3)
         self.down12 = DownSample(n_feat, scale_unetfeats)
         self.down23 = DownSample(n_feat + scale_unetfeats, scale_unetfeats)
 
@@ -91,7 +91,7 @@ class Encoder(nn.Module):
         return [enc1, enc2, enc3]
 
 
-class Decoder(nn.Module):
+class Decoder(Module):
     def __init__(
         self, n_feat, kernel_size, reduction, act, bias, scale_unetfeats, block
     ):
@@ -159,9 +159,9 @@ class Decoder(nn.Module):
                 )
                 for _ in range(bn)
             ]
-        self.decoder_level1 = nn.Sequential(*self.decoder_level1)
-        self.decoder_level2 = nn.Sequential(*self.decoder_level2)
-        self.decoder_level3 = nn.Sequential(*self.decoder_level3)
+        self.decoder_level1 = Sequential(*self.decoder_level1)
+        self.decoder_level2 = Sequential(*self.decoder_level2)
+        self.decoder_level3 = Sequential(*self.decoder_level3)
         if block == "CAB":
             self.skip_attn1 = CAB(n_feat, kernel_size, reduction, bias=bias, act=act)
             self.skip_attn2 = CAB(
@@ -192,12 +192,12 @@ class Decoder(nn.Module):
 
 ##########################################################################
 ##---------- Resizing Modules ----------
-class DownSample(nn.Module):
+class DownSample(Module):
     def __init__(self, in_channels, s_factor):
         super(DownSample, self).__init__()
-        self.down = nn.Sequential(
-            nn.Upsample(scale_factor=0.5, mode="bilinear", align_corners=False),
-            nn.Conv2d(
+        self.down = Sequential(
+            Upsample(scale_factor=0.5, mode="bilinear", align_corners=False),
+            Conv2d(
                 in_channels, in_channels + s_factor, 1, stride=1, padding=0, bias=False
             ),
         )
@@ -207,12 +207,12 @@ class DownSample(nn.Module):
         return x
 
 
-class UpSample(nn.Module):
+class UpSample(Module):
     def __init__(self, in_channels, s_factor):
         super(UpSample, self).__init__()
-        self.up = nn.Sequential(
-            nn.Upsample(scale_factor=2, mode="bilinear", align_corners=False),
-            nn.Conv2d(
+        self.up = Sequential(
+            Upsample(scale_factor=2, mode="bilinear", align_corners=False),
+            Conv2d(
                 in_channels + s_factor, in_channels, 1, stride=1, padding=0, bias=False
             ),
         )
@@ -222,12 +222,12 @@ class UpSample(nn.Module):
         return x
 
 
-class SkipUpSample(nn.Module):
+class SkipUpSample(Module):
     def __init__(self, in_channels, s_factor):
         super(SkipUpSample, self).__init__()
-        self.up = nn.Sequential(
-            nn.Upsample(scale_factor=2, mode="bilinear", align_corners=False),
-            nn.Conv2d(
+        self.up = Sequential(
+            Upsample(scale_factor=2, mode="bilinear", align_corners=False),
+            Conv2d(
                 in_channels + s_factor, in_channels, 1, stride=1, padding=0, bias=False
             ),
         )
@@ -240,13 +240,13 @@ class SkipUpSample(nn.Module):
 
 ##########################################################################
 # Mixed Residual Module
-class Mix(nn.Module):
+class Mix(Module):
     def __init__(self, m=1):
         super(Mix, self).__init__()
-        w = nn.Parameter(torch.FloatTensor([m]), requires_grad=True)
-        w = nn.Parameter(w, requires_grad=True)
+        w = Parameter(FloatTensor([m]), requires_grad=True)
+        w = Parameter(w, requires_grad=True)
         self.w = w
-        self.mix_block = nn.Sigmoid()
+        self.mix_block = Sigmoid()
 
     def forward(self, fea1, fea2, feat3):
         factor = self.mix_block(self.w)
@@ -261,7 +261,7 @@ class Mix(nn.Module):
 
 ##########################################################################
 # Architecture
-class CMFNet(nn.Module):
+class CMFNet(Module):
     def __init__(
         self,
         in_c=3,
@@ -274,18 +274,18 @@ class CMFNet(nn.Module):
     ):
         super(CMFNet, self).__init__()
 
-        p_act = nn.PReLU()
-        self.shallow_feat1 = nn.Sequential(
+        p_act = PReLU()
+        self.shallow_feat1 = Sequential(
             conv(in_c, n_feat // 2, kernel_size, bias=bias),
             p_act,
             conv(n_feat // 2, n_feat, kernel_size, bias=bias),
         )
-        self.shallow_feat2 = nn.Sequential(
+        self.shallow_feat2 = Sequential(
             conv(in_c, n_feat // 2, kernel_size, bias=bias),
             p_act,
             conv(n_feat // 2, n_feat, kernel_size, bias=bias),
         )
-        self.shallow_feat3 = nn.Sequential(
+        self.shallow_feat3 = Sequential(
             conv(in_c, n_feat // 2, kernel_size, bias=bias),
             p_act,
             conv(n_feat // 2, n_feat, kernel_size, bias=bias),
@@ -350,7 +350,7 @@ class CMFNet(nn.Module):
         mixed_img = self.add123(mix_r[0])
 
         ## Concat SAM features of Stage 1, Stage 2 and Stage 3
-        concat_feat = self.concat123(torch.cat([x1_out, x2_out, x3_out], 1))
+        concat_feat = self.concat123(cat([x1_out, x2_out, x3_out], 1))
         x_final = self.tail(concat_feat)
 
         return x_final + mixed_img
