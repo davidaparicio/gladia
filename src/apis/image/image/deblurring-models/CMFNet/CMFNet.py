@@ -1,21 +1,19 @@
-from PIL import Image
-from skimage import img_as_ubyte
 from collections import OrderedDict
 
+from gladia_api_utils.io import _open
+from gladia_api_utils.model_management import download_model
+from PIL import Image
+from skimage import img_as_ubyte
+from torch import clamp as torch_clamp
 from torch import device as torch_device
 from torch import load as torch_load
-from torch import clamp as torch_clamp
 from torch import no_grad as torch_no_grad
 from torch.cuda import is_available as is_cuda_available
-
 from torch.nn import Module
 from torch.nn.functional import pad
 from torchvision.transforms.functional import to_tensor
 
-from gladia_api_utils.io import _open
-from gladia_api_utils.model_management import download_model
 from apis.image.image.deblurring_models.CMFNet.model.CMFNet import CMFNet
-
 
 MODEL_PATH = download_model(
     url="https://github.com/FanChiMao/CMFNet/releases/download/v0.0/deblur_GoPro_CMFNet.pth",
@@ -45,7 +43,6 @@ def load_checkpoint(model: Module, weights: str) -> None:
             name = k[7:]  # remove `module.`
             new_state_dict[name] = v
         model.load_state_dict(new_state_dict)
-
 
 
 def predict(image: bytes) -> Image:

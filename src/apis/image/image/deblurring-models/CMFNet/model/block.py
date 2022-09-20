@@ -1,9 +1,9 @@
 from logging import getLogger
 
-from torch import mean, max, cat, sigmoid, ones
+from torch import cat
 from torch import float as torch_float
-from torch.nn import Conv2d, Sequential, Sigmoid, Module, ReLU, AdaptiveAvgPool2d, PReLU
-
+from torch import max, mean, ones, sigmoid
+from torch.nn import AdaptiveAvgPool2d, Conv2d, Module, PReLU, ReLU, Sequential, Sigmoid
 
 logger = getLogger(__name__)
 

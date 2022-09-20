@@ -1,5 +1,5 @@
-from torch import cat, FloatTensor
-from torch.nn import Sequential, Module, Upsample, Conv2d, Parameter, Sigmoid, PReLU
+from torch import FloatTensor, cat
+from torch.nn import Conv2d, Module, Parameter, PReLU, Sequential, Sigmoid, Upsample
 
 from .block import CAB, PAB, SAB, SAM, conv
 
