@@ -58,26 +58,6 @@ jobs:
           docker tag ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }} gladiaio/gladia:latest &&
           docker push gladiaio/gladia:latest
 
-  notify-release:
-    needs: promote-gladia-to-DH
-    runs-on: [self-hosted, linux, STD]
-    steps:
-      - uses: actions/checkout@v2
-      - name: "Set Slack Webhook"
-        run: |
-          echo "SLACK_WEBHOOK=$SLACK_WEBHOOK" >> $GITHUB_ENV
-      - name: Notify Slack DH Release
-        uses: rtCamp/action-slack-notify@v2.2.0
-        env: 
-          SLACK_CHANNEL: #releases
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_USERNAME: gladia-ai-ci
-          SLACK_TITLE: 'New Docker Hub Release :rocket:'
-          SLACK_MESSAGE: ${{ github.event.pull_request.title }} by ${{ github.event.pull_request.user.login }}
-          SLACK_WEBHOOK: ${{ env.SLACK_WEBHOOK }}
-          SLACK_ICON_EMOJI: ':rocket:'
-
-
   deploy-aipi-1:
     needs: promote-gladia-image
     runs-on: [self-hosted, linux, aipi-1]
@@ -96,7 +76,7 @@ jobs:
             -p ${AIPI_SERVICE_PORT}:8080 \
             -v /tmp/gladia:/tmp/gladia \
             -e TRITON_SERVER_PORT_HTTP=8000 \
-            -e TRITON_SERVER_URL=${env.TRITON_SERVER_URL} \
+            -e TRITON_SERVER_URL=${TRITON_SERVER_URL} \
             -e TRITON_LAZY_DOWNLOAD=false \
             -e TRITON_MODELS_PATH=/tmp/gladia/triton \
             -e HUGGINGFACE_ACCESS_TOKEN=${HUGGINGFACE_ACCESS_TOKEN} \
@@ -145,22 +125,3 @@ jobs:
           max_attempts: 60
           retry_on: error
           command: curl localhost:${AIPI_SERVICE_PORT}/${AIPI_READINESS_PATH} --connect-timeout 5
-
-  notify-aipi-prod-deployment:
-    needs: [deploy-aipi-1, deploy-aipi-2]
-    runs-on: [self-hosted, linux, STD]
-    steps:
-      - uses: actions/checkout@v2
-      - name: "Set Slack Webhook"
-        run: |
-          echo "SLACK_WEBHOOK=$SLACK_WEBHOOK" >> $GITHUB_ENV
-      - name: Notify Slack Deployment done
-        uses: rtCamp/action-slack-notify@v2.2.0
-        env: 
-          SLACK_CHANNEL: #releases
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_USERNAME: gladia-ai-ci
-          SLACK_TITLE: 'Deployment done :rocket:'
-          SLACK_MESSAGE: ${{ github.event.pull_request.title }} by ${{ github.event.pull_request.user.login }}
-          SLACK_WEBHOOK: ${{ env.SLACK_WEBHOOK }}
-          SLACK_ICON_EMOJI: ':gear:'
