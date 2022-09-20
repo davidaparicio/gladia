@@ -16,7 +16,7 @@ jobs:
           SLACK_USERNAME: gladia-ai-ci
           SLACK_TITLE: 'New Docker Hub Release :rocket:'
           SLACK_MESSAGE: ${{ github.event.pull_request.title }} by ${{ github.event.pull_request.user.login }}
-          SLACK_WEBHOOK: ${{ secret.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_ICON_EMOJI: ':rocket:'
   on-failure:
     runs-on: ubuntu-latest
@@ -30,5 +30,5 @@ jobs:
           SLACK_USERNAME: gladia-ai-ci
           SLACK_TITLE: 'New Docker Hub Release :rocket:'
           SLACK_MESSAGE: ${{ github.event.pull_request.title }} by ${{ github.event.pull_request.user.login }}
-          SLACK_WEBHOOK: ${{ secret.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_ICON_EMOJI: ':rocket:'
