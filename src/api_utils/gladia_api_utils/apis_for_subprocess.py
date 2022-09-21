@@ -215,7 +215,7 @@ def __set_api_port(api_name: str) -> int:
     """
     port = __find_free_port()
 
-    logger.error(f"Setting port for {__clean_name_for_env_var(api_name)} to {port}")
+    logger.info(f"Setting port for {__clean_name_for_env_var(api_name)} to {port}")
 
     os.environ[__clean_name_for_env_var(api_name)] = str(port)
 
