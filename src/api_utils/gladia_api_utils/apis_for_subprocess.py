@@ -296,7 +296,10 @@ def call_subprocess_api(
             except Exception:
                 try:
                     return response.content
-                except:
+                except Exception:
+                    logger.error(
+                        f"Could not parse response from subprocess api {api_name} at {api_url} falling back to raw response"
+                    )
                     return response.text
         else:
             logger.error(
