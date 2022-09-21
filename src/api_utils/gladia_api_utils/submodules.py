@@ -550,32 +550,11 @@ class TaskRouter:
             }
         }
 
-        endpoint_parameters_description = dict()
-        for parameter in input:
-            endpoint_parameters_description.update(
-                create_description_for_the_endpoint_parameter(parameter)
-            )
+        endpoint_parameters_description = self.__build_endpoint_parameters_description(
+            self.input
+        )
 
-        form_parameters = []
-        for key, value in endpoint_parameters_description.items():
-            form_parameters.append(
-                forge.arg(
-                    key,
-                    type=value["type"],
-                    default=value["constructor"](
-                        title=key,
-                        default=value["default"],
-                        description=value["description"],
-                        example=value[
-                            "example"
-                        ],  # NOTE: FastAPI does not use this value
-                        examples=value[
-                            "examples"
-                        ],  # NOTE: FastAPI does not use this value
-                        data_type=value.get("data_type", ""),
-                    ),
-                )
-            )
+        form_parameters = self.__build_form_parameters(endpoint_parameters_description)
 
         query_for_model_name = forge.arg(
             "model",
@@ -597,25 +576,12 @@ class TaskRouter:
         async def apply(*args, **kwargs):
 
             # cast BaseModel pydantic models into python type
-            parameters_in_body = {}
-
-            for key, value in kwargs.items():
-                if isinstance(value, BaseModel):
-                    parameters_in_body.update(value.dict())
-                else:
-                    parameters_in_body[key] = value
+            parameters_in_body = self.__build_parameters_in_body(kwargs)
 
             kwargs = parameters_in_body
 
-            routeur = (
-                to_task_name(self.root_package_path)
-                .replace(os.getenv("PATH_TO_GLADIA_SRC", "/app"), "")
-                .replace("/", ".")
-                .strip(".")
-            )
-            this_routeur = importlib.import_module(routeur.replace("/", "."))
-            inputs = this_routeur.inputs
-
+            self.__get_routeur_inputs()
+            
             model = kwargs["model"]
             # remove it from kwargs to avoid passing it to the predict function
             del kwargs["model"]
@@ -629,8 +595,8 @@ class TaskRouter:
                 )
 
             # return False if an error occured
-            kwargs, success, error_message = await clean_kwargs_based_on_router_inputs(
-                kwargs, inputs
+            kwargs, success, error_message = await self.clean_kwargs_based_on_router_inputs(
+                kwargs, self.inputs
             )
 
             if not success:
@@ -650,14 +616,12 @@ class TaskRouter:
                     result = call_subprocess_api(
                         api_name=api_name,
                         kwargs=kwargs,
-                        args=args,
-                        routeur_inputs=inputs,
                     )
 
                 else:
                     # if not exists call the subprocess
                     result = self.__call_in_subprocess(
-                        inputs=inputs, model=model, kwargs=kwargs, env_name=env_name
+                        inputs=self.inputs, model=model, kwargs=kwargs, env_name=env_name
                     )
 
             else:
@@ -665,36 +629,92 @@ class TaskRouter:
                     model=model, kwargs=kwargs, args=args
                 )
 
-            try:
-                logger.info(f"result: {result}")
-                logger.info(f"type: {type(result)}")
-                logger.info(f"self.output: {type(self.output)}")
-                logger.info(f"self.output: {self.output}")
-                return cast_response(result, self.output)
+            return self.__post_processing(result)
 
-            except Exception as e:
-                error_message = f"Couldn't cast response: {e}"
-                logger.error(error_message)
 
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=error_message,
+
+    def __get_routeur_inputs(self) -> list:
+        self.routeur = (
+                to_task_name(self.root_package_path)
+                .replace(os.getenv("PATH_TO_GLADIA_SRC", "/app"), "")
+                .replace("/", ".")
+                .strip(".")
+            )
+        self.this_routeur = importlib.import_module(self.routeur.replace("/", "."))
+        self.inputs = self.this_routeur.inputs
+        return self.inputs
+
+    def __build_parameters_in_body(self, kwargs: dict) -> dict:
+        """
+        Build the parameters in body for the post route
+        
+        Args: 
+            kwargs (dict): the kwargs to build the parameters in body
+
+        Returns:
+            dict: the parameters in body
+        """
+        parameters_in_body = dict()
+
+        for key, value in kwargs.items():
+            if isinstance(value, BaseModel):
+                parameters_in_body.update(value.dict())
+            else:
+                parameters_in_body[key] = value
+        
+        return parameters_in_body
+
+    def __build_endpoint_parameters_description(self, input: list) -> dict:
+        """
+        Build the endpoint parameters description
+        
+        Args:
+            input (list): list of inputs from the router
+
+        Returns:
+            dict: the endpoint parameters description
+        """
+        endpoint_parameters_description = dict()
+        for parameter in input:
+            endpoint_parameters_description.update(
+                create_description_for_the_endpoint_parameter(parameter)
+            )
+        return endpoint_parameters_description
+
+    def __build_form_parameters(self, endpoint_parameters_description: dict) -> list:
+        """
+        Build the form parameters for the endpoint
+        
+        Args:
+            endpoint_parameters_description (dict): the description of the endpoint parameters
+
+        Returns:
+            list: the list of the form parameters
+        """
+
+        form_parameters = []
+
+        for key, value in endpoint_parameters_description.items():
+            form_parameters.append(
+                forge.arg(
+                    key,
+                    type=value["type"],
+                    default=value["constructor"](
+                        title=key,
+                        default=value["default"],
+                        description=value["description"],
+                        example=value[
+                            "example"
+                        ],  # NOTE: FastAPI does not use this value
+                        examples=value[
+                            "examples"
+                        ],  # NOTE: FastAPI does not use this value
+                        data_type=value.get("data_type", ""),
+                    ),
                 )
-
-            finally:
-                if isinstance(result, str):
-                    try:
-                        if (
-                            result != "/"
-                            and is_valid_path(result)
-                            and os.path.exists(result)
-                        ):
-                            os.system(f"rm {result}")
-                    except Exception as e:
-                        # not a valid path
-                        # skip
-                        logger.debug(f"not a valid path: {e}")
-
+            )
+        return form_parameters
+    
 
     def __check_if_model_exist(
         self,
@@ -831,7 +851,7 @@ class TaskRouter:
         Returns:
             Any
         """
-        logger.info(type(cast_response))
+        
         try:
             return cast_response(result, self.output)
 

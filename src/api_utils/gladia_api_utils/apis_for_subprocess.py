@@ -261,7 +261,7 @@ def __get_subprocess_apis_to_start_from_config() -> Dict[str, int]:
 
 
 def call_subprocess_api(
-    api_name: str, kwargs: dict(), args: list(), routeur_inputs: list()
+    api_name: str, kwargs: dict()
 ) -> Any:
     """
     Call a subprocess api and return the response
@@ -270,8 +270,6 @@ def call_subprocess_api(
         api_name (str): Name of the subprocess api to call
         (should look like "/text/text/language-detection-models/toftrup-etal-2021/")
         kwargs (dict): Dict of kwargs to pass to the subprocess api
-        args (list): List of args to pass to the subprocess api
-        routeur_inputs (list): List of inputs the routeur has as a wrapping class
 
     Returns:
         Any: Response from the subprocess api
@@ -285,7 +283,6 @@ def call_subprocess_api(
 
         # 3. call the subprocess api and return the response
         logger.error(f"Calling subprocess api {api_name} at {api_url}")
-        logger.error(f"Kwargs: {type(kwargs)}")
 
         headers = {
             "accept": "application/json",
@@ -293,18 +290,7 @@ def call_subprocess_api(
             # 'Content-Type': 'multipart/form-data',
         }
 
-        params = {
-            "model": "tesseract-denoising",
-        }
-
-        files = {
-            "image": (None, ""),
-            "image_url": (
-                None,
-                "http://files.gladia.io/examples/image/text/ocr/testocr.png",
-            ),
-            "source_language": (None, "eng"),
-        }
+        params = {}
 
         response = requests.post(api_url, params=params, headers=headers, files=kwargs)
 

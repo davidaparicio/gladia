@@ -1,4 +1,5 @@
 import os
+import os
 import sys
 from asyncio.log import logger
 from importlib import import_module, util
@@ -129,11 +130,3 @@ if __name__ == "__main__":
 
     del task_routeur
     uvicorn.run(app, host="127.0.0.1", port=port, log_level="info")
-"""
-    logger.error(root_package_path)
-    sys.path.insert(0, models_folder.parent)
-    spec = util.spec_from_file_location("task_routeur", root_package_path)
-    task_routeur = util.module_from_spec(spec)
-    sys.modules["task_routeur"] = task_routeur
-    spec.loader.exec_module(task_routeur)
-"""
