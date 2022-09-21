@@ -278,7 +278,7 @@ def call_subprocess_api(
         api_url = f"http://localhost:{port}/predict"
 
         # 3. call the subprocess api and return the response
-        logger.error(f"Calling subprocess api {api_name} at {api_url}")
+        logger.info(f"Calling subprocess api {api_name} at {api_url}")
 
         headers = {
             "accept": "application/json",
