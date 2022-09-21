@@ -87,10 +87,7 @@
         ]
     },
     "subprocess_to_apify": [
-        "/text/text/language-detection-models/toftrup-etal-2021/",
-        "/image/text/ocr-models/tesseract-default/",
         "/image/text/ocr-models/tesseract-denoising/",
-        "/image/image/face-bluring-models/ageitgey/",
-        "/image/image/super-resolution-models/latent-sr/"
+        "/image/text/ocr-models/easy-ocr/env.yaml"
     ]
 }

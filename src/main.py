@@ -17,6 +17,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from fastapi_utils.timing import add_timing_middleware
+from gladia_api_utils.apis_for_subprocess import build_all_subprocesses_apis
 from gladia_api_utils.submodules import to_task_name
 from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.responses import RedirectResponse
@@ -373,5 +374,8 @@ if config["prometheus"]["active"]:
     instrumentator = __init_prometheus_instrumentator(
         config["prometheus"]["instrumentator"]
     )
+
+
+build_all_subprocesses_apis()
 
 import_submodules(apis)

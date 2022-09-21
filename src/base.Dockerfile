@@ -94,9 +94,6 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
         libtesseract-dev \
         python3-pil \
         tesseract-ocr-all && \
-    echo "== ADJUSTING python ref ==" && \
-    rm /usr/bin/python3 && \
-    ln -s /usr/bin/python3.8 /usr/bin/python3 && \
     echo "== ADJUSTING binaries ==" && \ 
     mv /usr/bin/python3 /usr/bin/python38 && \
     ln -sf /usr/bin/python /usr/bin/python3 && \
@@ -111,4 +108,7 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
     mv bin/micromamba /usr/local/bin/micromamba && \ 
     micromamba shell init -s bash && \
     micromamba config set always_softlink $MAMBA_ALWAYS_SOFTLINK && \
+    echo "== ADJUSTING python ref ==" && \
+    rm /usr/bin/python3 && \
+    ln -s /usr/bin/python3.8 /usr/bin/python3 && \
     $CLEAN_LAYER_SCRIPT
