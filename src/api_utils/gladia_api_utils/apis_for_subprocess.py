@@ -219,10 +219,6 @@ def __set_api_port(api_name: str) -> int:
 
     os.environ[__clean_name_for_env_var(api_name)] = str(port)
 
-    print(
-        f"READ port for {__clean_name_for_env_var(api_name)} to {os.getenv(__clean_name_for_env_var(api_name))}"
-    )
-
     return port
 
 
