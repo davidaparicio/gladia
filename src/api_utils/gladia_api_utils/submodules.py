@@ -598,7 +598,7 @@ class TaskRouter:
                 kwargs,
                 success,
                 error_message,
-            ) = await self.clean_kwargs_based_on_router_inputs(kwargs, self.inputs)
+            ) = await clean_kwargs_based_on_router_inputs(kwargs, self.inputs)
 
             if not success:
                 return get_error_reponse(400, error_message)
