@@ -225,7 +225,7 @@ def __convert_string_response(
     # try to load it as a json representation
     # else return it as is
     if not os.path.exists(response):
-        __load_json_string_representation(response)
+        return __load_json_string_representation(response)
 
     # if the string looks like a filepath
     # try to load it as a json
@@ -233,7 +233,7 @@ def __convert_string_response(
     else:
         try:
             if pathlib.Path(response).is_file():
-                __load_file_as_response(response)
+                return __load_file_as_response(response)
             else:
                 return response
         except OSError as os_error:

@@ -5,8 +5,11 @@ import subprocess
 import time
 from asyncio.log import logger
 from logging import getLogger
+from pathlib import Path
 from typing import Any, Dict, Tuple, Union
 from urllib import request
+
+import requests
 
 logger = getLogger(__name__)
 
@@ -73,11 +76,12 @@ def __create_unit_file_for_api(api_name: str) -> str:
 
     # 2. get the path to the supervisor service
     service_file_path = os.path.join(SERVICE_PATH, f"{service_name}.conf")
-    cwd_path = os.path.dirname(os.path.realpath(__file__))
+    cwd = os.path.dirname(os.path.abspath(__file__))
     mamba_root_prefix = os.getenv("MAMBA_ROOT_PREFIX", "/opt/conda")
-    log_path = os.path.join(LOGS_PATH, f"{service_name}")
 
-    os.makedirs(log_path, exist_ok=True)
+    # 3. create the log file
+    log_path = os.path.join(LOGS_PATH, f"{service_name}")
+    Path(log_path).touch()
 
     # 3. create the unit file
     unit_file = f"""
@@ -86,14 +90,14 @@ nodaemon=false
 
 [program:{service_name}]
 user=root
-directory={subprocess_api_dir}
-command=/usr/local/bin/micromamba run -r {mamba_root_prefix} -n {micromamba_env_name} --cwd={cwd_path} python3 fastapi_runner.py {port} {model_name}
+directory={cwd}
+command=/usr/local/bin/micromamba run -r {mamba_root_prefix} -n {micromamba_env_name} --cwd={subprocess_api_dir} python3 {cwd}/fastapi_runner.py {port} {subprocess_api_dir}/{model_name}.py
 stdout_logfile={log_path}
 stdout_logfile_maxbytes=0
 stderr_logfile={log_path}
 stderr_logfile_maxbytes=0
-startsecs=30
-stopwaitsecs=30
+startsecs=5
+stopwaitsecs=5
 autostart=false
 autorestart=true
 """
@@ -146,6 +150,19 @@ def __start_api_service(service_name: str) -> None:
     subprocess.run(["supervisorctl", "start", service_name])
 
 
+def __clean_name_for_env_var(name: str) -> str:
+    """
+    Clean a name to be used as an environment variable
+
+    Args:
+        name (str): Name to clean
+
+    Returns:
+        str: Cleaned name
+    """
+    return name.replace("-", "").replace("/", "").replace("_", "").upper()
+
+
 def __get_api_port(api_name: str) -> Union[int, bool]:
     """
     Get the port of a subprocess api based on it's name
@@ -158,7 +175,7 @@ def __get_api_port(api_name: str) -> Union[int, bool]:
         Union[int, bool]: Port of the subprocess api if it exists, False otherwise
     """
 
-    port = os.getenv(api_name, False)
+    port = os.getenv(__clean_name_for_env_var(api_name), False)
 
     if not port:
         return False
@@ -191,12 +208,16 @@ def __set_api_port(api_name: str) -> int:
 
     Args:
         api_name (str): Name of the api to set the port for
+        (should look like /input/output/task-models/model-name/)
 
     Returns:
         int: Port of the api
     """
     port = __find_free_port()
-    os.environ[api_name] = str(port)
+
+    logger.info(f"Setting port for {__clean_name_for_env_var(api_name)} to {port}")
+
+    os.environ[__clean_name_for_env_var(api_name)] = str(port)
 
     return port
 
@@ -235,14 +256,14 @@ def __get_subprocess_apis_to_start_from_config() -> Dict[str, int]:
     return apis_to_start_dict
 
 
-def call_subprocess_api(api_name: str, payload: Dict) -> Any:
+def call_subprocess_api(api_name: str, kwargs: dict()) -> Any:
     """
     Call a subprocess api and return the response
 
     Args:
         api_name (str): Name of the subprocess api to call
         (should look like "/text/text/language-detection-models/toftrup-etal-2021/")
-        payload (Dict): Payload to send to the subprocess api ? kwargs ?
+        kwargs (dict): Dict of kwargs to pass to the subprocess api
 
     Returns:
         Any: Response from the subprocess api
@@ -251,20 +272,46 @@ def call_subprocess_api(api_name: str, payload: Dict) -> Any:
     port = __get_api_port(api_name)
 
     # 2. if the port is not set, return False
-    if not port:
-        return False
-    else:
-        api_url = f"http://localhost:{port}"
+    if port:
+        api_url = f"http://localhost:{port}/predict"
 
         # 3. call the subprocess api and return the response
-        logger.error(f"subprocess api response: {payload}")
-        response = request.post(api_url, json=payload)
-        logger.error(f"subprocess api response: {response}")
-        return response
+        logger.info(f"Calling subprocess api {api_name} at {api_url}")
+
+        headers = {
+            "accept": "application/json",
+            # requests won't add a boundary if this header is set when you pass files=
+            # 'Content-Type': 'multipart/form-data',
+        }
+
+        params = {}
+
+        response = requests.post(api_url, params=params, headers=headers, files=kwargs)
+
+        if response.status_code == 200:
+            try:
+                return response.json()
+            except Exception:
+                try:
+                    return response.content
+                except Exception:
+                    logger.error(
+                        f"Could not parse response from subprocess api {api_name} at {api_url} falling back to raw response"
+                    )
+                    return response.text
+        else:
+            logger.error(
+                f"Error calling subprocess api {api_name} at {api_url}: {response.status_code}"
+            )
+            return False
+
+    else:
+        return False
 
 
 def is_subprocess_api_running(api_name_to_check: str) -> bool:
     """
+
     Check if a subprocess api is running based on it's name
 
     Args:
@@ -275,12 +322,10 @@ def is_subprocess_api_running(api_name_to_check: str) -> bool:
         bool: True if the api is running, False otherwise
     """
     # 1. get the host and port of the subprocess api based on the api name in the environment variables
-    port = __get_api_port(api_name_to_check)
+    port = __get_api_port(__clean_name_for_env_var(api_name_to_check))
 
     # 2. if the port is not set, return False
-    if not port:
-        return False
-    else:
+    if port:
         api_url = f"http://localhost:{port}/status"
 
         # 3. try to get the status of the api
@@ -293,6 +338,8 @@ def is_subprocess_api_running(api_name_to_check: str) -> bool:
                 f"Could not get the status of the subprocess api {api_name_to_check} at {api_url}: {e}"
             )
             return False
+    else:
+        return False
 
 
 def build_all_subprocesses_apis() -> Dict[int, bool]:
@@ -323,5 +370,7 @@ def build_all_subprocesses_apis() -> Dict[int, bool]:
             "running": is_subprocess_api_running(api_name),
             "service_name": service_name,
         }
+
+        logger.info(f"apis_started: {apis_started}")
 
     return apis_started

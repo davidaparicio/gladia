@@ -10,6 +10,7 @@ dependencies:
   - conda-forge::mkl
   - conda-forge::mkl-service
   - conda-forge::uvicorn
+  - conda-forge::gunicorn
   - conda-forge::fastapi
   - pip:
     - -e /app/api_utils/

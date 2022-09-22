@@ -103,7 +103,7 @@ ENV LD_PRELOAD="/opt/tritonserver/backends/pytorch/libmkl_rt.so" \
 
 RUN echo "== ADJUSTING binaries ==" && \ 
     mv /usr/bin/python3 /usr/bin/python38 && \
-    ln -sf /usr/bin/python /usr/bin/python3 && \
+    ln -sf /usr/bin/python3.8 /usr/bin/python3 && \
     echo "== ADJUSTING entrypoint ==" && \ 
     mv $PATH_TO_GLADIA_SRC/tools/docker/entrypoint.sh /opt/nvidia/nvidia_entrypoint.sh && \
     echo "== ADJUSTING path rights ==" && \ 
