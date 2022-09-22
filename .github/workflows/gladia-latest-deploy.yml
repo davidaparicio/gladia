@@ -87,8 +87,8 @@ jobs:
       - name: Gladia AIPI-1 readiness
         uses: nick-fields/retry@v2
         with:
-          timeout_seconds: 5
-          max_attempts: 60
+          timeout_seconds: 60
+          max_attempts: 10
           retry_on: error
           command: curl localhost:${AIPI_SERVICE_PORT}/${AIPI_READINESS_PATH} --connect-timeout 5
 
