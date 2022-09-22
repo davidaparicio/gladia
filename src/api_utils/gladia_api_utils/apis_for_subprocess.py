@@ -8,7 +8,6 @@ from logging import getLogger
 from pathlib import Path
 from typing import Any, Dict, Tuple, Union
 from urllib import request
-
 import requests
 
 logger = getLogger(__name__)

@@ -14,7 +14,6 @@ concurrency:
 env:
   TAG_PROMOTED: ci-${{ github.event.pull_request.number }}
   TAG_PROMOTE: latest
-  SLACK_WEBHOOK: ${SLACK_WEBHOOK}
   
 jobs:
 
@@ -58,23 +57,6 @@ jobs:
           docker pull ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }} &&
           docker tag ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }} gladiaio/gladia:latest &&
           docker push gladiaio/gladia:latest
-    
-  notify-release:
-    needs: promote-gladia-to-DH
-    runs-on: [self-hosted, linux, STD]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Notify Slack DH Release
-        uses: rtCamp/action-slack-notify@v2.2.0
-        env: 
-          SLACK_CHANNEL: #releases
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_USERNAME: gladia-ai-ci
-          SLACK_TITLE: 'New Docker Hub Release :rocket:'
-          SLACK_MESSAGE: ${{ github.event.pull_request.title }} by ${{ github.event.pull_request.user.login }}
-          SLACK_WEBHOOK: ${{ env.SLACK_WEBHOOK }}
-          SLACK_ICON_EMOJI: ':rocket:'
-
 
   deploy-aipi-1:
     needs: promote-gladia-image
@@ -101,9 +83,14 @@ jobs:
             -e STABILITY_KEY=${STABILITY_KEY} \
             -e MODE=server \
             ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
-      - name: sleep to let it start before deploying next worker
-        run: sleep 120
-      # todo : healthcheck, notify failure
+
+      - name: Gladia AIPI-1 readiness
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 5
+          max_attempts: 60
+          retry_on: error
+          command: curl localhost:${AIPI_SERVICE_PORT}/${AIPI_READINESS_PATH} --connect-timeout 5
 
   deploy-aipi-2:
     needs: deploy-aipi-1
@@ -131,18 +118,10 @@ jobs:
             -e MODE=server \
             ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
 
-  notify-aipi-prod-deployment:
-    needs: [deploy-aipi-1, deploy-aipi-2]
-    runs-on: [self-hosted, linux, STD]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Notify Slack Deployment done
-        uses: rtCamp/action-slack-notify@v2.2.0
-        env: 
-          SLACK_CHANNEL: #releases
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_USERNAME: gladia-ai-ci
-          SLACK_TITLE: 'Deployment done :rocket:'
-          SLACK_MESSAGE: ${{ github.event.pull_request.title }} by ${{ github.event.pull_request.user.login }}
-          SLACK_WEBHOOK: ${{ env.SLACK_WEBHOOK }}
-          SLACK_ICON_EMOJI: ':gear:'
+      - name: Gladia AIPI-2 readiness
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 5
+          max_attempts: 60
+          retry_on: error
+          command: curl localhost:${AIPI_SERVICE_PORT}/${AIPI_READINESS_PATH} --connect-timeout 5
