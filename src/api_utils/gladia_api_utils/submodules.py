@@ -11,8 +11,6 @@ from shlex import quote
 from typing import Any, List, Optional, Tuple, Union
 from urllib.request import urlopen
 
-from .casting import cast_response
-
 import forge
 import starlette
 import yaml
@@ -24,6 +22,7 @@ from gladia_api_utils.apis_for_subprocess import (
 )
 from pydantic import BaseModel, create_model
 
+from .casting import cast_response
 from .file_management import is_binary_file, is_valid_path, write_tmp_file
 from .responses import AudioResponse, ImageResponse, VideoResponse
 
@@ -581,7 +580,7 @@ class TaskRouter:
             kwargs = parameters_in_body
 
             self.__get_routeur_inputs()
-            
+
             model = kwargs["model"]
             # remove it from kwargs to avoid passing it to the predict function
             del kwargs["model"]
@@ -595,9 +594,11 @@ class TaskRouter:
                 )
 
             # return False if an error occured
-            kwargs, success, error_message = await self.clean_kwargs_based_on_router_inputs(
-                kwargs, self.inputs
-            )
+            (
+                kwargs,
+                success,
+                error_message,
+            ) = await self.clean_kwargs_based_on_router_inputs(kwargs, self.inputs)
 
             if not success:
                 return get_error_reponse(400, error_message)
@@ -621,7 +622,10 @@ class TaskRouter:
                 else:
                     # if not exists call the subprocess
                     result = self.__call_in_subprocess(
-                        inputs=self.inputs, model=model, kwargs=kwargs, env_name=env_name
+                        inputs=self.inputs,
+                        model=model,
+                        kwargs=kwargs,
+                        env_name=env_name,
                     )
 
             else:
@@ -631,15 +635,13 @@ class TaskRouter:
 
             return self.__post_processing(result)
 
-
-
     def __get_routeur_inputs(self) -> list:
         self.routeur = (
-                to_task_name(self.root_package_path)
-                .replace(os.getenv("PATH_TO_GLADIA_SRC", "/app"), "")
-                .replace("/", ".")
-                .strip(".")
-            )
+            to_task_name(self.root_package_path)
+            .replace(os.getenv("PATH_TO_GLADIA_SRC", "/app"), "")
+            .replace("/", ".")
+            .strip(".")
+        )
         self.this_routeur = importlib.import_module(self.routeur.replace("/", "."))
         self.inputs = self.this_routeur.inputs
         return self.inputs
@@ -647,8 +649,8 @@ class TaskRouter:
     def __build_parameters_in_body(self, kwargs: dict) -> dict:
         """
         Build the parameters in body for the post route
-        
-        Args: 
+
+        Args:
             kwargs (dict): the kwargs to build the parameters in body
 
         Returns:
@@ -661,13 +663,13 @@ class TaskRouter:
                 parameters_in_body.update(value.dict())
             else:
                 parameters_in_body[key] = value
-        
+
         return parameters_in_body
 
     def __build_endpoint_parameters_description(self, input: list) -> dict:
         """
         Build the endpoint parameters description
-        
+
         Args:
             input (list): list of inputs from the router
 
@@ -684,7 +686,7 @@ class TaskRouter:
     def __build_form_parameters(self, endpoint_parameters_description: dict) -> list:
         """
         Build the form parameters for the endpoint
-        
+
         Args:
             endpoint_parameters_description (dict): the description of the endpoint parameters
 
@@ -714,7 +716,6 @@ class TaskRouter:
                 )
             )
         return form_parameters
-    
 
     def __check_if_model_exist(
         self,
@@ -851,7 +852,7 @@ class TaskRouter:
         Returns:
             Any
         """
-        
+
         try:
             return cast_response(result, self.output)
 
@@ -941,4 +942,3 @@ async def clean_kwargs_based_on_router_inputs(
                 success = False
 
     return kwargs, success, error_message
-

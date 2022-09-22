@@ -256,9 +256,7 @@ def __get_subprocess_apis_to_start_from_config() -> Dict[str, int]:
     return apis_to_start_dict
 
 
-def call_subprocess_api(
-    api_name: str, kwargs: dict()
-) -> Any:
+def call_subprocess_api(api_name: str, kwargs: dict()) -> Any:
     """
     Call a subprocess api and return the response
 

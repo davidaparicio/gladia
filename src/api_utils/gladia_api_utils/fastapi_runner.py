@@ -1,5 +1,4 @@
 import os
-import os
 import sys
 from asyncio.log import logger
 from importlib import import_module, util
