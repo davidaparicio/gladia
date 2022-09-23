@@ -88,6 +88,5 @@
     },
     "subprocess_to_apify": [
         "/image/text/ocr-models/tesseract-denoising/",
-        "/image/text/ocr-models/easy-ocr/env.yaml"
     ]
 }
