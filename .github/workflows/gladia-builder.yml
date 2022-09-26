@@ -246,7 +246,7 @@ jobs:
           -e TEST_STOP_AT_FAIL=${{ env.TEST_STOP_AT_FAIL }}
           -e TEST_MARKERS=${{ env.TEST_MARKERS }}
           test-pr-${{ github.event.pull_request.number }}
-          /bin/bash -c 'eval "$(micromamba shell hook --shell=bash)" && micromamba activate server &&python -m pytest apis/ $TEST_DEFAULT_MODELS_ONLY $TEST_DEFAULT_INPUTS_ONLY $TEST_STOP_AT_FAIL $TEST_MARKERS'
+          /bin/bash -c 'eval "$(micromamba shell hook --shell=bash)" && micromamba activate server &&python -m pytest -o log_cli=true --log-cli-level=DEBUG apis/ $TEST_DEFAULT_MODELS_ONLY $TEST_DEFAULT_INPUTS_ONLY $TEST_STOP_AT_FAIL $TEST_MARKERS'
 
       - name: Logs
         id: logs
