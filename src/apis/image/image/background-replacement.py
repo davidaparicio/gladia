@@ -8,14 +8,18 @@ inputs = [
     {
         "type": "image",
         "name": "original_image",
-        "example": task_metadata["inputs_example"]["original_image_url"]["default_example"],
+        "example": task_metadata["inputs_example"]["original_image_url"][
+            "default_example"
+        ],
         "examples": task_metadata["inputs_example"]["original_image_url"]["examples"],
         "placeholder": "Image to replace the background from",
     },
     {
         "type": "image",
         "name": "background_image",
-        "example": task_metadata["inputs_example"]["background_image_url"]["default_example"],
+        "example": task_metadata["inputs_example"]["background_image_url"][
+            "default_example"
+        ],
         "examples": task_metadata["inputs_example"]["background_image_url"]["examples"],
         "placeholder": "Image the background will be replaced with",
     },
@@ -26,7 +30,6 @@ inputs = [
         "examples": task_metadata["inputs_example"]["alignment"]["examples"],
         "placeholder": "original image insertion position in the background image",
     },
-
 ]
 
 output = {"name": "replaced_image", "type": "image", "example": "a.png"}

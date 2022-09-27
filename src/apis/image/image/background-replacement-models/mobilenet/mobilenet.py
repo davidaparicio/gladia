@@ -1,12 +1,10 @@
-from io import BytesIO
-from PIL import Image
-import numpy as np
 from gladia_api_utils.io import _open
-from apis.image.image.background_removal_models.mobilenet.mobilenet import predict as background_removal_predict
+from PIL import Image
 
-from logging import getLogger
+from apis.image.image.background_removal_models.mobilenet.mobilenet import (
+    predict as background_removal_predict,
+)
 
-logger = getLogger(__name__)
 
 def predict(original_image: bytes, background_image: bytes, alignment: str) -> Image:
     """
@@ -16,7 +14,7 @@ def predict(original_image: bytes, background_image: bytes, alignment: str) -> I
         original_image (bytes): Image to replace the background from
         background_image (bytes): Image the background will be replaced with
         alignment (str): insertion position type
-        
+
     Returns:
         Image: Image with the background replaced
     """
@@ -27,7 +25,7 @@ def predict(original_image: bytes, background_image: bytes, alignment: str) -> I
 
     # Convert image to RGBA
     front_image = front_image.convert("RGBA")
-    
+
     # Convert image to RGBA
     background = background.convert("RGBA")
 
@@ -95,7 +93,9 @@ def predict(original_image: bytes, background_image: bytes, alignment: str) -> I
         height = (background.height - front_image.height) // 2
 
         # Crop the background
-        background = background.crop((width, height, width + front_image.width, height + frontImage.height))
+        background = background.crop(
+            (width, height, width + front_image.width, height + front_image.height)
+        )
     else:
         # else center
         # Calculate width to be at the center
@@ -104,8 +104,7 @@ def predict(original_image: bytes, background_image: bytes, alignment: str) -> I
         # Calculate height to be at the center
         height = (background.height - front_image.height) // 2
 
-
     # Paste the image on the background
     background.paste(front_image, (width, height), front_image)
-    
+
     return background
