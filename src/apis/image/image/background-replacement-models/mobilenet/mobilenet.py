@@ -21,12 +21,12 @@ def predict(original_image: bytes, background_image: bytes, alignment: str) -> I
         Image: Image with the background replaced
     """
 
-    frontImage = background_removal_predict(image=original_image)
+    front_image = background_removal_predict(image=original_image)
 
     background = _open(background_image)
 
     # Convert image to RGBA
-    frontImage = frontImage.convert("RGBA")
+    front_image = front_image.convert("RGBA")
     
     # Convert image to RGBA
     background = background.convert("RGBA")
@@ -36,28 +36,28 @@ def predict(original_image: bytes, background_image: bytes, alignment: str) -> I
         width = 0
 
         # Calculate height to be at the center
-        height = (background.height - frontImage.height) // 2
+        height = (background.height - front_image.height) // 2
 
     elif alignment == "right":
         # Calculate width to be at the right
-        width = background.width - frontImage.width
+        width = background.width - front_image.width
 
         # Calculate height to be at the center
-        height = (background.height - frontImage.height) // 2
+        height = (background.height - front_image.height) // 2
 
     elif alignment == "top" or alignment == "top-center":
         # Calculate width to be at the center
-        width = (background.width - frontImage.width) // 2
+        width = (background.width - front_image.width) // 2
 
         # Calculate height to be at the top
         height = 0
 
     elif alignment == "bottom" or alignment == "bottom-center":
         # Calculate width to be at the center
-        width = (background.width - frontImage.width) // 2
+        width = (background.width - front_image.width) // 2
 
         # Calculate height to be at the bottom
-        height = background.height - frontImage.height
+        height = background.height - front_image.height
 
     elif alignment == "top-left":
         # Calculate width to be at the left
@@ -68,7 +68,7 @@ def predict(original_image: bytes, background_image: bytes, alignment: str) -> I
 
     elif alignment == "top-right":
         # Calculate width to be at the right
-        width = background.width - frontImage.width
+        width = background.width - front_image.width
 
         # Calculate height to be at the top
         height = 0
@@ -78,34 +78,34 @@ def predict(original_image: bytes, background_image: bytes, alignment: str) -> I
         width = 0
 
         # Calculate height to be at the bottom
-        height = background.height - frontImage.height
+        height = background.height - front_image.height
 
     elif alignment == "bottom-right":
         # Calculate width to be at the right
-        width = background.width - frontImage.width
+        width = background.width - front_image.width
 
         # Calculate height to be at the bottom
-        height = background.height - frontImage.height
+        height = background.height - front_image.height
 
     elif alignment == "cropped":
         # Calculate width to be at the center
-        width = (background.width - frontImage.width) // 2
+        width = (background.width - front_image.width) // 2
 
         # Calculate height to be at the center
-        height = (background.height - frontImage.height) // 2
+        height = (background.height - front_image.height) // 2
 
         # Crop the background
-        background = background.crop((width, height, width + frontImage.width, height + frontImage.height))
+        background = background.crop((width, height, width + front_image.width, height + frontImage.height))
     else:
         # else center
         # Calculate width to be at the center
-        width = (background.width - frontImage.width) // 2
+        width = (background.width - front_image.width) // 2
 
         # Calculate height to be at the center
-        height = (background.height - frontImage.height) // 2
+        height = (background.height - front_image.height) // 2
 
 
     # Paste the image on the background
-    background.paste(frontImage, (width, height), frontImage)
+    background.paste(front_image, (width, height), front_image)
     
     return background
