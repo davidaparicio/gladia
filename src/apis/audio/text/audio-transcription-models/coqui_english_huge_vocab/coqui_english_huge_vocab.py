@@ -1,7 +1,7 @@
 from typing import Dict
 
 from gladia_api_utils.io import _open
-
+from gladia_api_utils.CoquiEngineHelper import SpeechToTextEngine
 
 def predict(audio: bytes, language: str = "en") -> Dict[str, str]:
     """
@@ -13,9 +13,7 @@ def predict(audio: bytes, language: str = "en") -> Dict[str, str]:
 
     Returns:
         Dict[str, str]: The text transcription of the audio.
-    """
-
-    from gladia_api_utils.CoquiEngineHelper import SpeechToTextEngine
+    """    
 
     # Load app configs and initialize STT model
     engine = SpeechToTextEngine(

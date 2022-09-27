@@ -31,5 +31,5 @@ output = {
 router = APIRouter()
 
 TaskRouter(
-    router=router, input=inputs, output=output, default_model="coqui_english_huge_vocab"
+    router=router, input=inputs, output=output, default_model="openai-whisper-tiny"
 )
