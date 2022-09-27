@@ -1,4 +1,3 @@
-from enum import Enum
 import importlib
 import json
 import os
@@ -6,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 import urllib.parse
+from enum import Enum
 from logging import getLogger
 from pathlib import Path
 from shlex import quote
@@ -389,8 +389,6 @@ def get_example_name(path: str) -> str:
     return f"from_{file_name}_{extension[1:]}"
 
 
-
-
 def create_description_for_the_endpoint_parameter(endpoint_param: dict) -> dict:
     """
     Create a description for the endpoint parameters.
@@ -711,12 +709,10 @@ class TaskRouter:
         form_parameters = []
 
         for key, value in endpoint_parameters_description.items():
-            if str(value["type"]) == "<enum 'Enum'>":             
-                enum_values = {v: v for v in value[
-                                "examples"
-                            ]}
+            if str(value["type"]) == "<enum 'Enum'>":
+                enum_values = {v: v for v in value["examples"]}
                 # make the list of the enum values
-                DynamicEnum = Enum('DynamicEnum', enum_values)
+                DynamicEnum = Enum("DynamicEnum", enum_values)
                 form_parameters.append(
                     forge.arg(
                         key,
@@ -968,9 +964,7 @@ async def clean_kwargs_based_on_router_inputs(
             # remove the url arg to avoid it to be passed in predict
             if f"{input_name}_url" in kwargs:
                 del kwargs[f"{input_name}_url"]
-        elif(
-            input["type"] in LIST_TYPES
-        ):
+        elif input["type"] in LIST_TYPES:
             # extracted selected values from the list / Enum
             # I'm sure there is a better way to do this
             # J.L
