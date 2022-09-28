@@ -5,7 +5,7 @@ import subprocess
 import sys
 import tempfile
 import urllib.parse
-from enum import Enum
+from enum import Enum, EnumMeta
 from logging import getLogger
 from pathlib import Path
 from shlex import quote
@@ -709,43 +709,31 @@ class TaskRouter:
         form_parameters = []
 
         for key, value in endpoint_parameters_description.items():
-            if str(value["type"]) == "<enum 'Enum'>":
+            if isinstance(value["type"], EnumMeta):
                 enum_values = {v: v for v in value["examples"]}
                 # make the list of the enum values
-                DynamicEnum = Enum("DynamicEnum", enum_values)
-                form_parameters.append(
-                    forge.arg(
-                        key,
-                        type=DynamicEnum,
-                        default=value["constructor"](
-                            title=key,
-                            default=value["default"],
-                            description=value["description"],
-                            example=value["example"],
-                            examples=value["examples"],
-                            data_type=value.get("data_type", ""),
-                        ),
-                    )
-                )
+                this_type = Enum("DynamicEnum", enum_values)
             else:
-                form_parameters.append(
-                    forge.arg(
-                        key,
-                        type=value["type"],
-                        default=value["constructor"](
-                            title=key,
-                            default=value["default"],
-                            description=value["description"],
-                            example=value[
-                                "example"
-                            ],  # NOTE: FastAPI does not use this value
-                            examples=value[
-                                "examples"
-                            ],  # NOTE: FastAPI does not use this value
-                            data_type=value.get("data_type", ""),
-                        ),
-                    )
+                this_type = value["type"]
+            
+            form_parameters.append(
+                forge.arg(
+                    key,
+                    type=this_type,
+                    default=value["constructor"](
+                        title=key,
+                        default=value["default"],
+                        description=value["description"],
+                        example=value[
+                            "example"
+                        ],  # NOTE: FastAPI does not use this value
+                        examples=value[
+                            "examples"
+                        ],  # NOTE: FastAPI does not use this value
+                        data_type=value.get("data_type", ""),
+                    ),
                 )
+            )
         return form_parameters
 
     def __check_if_model_exist(
@@ -965,10 +953,7 @@ async def clean_kwargs_based_on_router_inputs(
             if f"{input_name}_url" in kwargs:
                 del kwargs[f"{input_name}_url"]
         elif input["type"] in LIST_TYPES:
-            # extracted selected values from the list / Enum
-            # I'm sure there is a better way to do this
-            # J.L
-            kwargs[input_name] = str(kwargs[input_name]).replace("DynamicEnum.", "")
+            kwargs[input_name] = str(kwargs[input_name].value)
         else:
             if not kwargs.get(input_name, None):
                 error_message = (
