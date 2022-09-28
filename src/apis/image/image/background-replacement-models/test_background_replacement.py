@@ -18,7 +18,7 @@ inputs_to_test = get_inputs_to_test(
 
 class TestBackgroundReplacement:
     """
-    Class to test the guided inpainting endpoint
+    Class to test the background replacement endpoint
     """
 
     target_url = "/image/image/background-replacement/"
