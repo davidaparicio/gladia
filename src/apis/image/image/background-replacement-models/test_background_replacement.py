@@ -1,5 +1,3 @@
-import os
-import tempfile
 from typing import Any, Dict
 
 import pytest
@@ -13,7 +11,9 @@ from tests.utils import get_inputs_to_test, get_models_to_test
 client = TestClient(app)
 
 models = get_models_to_test()
-inputs_to_test = get_inputs_to_test(["original_image_url", "background_image_url", "alignment"])
+inputs_to_test = get_inputs_to_test(
+    ["original_image_url", "background_image_url", "alignment"]
+)
 
 
 class TestGuidedInpainting:
@@ -43,7 +43,9 @@ class TestGuidedInpainting:
             params={"model": model} if model else {},
             files={
                 "original_image": requests.get(inputs["original_image_url"]).content,
-                "background_image": requests.get(inputs["background_image_url"]).content,
+                "background_image": requests.get(
+                    inputs["background_image_url"]
+                ).content,
             },
             data={
                 "alignment": inputs["alignment"],
