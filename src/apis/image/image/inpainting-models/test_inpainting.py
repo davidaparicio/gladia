@@ -40,8 +40,8 @@ class TestInpainting:
             url=self.target_url,
             params={"model": model} if model else {},
             files={
-                "original_image": requests.get(inputs["original_image_url"]),
-                "mask_image": requests.get(inputs["mask_image_url"]),
+                "original_image": requests.get(inputs["original_image_url"]).content,
+                "mask_image": requests.get(inputs["mask_image_url"])).content,
             },
         )
 
