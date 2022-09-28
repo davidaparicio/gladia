@@ -5,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 import urllib.parse
+from enum import Enum, EnumMeta
 from logging import getLogger
 from pathlib import Path
 from shlex import quote
@@ -37,6 +38,7 @@ MODELS_FOLDER_SUFFIX = "models"
 
 FILE_TYPES = ["image", "audio", "video"]
 TEXT_TYPES = ["text", "str", "string"]
+LIST_TYPES = ["list", "tuple", "set"]
 NUMBER_TYPES = ["number", "int", "integer"]
 DECIMAL_TYPES = ["float", "decimal"]
 BOOLEAN_TYPES = ["bool", "boolean"]
@@ -359,6 +361,7 @@ def get_endpoint_parameter_type(parameter: dict) -> Any:
 
     type_correspondence = {key: str for key in TEXT_TYPES}
     type_correspondence.update({key: int for key in NUMBER_TYPES})
+    type_correspondence.update({key: Enum for key in LIST_TYPES})
     type_correspondence.update({key: float for key in DECIMAL_TYPES})
     type_correspondence.update({key: bool for key in BOOLEAN_TYPES})
     type_correspondence.update({key: Optional[UploadFile] for key in FILE_TYPES})
@@ -371,7 +374,16 @@ def get_endpoint_parameter_type(parameter: dict) -> Any:
     return parameter_type
 
 
-def get_example_name(path):
+def get_example_name(path: str) -> str:
+    """
+    Get the name of the example from the path.
+
+    Args:
+        path (str): path to the example
+
+    Returns:
+        str: name of the example
+    """
     file_name_with_extension = os.path.basename(path)
     file_name, extension = os.path.splitext(file_name_with_extension)
     return f"from_{file_name}_{extension[1:]}"
@@ -404,8 +416,8 @@ def create_description_for_the_endpoint_parameter(endpoint_param: dict) -> dict:
             get_example_name(example): example for example in endpoint_param["examples"]
         }
         if endpoint_param["type"] in FILE_TYPES and endpoint_param.get("examples", None)
-        else {},
-        "description": "",  # TODO: retrieve from {task}.py
+        else endpoint_param.get("examples", {}),
+        "description": endpoint_param.get("placeholder", ""),
     }
 
     # TODO: add validator checking that file and file_url can both be empty
@@ -422,7 +434,7 @@ def create_description_for_the_endpoint_parameter(endpoint_param: dict) -> dict:
             }
             if endpoint_param.get("examples", None)
             else {},
-            "description": "",  # TODO: copy description from above param
+            "description": f'{endpoint_param.get("placeholder", "")} (url) - ignored if "{endpoint_param["name"]}" file is provided',
         }
 
     return parameters_to_add
@@ -697,10 +709,17 @@ class TaskRouter:
         form_parameters = []
 
         for key, value in endpoint_parameters_description.items():
+            if isinstance(value["type"], EnumMeta):
+                enum_values = {v: v for v in value["examples"]}
+                # make the list of the enum values
+                this_type = Enum("DynamicEnum", enum_values)
+            else:
+                this_type = value["type"]
+
             form_parameters.append(
                 forge.arg(
                     key,
-                    type=value["type"],
+                    type=this_type,
                     default=value["constructor"](
                         title=key,
                         default=value["default"],
@@ -933,7 +952,8 @@ async def clean_kwargs_based_on_router_inputs(
             # remove the url arg to avoid it to be passed in predict
             if f"{input_name}_url" in kwargs:
                 del kwargs[f"{input_name}_url"]
-
+        elif input["type"] in LIST_TYPES:
+            kwargs[input_name] = str(kwargs[input_name].value)
         else:
             if not kwargs.get(input_name, None):
                 error_message = (

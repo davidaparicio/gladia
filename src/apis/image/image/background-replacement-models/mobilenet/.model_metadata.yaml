@@ -1,0 +1,22 @@
+api:
+  content: ''
+  tags: []
+gladia:
+  accelerator: ''
+  example: http://files.gladia.io/output/image/image/background-removal/mobilenet/example/from_owl2_png.png
+  examples:
+    from_owl2_jpg: http://files.gladia.io/output/image/image/background-removal/mobilenet/examples/from_owl2_jpg.png
+    from_owl2_png: http://files.gladia.io/output/image/image/background-removal/mobilenet/examples/from_owl2_png.png
+  format: ''
+  latency: ''
+huggingface:
+  link: ''
+license:
+  content: ''
+  link: ''
+  title: ''
+paper:
+  authors: []
+  citation: ''
+  link: ''
+  title: ''
