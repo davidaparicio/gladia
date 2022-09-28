@@ -16,7 +16,7 @@ inputs_to_test = get_inputs_to_test(
 )
 
 
-class TestGuidedInpainting:
+class TestBackgroundReplacement:
     """
     Class to test the guided inpainting endpoint
     """
