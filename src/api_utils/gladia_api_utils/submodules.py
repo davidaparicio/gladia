@@ -715,7 +715,7 @@ class TaskRouter:
                 this_type = Enum("DynamicEnum", enum_values)
             else:
                 this_type = value["type"]
-            
+
             form_parameters.append(
                 forge.arg(
                     key,
