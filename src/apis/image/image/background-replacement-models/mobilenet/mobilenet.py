@@ -43,14 +43,14 @@ def predict(original_image: bytes, background_image: bytes, alignment: str) -> I
         # Calculate height to be at the center
         height = (background.height - front_image.height) // 2
 
-    elif alignment == "top" or alignment == "top-center":
+    elif alignment in ["top", "top-center"]:
         # Calculate width to be at the center
         width = (background.width - front_image.width) // 2
 
         # Calculate height to be at the top
         height = 0
 
-    elif alignment == "bottom" or alignment == "bottom-center":
+    elif alignment in ["bottom", "bottom-center"]:
         # Calculate width to be at the center
         width = (background.width - front_image.width) // 2
 
