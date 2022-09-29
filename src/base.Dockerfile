@@ -93,7 +93,7 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
         tesseract-ocr  \
         libtesseract-dev \
         python3-pil \
-        tesseract-ocr-all && \
+        tesseract-ocr-all \
         poppler-utils && \
     echo "== ADJUSTING binaries ==" && \ 
     mv /usr/bin/python3 /usr/bin/python38 && \
