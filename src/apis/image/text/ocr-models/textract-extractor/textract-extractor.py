@@ -33,5 +33,6 @@ def predict(image: bytes, source_language: str) -> Dict[str, Union[str, List[str
     result = textract.process(file).decode("utf-8")
 
     clean_result = clean(result)
+    os.unlink(file)
 
-    return {"prediction": clean_result, "prediction_raw": [clean_result.split("\n")]}
+    return {"prediction": clean_result, "prediction_raw": [clean_result]}
