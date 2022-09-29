@@ -54,144 +54,551 @@ MIME_TYPES_CATEGORIES = {
 }
 
 MIME_TYPE_TO_CATEGORY = {
-    "audio/aac": MIME_TYPES_CATEGORIES["audio"],
-    "audio/midi": MIME_TYPES_CATEGORIES["audio"],
-    "audio/ogg": MIME_TYPES_CATEGORIES["audio"],
-    "audio/x-wav": MIME_TYPES_CATEGORIES["audio"],
-    "audio/webm": MIME_TYPES_CATEGORIES["audio"],
-    "audio/3gpp": MIME_TYPES_CATEGORIES["audio"],
-    "audio/3gpp2": MIME_TYPES_CATEGORIES["audio"],
-    "video/x-msvideo": MIME_TYPES_CATEGORIES["video"],
-    "video/mpeg": MIME_TYPES_CATEGORIES["video"],
-    "video/ogg": MIME_TYPES_CATEGORIES["video"],
-    "video/webm": MIME_TYPES_CATEGORIES["video"],
-    "video/3gpp": MIME_TYPES_CATEGORIES["video"],
-    "video/3gpp2": MIME_TYPES_CATEGORIES["video"],
-    "image/bmp": MIME_TYPES_CATEGORIES["image"],
-    "image/gif": MIME_TYPES_CATEGORIES["image"],
-    "image/x-icon": MIME_TYPES_CATEGORIES["image"],
-    "image/jpeg": MIME_TYPES_CATEGORIES["image"],
-    "image/png": MIME_TYPES_CATEGORIES["image"],
-    "image/svg+xml": MIME_TYPES_CATEGORIES["image"],
-    "image/tiff": MIME_TYPES_CATEGORIES["image"],
-    "image/webp": MIME_TYPES_CATEGORIES["image"],
-    "font/otf": MIME_TYPES_CATEGORIES["font"],
-    "font/ttf": MIME_TYPES_CATEGORIES["font"],
-    "font/woff": MIME_TYPES_CATEGORIES["font"],
-    "font/woff2": MIME_TYPES_CATEGORIES["font"],
-    "application/octet-stream": MIME_TYPES_CATEGORIES["binary"],
-    "application/vnd.amazon.ebook": MIME_TYPES_CATEGORIES["ebook"],
-    "application/epub+zip": MIME_TYPES_CATEGORIES["ebook"],
-    "application/x-bzip": MIME_TYPES_CATEGORIES["archive"],
-    "application/x-bzip2": MIME_TYPES_CATEGORIES["archive"],
-    "application/java-archive": MIME_TYPES_CATEGORIES["archive"],
-    "application/x-rar-compressed": MIME_TYPES_CATEGORIES["archive"],
-    "application/x-tar": MIME_TYPES_CATEGORIES["archive"],
-    "application/zip": MIME_TYPES_CATEGORIES["archive"],
-    "application/x-7z-compressed": MIME_TYPES_CATEGORIES["archive"],
-    "application/x-csh": MIME_TYPES_CATEGORIES["executable"],
-    "application/ogg": MIME_TYPES_CATEGORIES["executable"],
-    "application/x-sh": MIME_TYPES_CATEGORIES["executable"],
-    "application/x-shockwave-flash": MIME_TYPES_CATEGORIES["executable"],
-    "text/css": MIME_TYPES_CATEGORIES["web_content"],
-    "text/html": MIME_TYPES_CATEGORIES["web_content"],
-    "application/javascript": MIME_TYPES_CATEGORIES["web_content"],
-    "application/xhtml+xml": MIME_TYPES_CATEGORIES["web_content"],
-    "application/vnd.mozilla.xul+xml": MIME_TYPES_CATEGORIES["web_content"],
-    "text/csv": MIME_TYPES_CATEGORIES["flat_structured_data"],
-    "text/tab-separated-values": MIME_TYPES_CATEGORIES["flat_structured_data"],
-    "application/vnd.ms-excel": MIME_TYPES_CATEGORIES["spreadsheet"],
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": MIME_TYPES_CATEGORIES[
-        "spreadsheet"
-    ],
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.template": MIME_TYPES_CATEGORIES[
-        "spreadsheet"
-    ],
-    "application/vnd.ms-excel.sheet.macroEnabled.12": MIME_TYPES_CATEGORIES[
-        "spreadsheet"
-    ],
-    "application/vnd.ms-excel.template.macroEnabled.12": MIME_TYPES_CATEGORIES[
-        "spreadsheet"
-    ],
-    "application/vnd.ms-excel.addin.macroEnabled.12": MIME_TYPES_CATEGORIES[
-        "spreadsheet"
-    ],
-    "application/vnd.ms-excel.sheet.binary.macroEnabled.12": MIME_TYPES_CATEGORIES[
-        "spreadsheet"
-    ],
-    "application/vnd.oasis.opendocument.spreadsheet": MIME_TYPES_CATEGORIES[
-        "spreadsheet"
-    ],
-    "application/vnd.oasis.opendocument.spreadsheet-template": MIME_TYPES_CATEGORIES[
-        "spreadsheet"
-    ],
-    "application/vnd.oasis.opendocument.spreadsheet-flat-xml": MIME_TYPES_CATEGORIES[
-        "spreadsheet"
-    ],
-    "application/vnd.lotus-1-2-3": MIME_TYPES_CATEGORIES["spreadsheet"],
-    "application/vnd.lotus-approach": MIME_TYPES_CATEGORIES["spreadsheet"],
-    "application/vnd.lotus-freelance": MIME_TYPES_CATEGORIES["spreadsheet"],
-    "application/xslt+xml": MIME_TYPES_CATEGORIES["web_content"],
-    "application/json": MIME_TYPES_CATEGORIES["multidimensional_structured_data"],
-    "application/xml": MIME_TYPES_CATEGORIES["multidimensional_structured_data"],
-    "application/msword": MIME_TYPES_CATEGORIES["document"],
-    "application/x-abiword": MIME_TYPES_CATEGORIES["document"],
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": MIME_TYPES_CATEGORIES[
-        "document"
-    ],
-    "application/vnd.oasis.opendocument.text": MIME_TYPES_CATEGORIES["document"],
-    "application/rtf": MIME_TYPES_CATEGORIES["document"],
-    "application/vnd.ms-powerpoint": MIME_TYPES_CATEGORIES["presentation"],
-    "application/vnd.oasis.opendocument.presentation": MIME_TYPES_CATEGORIES[
-        "presentation"
-    ],
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation": MIME_TYPES_CATEGORIES[
-        "presentation"
-    ],
-    "application/pdf": MIME_TYPES_CATEGORIES["pdf"],
-    "application/vnd.visio": MIME_TYPES_CATEGORIES["diagram"],
-    "application/vnd.oasis.opendocument.graphics": MIME_TYPES_CATEGORIES["diagram"],
-    "application/vnd.openxmlformats-officedocument.drawingml.diagramData+xml": MIME_TYPES_CATEGORIES[
-        "diagram"
-    ],
-    "application/vnd.openxmlformats-officedocument.drawingml.diagramColors+xml": MIME_TYPES_CATEGORIES[
-        "diagram"
-    ],
-    "application/vnd.openxmlformats-officedocument.drawingml.diagramLayout+xml": MIME_TYPES_CATEGORIES[
-        "diagram"
-    ],
-    "application/vnd.openxmlformats-officedocument.drawingml.diagramStyle+xml": MIME_TYPES_CATEGORIES[
-        "diagram"
-    ],
-    "application/vnd.ms-office.drawingml.diagramData+xml": MIME_TYPES_CATEGORIES[
-        "diagram"
-    ],
-    "application/vnd.ms-office.drawingml.diagramColors+xml": MIME_TYPES_CATEGORIES[
-        "diagram"
-    ],
-    "application/vnd.ms-office.drawingml.diagramLayout+xml": MIME_TYPES_CATEGORIES[
-        "diagram"
-    ],
-    "application/vnd.ms-office.drawingml.diagramStyle+xml": MIME_TYPES_CATEGORIES[
-        "diagram"
-    ],
-    "text/plain": MIME_TYPES_CATEGORIES["text"],
-    "text/calendar": MIME_TYPES_CATEGORIES["text"],
-    "text/x-vcard": MIME_TYPES_CATEGORIES["calendar"],
-    "text/x-vcalendar": MIME_TYPES_CATEGORIES["calendar"],
-    "text/x-vnote": MIME_TYPES_CATEGORIES["calendar"],
-    "text/x-vtodo": MIME_TYPES_CATEGORIES["calendar"],
-    "text/x-vjournal": MIME_TYPES_CATEGORIES["calendar"],
-    "text/x-vmessage": MIME_TYPES_CATEGORIES["calendar"],
-    "text/x-vfreebusy": MIME_TYPES_CATEGORIES["calendar"],
-    "text/x-vtimezone": MIME_TYPES_CATEGORIES["calendar"],
-    "text/x-vavailability": MIME_TYPES_CATEGORIES["calendar"],
-    "text/x-vpoll": MIME_TYPES_CATEGORIES["calendar"],
-    "text/x-vdirectory": MIME_TYPES_CATEGORIES["calendar"],
-    "text/x-vconference": MIME_TYPES_CATEGORIES["calendar"],
-    "text/x-vexample": MIME_TYPES_CATEGORIES["calendar"],
-    "text/x-vrsvp": MIME_TYPES_CATEGORIES["calendar"],
-    "text/x-vrsvp-reply": MIME_TYPES_CATEGORIES["calendar"],
+    "audio/aac": {
+        "category": MIME_TYPES_CATEGORIES["audio"],
+        "description": "AAC audio",
+        "extension": "aac",
+    },
+    "audio/midi": {
+        "category": MIME_TYPES_CATEGORIES["audio"],
+        "description": "Musical Instrument Digital Interface (MIDI)",
+        "extension": "mid",
+    },
+    "audio/ogg": {
+        "category": MIME_TYPES_CATEGORIES["audio"],
+        "description": "OGG audio",
+        "extension": "ogg",
+    },
+    "audio/x-wav": {
+        "category": MIME_TYPES_CATEGORIES["audio"],
+        "description": "Waveform Audio Format",
+        "extension": "wav",
+    },
+    "audio/webm": {
+        "category": MIME_TYPES_CATEGORIES["audio"],
+        "description": "WEBM audio",
+        "extension": "webm",
+    },
+    "audio/3gpp": {
+        "category": MIME_TYPES_CATEGORIES["audio"],
+        "description": "3GPP audio",
+        "extension": "3gp",
+    },
+    "audio/3gpp2": {
+        "category": MIME_TYPES_CATEGORIES["audio"],
+        "description": "3GPP2 audio",
+        "extension": "3g2",
+    },
+    "video/x-msvideo": {
+        "category": MIME_TYPES_CATEGORIES["video"],
+        "description": "AVI: Audio Video Interleave",
+        "extension": "avi",
+    },
+    "video/mpeg": {
+        "category": MIME_TYPES_CATEGORIES["video"],
+        "description": "MPEG Video",
+        "extension": "mpeg",
+    },
+    "video/ogg": {
+        "category": MIME_TYPES_CATEGORIES["video"],
+        "description": "OGG video",
+        "extension": "ogv",
+    },
+    "video/webm": {
+        "category": MIME_TYPES_CATEGORIES["video"],
+        "description": "WEBM video",
+        "extension": "webm",
+    },
+    "video/3gpp": {
+        "category": MIME_TYPES_CATEGORIES["video"],
+        "description": "3GPP video",
+        "extension": "3gp",
+    },
+    "video/3gpp2": {
+        "category": MIME_TYPES_CATEGORIES["video"],
+        "description": "3GPP2 video",
+        "extension": "3g2",
+    },
+    "image/bmp": {
+        "category": MIME_TYPES_CATEGORIES["image"],
+        "description": "Windows OS/2 Bitmap Graphics",
+        "extension": "bmp",
+    },
+    "image/gif": {
+        "category": MIME_TYPES_CATEGORIES["image"],
+        "description": "Graphics Interchange Format (GIF)",
+        "extension": "gif",
+    },
+    "image/x-icon": {
+        "category": MIME_TYPES_CATEGORIES["image"],
+        "description": "Icon format",
+        "extension": "ico",
+    },
+    "image/jpeg": {
+        "category": MIME_TYPES_CATEGORIES["image"],
+        "description": "JPEG images",
+        "extension": "jpg",
+    },
+    "image/png": {
+        "category": MIME_TYPES_CATEGORIES["image"],
+        "description": "Portable Network Graphics",
+        "extension": "png",
+    },
+    "image/svg+xml": {
+        "category": MIME_TYPES_CATEGORIES["image"],
+        "description": "Scalable Vector Graphics (SVG)",
+        "extension": "svg",
+    },
+    "image/tiff": {
+        "category": MIME_TYPES_CATEGORIES["image"],
+        "description": "Tagged Image File Format (TIFF)",
+        "extension": "tiff",
+    },
+    "image/webp": {
+        "category": MIME_TYPES_CATEGORIES["image"],
+        "description": "WEBP image",
+        "extension": "webp",
+    },
+    "font/otf": {
+        "category": MIME_TYPES_CATEGORIES["font"],
+        "description": "OpenType font",
+        "extension": "otf",
+    },
+    "font/ttf": {
+        "category": MIME_TYPES_CATEGORIES["font"],
+        "description": "TrueType Font",
+        "extension": "ttf",
+    },
+    "font/woff": {
+        "category": MIME_TYPES_CATEGORIES["font"],
+        "description": "Web Open Font Format (WOFF)",
+        "extension": "woff",
+    },
+    "font/woff2": {
+        "category": MIME_TYPES_CATEGORIES["font"],
+        "description": "Web Open Font Format (WOFF)",
+        "extension": "woff2",
+    },
+    "application/octet-stream": {
+        "category": MIME_TYPES_CATEGORIES["binary"],
+        "description": "Any kind of binary data",
+        "extension": "bin",
+    },
+    "application/vnd.amazon.ebook": {
+        "category": MIME_TYPES_CATEGORIES["ebook"],
+        "description": "Amazon Kindle eBook format",
+        "extension": "azw",
+    },
+    "application/epub+zip": {
+        "category": MIME_TYPES_CATEGORIES["ebook"],
+        "description": "Electronic publication (EPUB)",
+        "extension": "epub",
+    },
+    "application/x-bzip": {
+        "category": MIME_TYPES_CATEGORIES["archive"],
+        "description": "BZip archive",
+        "extension": "bz",
+    },
+    "application/x-bzip2": {
+        "category": MIME_TYPES_CATEGORIES["archive"],
+        "description": "BZip2 archive",
+        "extension": "bz2",
+    },
+    "application/java-archive": {
+        "category": MIME_TYPES_CATEGORIES["archive"],
+        "description": "Java Archive (JAR)",
+        "extension": "jar",
+    },
+    "application/x-rar-compressed": {
+        "category": MIME_TYPES_CATEGORIES["archive"],
+        "description": "RAR archive",
+        "extension": "rar",
+    },
+    "application/x-tar": {
+        "category": MIME_TYPES_CATEGORIES["archive"],
+        "description": "Tape Archive (TAR)",
+        "extension": "tar",
+    },
+    "application/zip": {
+        "category": MIME_TYPES_CATEGORIES["archive"],
+        "description": "ZIP archive",
+        "extension": "zip",
+    },
+    "application/x-7z-compressed": {
+        "category": MIME_TYPES_CATEGORIES["archive"],
+        "description": "7-zip archive",
+        "extension": "7z",
+    },
+    "application/x-csh": {
+        "category": MIME_TYPES_CATEGORIES["executable"],
+        "description": "C-Shell script",
+        "extension": "csh",
+    },
+    "application/ogg": {
+        "category": MIME_TYPES_CATEGORIES["executable"],
+        "description": "OGG",
+        "extension": "ogx",
+    },
+    "application/x-sh": {
+        "category": MIME_TYPES_CATEGORIES["executable"],
+        "description": "Bourne shell script",
+        "extension": "sh",
+    },
+    "application/x-shockwave-flash": {
+        "category": MIME_TYPES_CATEGORIES["executable"],
+        "description": "Adobe Flash",
+        "extension": "swf",
+    },
+    "text/css": {
+        "category": MIME_TYPES_CATEGORIES["web_content"],
+        "description": "Cascading Style Sheets (CSS)",
+        "extension": "css",
+    },
+    "text/html": {
+        "category": MIME_TYPES_CATEGORIES["web_content"],
+        "description": "HyperText Markup Language (HTML)",
+        "extension": "html",
+    },
+    "application/javascript": {
+        "category": MIME_TYPES_CATEGORIES["web_content"],
+        "description": "JavaScript",
+        "extension": "js",
+    },
+    "application/xhtml+xml": {
+        "category": MIME_TYPES_CATEGORIES["web_content"],
+        "description": "XHTML",
+        "extension": "xhtml",
+    },
+    "application/vnd.mozilla.xul+xml": {
+        "category": MIME_TYPES_CATEGORIES["web_content"],
+        "description": "XUL",
+        "extension": "xul",
+    },
+    "text/csv": {
+        "category": MIME_TYPES_CATEGORIES["flat_structured_data"],
+        "description": "Comma-separated values (CSV)",
+        "extension": "csv",
+    },
+    "text/tab-separated-values": {
+        "category": MIME_TYPES_CATEGORIES["flat_structured_data"],
+        "description": "Tab-separated values (TSV)",
+        "extension": "tsv",
+    },
+    "application/vnd.ms-excel": {
+        "category": MIME_TYPES_CATEGORIES["spreadsheet"],
+        "description": "Microsoft Excel",
+        "extension": "xls",
+    },
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+        "category": MIME_TYPES_CATEGORIES["spreadsheet"],
+        "description": "Microsoft Excel (OpenXML)",
+        "extension": "xlsx",
+    },
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.template": {
+        "category": MIME_TYPES_CATEGORIES["spreadsheet"],
+        "description": "Microsoft Excel (OpenXML)",
+        "extension": "xltx",
+    },
+    "application/vnd.ms-excel.sheet.macroEnabled.12": {
+        "category": MIME_TYPES_CATEGORIES["spreadsheet"],
+        "description": "Microsoft Excel (OpenXML)",
+        "extension": "xlsm",
+    },
+    "application/vnd.ms-excel.template.macroEnabled.12": {
+        "category": MIME_TYPES_CATEGORIES["spreadsheet"],
+        "description": "Microsoft Excel (OpenXML)",
+        "extension": "xltm",
+    },
+    "application/vnd.ms-excel.addin.macroEnabled.12": {
+        "category": MIME_TYPES_CATEGORIES["spreadsheet"],
+        "description": "Microsoft Excel (OpenXML)",
+        "extension": "xlam",
+    },
+    "application/vnd.ms-excel.sheet.binary.macroEnabled.12": {
+        "category": MIME_TYPES_CATEGORIES["spreadsheet"],
+        "description": "Microsoft Excel (OpenXML)",
+        "extension": "xlsb",
+    },
+    "application/vnd.oasis.opendocument.spreadsheet": {
+        "category": MIME_TYPES_CATEGORIES["spreadsheet"],
+        "description": "OpenDocument spreadsheet",
+        "extension": "ods",
+    },
+    "application/vnd.oasis.opendocument.spreadsheet-template": {
+        "category": MIME_TYPES_CATEGORIES["spreadsheet"],
+        "description": "OpenDocument spreadsheet template",
+        "extension": "ots",
+    },
+    "application/vnd.oasis.opendocument.spreadsheet-flat-xml": {
+        "category": MIME_TYPES_CATEGORIES["spreadsheet"],
+        "description": "OpenDocument spreadsheet (Flat XML)",
+        "extension": "fods",
+    },
+    "application/vnd.lotus-1-2-3": {
+        "category": MIME_TYPES_CATEGORIES["spreadsheet"],
+        "description": "Lotus 1-2-3",
+        "extension": "123",
+    },
+    "application/vnd.lotus-approach": {
+        "category": MIME_TYPES_CATEGORIES["spreadsheet"],
+        "description": "Lotus Approach",
+        "extension": "apr",
+    },
+    "application/vnd.lotus-freelance": {
+        "category": MIME_TYPES_CATEGORIES["spreadsheet"],
+        "description": "Lotus Freelance",
+        "extension": "pre",
+    },
+    "application/xslt+xml": {
+        "category": MIME_TYPES_CATEGORIES["spreadsheet"],
+        "description": "XSLT",
+        "extension": "xslt",
+    },
+    "application/json": {
+        "category": MIME_TYPES_CATEGORIES["multidimensional_structured_data"],
+        "description": "JSON",
+        "extension": "json",
+    },
+    "application/xml": {
+        "category": MIME_TYPES_CATEGORIES["multidimensional_structured_data"],
+        "description": "XML",
+        "extension": "xml",
+    },
+    "application/msword": {
+        "category": MIME_TYPES_CATEGORIES["document"],
+        "description": "Microsoft Word",
+        "extension": "doc",
+    },
+    "application/x-abiword": {
+        "category": MIME_TYPES_CATEGORIES["document"],
+        "description": "AbiWord",
+        "extension": "abw",
+    },
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+        "category": MIME_TYPES_CATEGORIES["document"],
+        "description": "Microsoft Word (OpenXML)",
+        "extension": "docx",
+    },
+    "application/vnd.oasis.opendocument.text": {
+        "category": MIME_TYPES_CATEGORIES["document"],
+        "description": "OpenDocument text",
+        "extension": "odt",
+    },
+    "application/rtf": {
+        "category": MIME_TYPES_CATEGORIES["document"],
+        "description": "Rich Text Format (RTF)",
+        "extension": "rtf",
+    },
+    "application/vnd.ms-powerpoint": {
+        "category": MIME_TYPES_CATEGORIES["presentation"],
+        "description": "Microsoft PowerPoint",
+        "extension": "ppt",
+    },
+    "application/vnd.oasis.opendocument.presentation": {
+        "category": MIME_TYPES_CATEGORIES["presentation"],
+        "description": "OpenDocument presentation",
+        "extension": "odp",
+    },
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation": {
+        "category": MIME_TYPES_CATEGORIES["presentation"],
+        "description": "Microsoft PowerPoint (OpenXML)",
+        "extension": "pptx",
+    },
+    "application/pdf": {
+        "category": MIME_TYPES_CATEGORIES["document"],
+        "description": "Adobe Portable Document Format (PDF)",
+        "extension": "pdf",
+    },
+    "application/vnd.visio": {
+        "category": MIME_TYPES_CATEGORIES["diagram"],
+        "description": "Microsoft Visio",
+        "extension": "vsd",
+    },
+    "application/vnd.oasis.opendocument.graphics": {
+        "category": MIME_TYPES_CATEGORIES["diagram"],
+        "description": "OpenDocument drawing",
+        "extension": "odg",
+    },
+    "application/vnd.openxmlformats-officedocument.drawingml.diagramData+xml": {
+        "category": MIME_TYPES_CATEGORIES["diagram"],
+        "description": "Microsoft Visio (OpenXML)",
+        "extension": "vsdx",
+    },
+    "application/vnd.openxmlformats-officedocument.drawingml.diagramColors+xml": {
+        "category": MIME_TYPES_CATEGORIES["diagram"],
+        "description": "Microsoft Visio (OpenXML)",
+        "extension": "vssx",
+    },
+    "application/vnd.openxmlformats-officedocument.drawingml.diagramLayout+xml": {
+        "category": MIME_TYPES_CATEGORIES["diagram"],
+        "description": "Microsoft Visio (OpenXML)",
+        "extension": "vstx",
+    },
+    "application/vnd.openxmlformats-officedocument.drawingml.diagramStyle+xml": {
+        "category": MIME_TYPES_CATEGORIES["diagram"],
+        "description": "Microsoft Visio (OpenXML)",
+        "extension": "vssx",
+    },
+    "application/vnd.ms-office.drawingml.diagramData+xml": {
+        "category": MIME_TYPES_CATEGORIES["diagram"],
+        "description": "Microsoft Visio (OpenXML)",
+        "extension": "vsdx",
+    },
+    "application/vnd.ms-office.drawingml.diagramColors+xml": {
+        "category": MIME_TYPES_CATEGORIES["diagram"],
+        "description": "Microsoft Visio (OpenXML)",
+        "extension": "vssx",
+    },
+    "application/vnd.ms-office.drawingml.diagramLayout+xml": {
+        "category": MIME_TYPES_CATEGORIES["diagram"],
+        "description": "Microsoft Visio (OpenXML)",
+        "extension": "vstx",
+    },
+    "application/vnd.ms-office.drawingml.diagramStyle+xml": {
+        "category": MIME_TYPES_CATEGORIES["diagram"],
+        "description": "Microsoft Visio (OpenXML)",
+        "extension": "vssx",
+    },
+    "text/plain": {
+        "category": MIME_TYPES_CATEGORIES["text"],
+        "description": "Plain text",
+        "extension": "txt",
+    },
+    "text/calendar": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "iCalendar",
+        "extension": "ics",
+    },
+    "text/x-vcard": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vCard",
+        "extension": "vcf",
+    },
+    "text/x-vcalendar": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vCalendar",
+        "extension": "vcs",
+    },
+    "text/x-vnote": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vNote",
+        "extension": "vnt",
+    },
+    "text/x-vtodo": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vTodo",
+        "extension": "vtd",
+    },
+    "text/x-vjournal": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vJournal",
+        "extension": "vjd",
+    },
+    "text/x-vmessage": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vMessage",
+        "extension": "vmg",
+    },
+    "text/x-vfreebusy": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vFreeBusy",
+        "extension": "vfb",
+    },
+    "text/x-vtimezone": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vTimezone",
+        "extension": "vtz",
+    },
+    "text/x-vavailability": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vAvailability",
+        "extension": "vav",
+    },
+    "text/x-vpoll": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vPoll",
+        "extension": "vpl",
+    },
+    "text/x-vdirectory": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vDirectory",
+        "extension": "vdr",
+    },
+    "text/x-vconference": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vConference",
+        "extension": "vcf",
+    },
+    "text/x-vexample": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vExample",
+        "extension": "vex",
+    },
+    "text/x-vrsvp": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vRSVP",
+        "extension": "vrs",
+    },
+    "text/x-vrsvp-reply": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vRSVP-Reply",
+        "extension": "vrr",
+    },
+    "text/x-vrsvp-request": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vRSVP-Request",
+        "extension": "vrr",
+    },
+    "text/x-vrsvp-error": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vRSVP-Error",
+        "extension": "vre",
+    },
+    "text/x-vrsvp-reminder": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vRSVP-Reminder",
+        "extension": "vrm",
+    },
+    "text/x-vrsvp-availability": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vRSVP-Availability",
+        "extension": "vra",
+    },
+    "text/x-vrsvp-poll": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vRSVP-Poll",
+        "extension": "vrp",
+    },
+    "text/x-vrsvp-poll-change": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vRSVP-Poll-Change",
+        "extension": "vpc",
+    },
+    "text/x-vrsvp-poll-vote": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vRSVP-Poll-Vote",
+        "extension": "vpv",
+    },
+    "text/x-vrsvp-poll-published": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vRSVP-Poll-Published",
+        "extension": "vpp",
+    },
+    "text/x-vrsvp-poll-expired": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vRSVP-Poll-Expired",
+        "extension": "vpe",
+    },
+    "text/x-vrsvp-poll-closed": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vRSVP-Poll-Closed",
+        "extension": "vpc",
+    },
+    "text/x-vrsvp-poll-answered": {
+        "category": MIME_TYPES_CATEGORIES["calendar"],
+        "description": "vRSVP",
+        "extension": "vpa",
+    }
 }
 
 
@@ -835,9 +1242,49 @@ def get_mime_category(mime_type: str) -> str:
     """
 
     if mime_type in MIME_TYPE_TO_CATEGORY:
-        return MIME_TYPE_TO_CATEGORY[mime_type]
+        return MIME_TYPE_TO_CATEGORY[mime_type]["category"]
 
     return MIME_TYPES_CATEGORIES["unknown"]
+
+
+def get_mime_extension(mime_type: str) -> str:
+    """
+    Returns the category of the mime type.
+
+    Args:
+        mime_type (str): The mime type to analyze.
+
+    Returns:
+        str: The category of the mime type.
+    """
+
+    if mime_type in MIME_TYPE_TO_CATEGORY:
+        return MIME_TYPE_TO_CATEGORY[mime_type]["extension"]
+
+    return ""
+
+def get_file_extension(file_path: str) -> str:
+    """
+    Returns the file extension associated to the mime type
+
+    Args:
+        file_path (str): The path to the file to analyze.
+
+    Returns:
+        str: the file extension associated to the mime type
+    """
+
+    if not os.path.isabs(file_path):
+        namespace = sys._getframe(1).f_globals
+        cwd = os.getcwd()
+        rel_path = namespace["__file__"]
+        root_path = os.path.dirname(os.path.join(cwd, rel_path))
+        file_path = os.path.join(root_path, file_path)
+
+    file_mime_type = get_file_type(file_path)
+    file_extension = get_mime_extension(file_mime_type)
+
+    return file_extension
 
 
 def get_file_type(file_path: str) -> str:
@@ -853,12 +1300,13 @@ def get_file_type(file_path: str) -> str:
     """
 
     # used for relative paths
-    namespace = sys._getframe(1).f_globals
-    cwd = os.getcwd()
-    rel_path = namespace["__file__"]
-    root_path = os.path.dirname(os.path.join(cwd, rel_path))
+
 
     if not os.path.isabs(file_path):
+        namespace = sys._getframe(1).f_globals
+        cwd = os.getcwd()
+        rel_path = namespace["__file__"]
+        root_path = os.path.dirname(os.path.join(cwd, rel_path))
         file_path = os.path.join(root_path, file_path)
 
     return magic.from_file(str(file_path), mime=True)
