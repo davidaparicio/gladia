@@ -1,5 +1,3 @@
-import os
-import tempfile
 from typing import Any, Dict
 
 import pytest
@@ -38,20 +36,12 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        tmp_original_image_file = tempfile.NamedTemporaryFile(mode="wb", delete=False)
-        tmp_original_image_file.write(
-            requests.get(inputs["original_image_url"]).content
-        )
-
-        tmp_mask_image_file = tempfile.NamedTemporaryFile(mode="wb", delete=False)
-        tmp_mask_image_file.write(requests.get(inputs["mask_image_url"]).content)
-
         response = client.post(
             url=self.target_url,
             params={"model": model} if model else {},
             files={
-                "original_image": open(tmp_original_image_file.name, "rb"),
-                "mask_image": open(tmp_mask_image_file.name, "rb"),
+                "original_image": requests.get(inputs["original_image_url"]).content,
+                "mask_image": requests.get(inputs["mask_image_url"]).content,
             },
             data={
                 "prompt": inputs["prompt"],
@@ -87,7 +77,7 @@ class TestGuidedInpainting:
         assert response.status_code == 200
 
     @pytest.mark.parametrize("model", models)
-    def test_invalid_original_image_input_task(self, model: str) -> bool:
+    def test_invalid_original_image_input_task(self, model: str, tmp_path) -> bool:
         """
         Test the guided inpainting endpoint with an invalid original image input
 
@@ -98,18 +88,13 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        tmp_local_mp3_file = tempfile.NamedTemporaryFile(mode="wb", delete=False)
-        tmp_local_mp3_file.write(
-            requests.get(f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp3").content
-        )
-
         response = client.post(
             url=self.target_url,
             params={"model": model} if model else {},
             files={
                 "original_image": (
-                    tmp_local_mp3_file.name,
-                    open(tmp_local_mp3_file.name, "rb"),
+                    "test.mp3",
+                    requests.get(f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp3").content,
                     "audio/mpeg",
                 ),
                 "mask_image_url": inputs_to_test[0]["mask_image_url"],
@@ -118,9 +103,6 @@ class TestGuidedInpainting:
                 "prompt": inputs_to_test[0]["prompt"],
             },
         )
-
-        tmp_local_mp3_file.close()
-        os.unlink(tmp_local_mp3_file.name)
 
         assert response.status_code == 500  # TODO
 
@@ -136,19 +118,14 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        tmp_local_mp3_file = tempfile.NamedTemporaryFile(mode="wb", delete=False)
-        tmp_local_mp3_file.write(
-            requests.get(f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp3").content
-        )
-
         response = client.post(
             url=self.target_url,
             params={"model": model} if model else {},
             files={
                 "original_image_url": inputs_to_test[0]["original_image_url"],
                 "mask_image": (
-                    tmp_local_mp3_file.name,
-                    open(tmp_local_mp3_file.name, "rb"),
+                    "test.mp3",
+                    requests.get(f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp3").content,
                     "audio/mpeg",
                 ),
             },
@@ -156,9 +133,6 @@ class TestGuidedInpainting:
                 "prompt": inputs_to_test[0]["prompt"],
             },
         )
-
-        tmp_local_mp3_file.close()
-        os.unlink(tmp_local_mp3_file.name)
 
         assert response.status_code == 422
 
