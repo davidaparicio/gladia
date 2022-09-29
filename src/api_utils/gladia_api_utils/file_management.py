@@ -598,7 +598,7 @@ MIME_TYPE_TO_CATEGORY = {
         "category": MIME_TYPES_CATEGORIES["calendar"],
         "description": "vRSVP",
         "extension": "vpa",
-    }
+    },
 }
 
 
@@ -1263,6 +1263,7 @@ def get_mime_extension(mime_type: str) -> str:
 
     return ""
 
+
 def get_file_extension(file_path: str) -> str:
     """
     Returns the file extension associated to the mime type
@@ -1300,7 +1301,6 @@ def get_file_type(file_path: str) -> str:
     """
 
     # used for relative paths
-
 
     if not os.path.isabs(file_path):
         namespace = sys._getframe(1).f_globals
