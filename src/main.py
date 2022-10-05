@@ -190,7 +190,7 @@ def __add_router(module: ModuleType, module_path: str) -> None:
 
     active_task_list = list(map(lambda each: to_task_name(each).upper(), module_config))
 
-    if "NONE" not in active_task_list and (
+    if ("NONE" not in active_task_list and "NONE" not in module_config) and (
         module_task in active_task_list or "*" in module_config
     ):
         # remove the "apis" part of the path
