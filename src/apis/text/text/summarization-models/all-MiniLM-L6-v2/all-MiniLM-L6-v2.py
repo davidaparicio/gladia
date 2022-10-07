@@ -1,5 +1,6 @@
 # inspired from https://huggingface.co/spaces/ml6team/post-processing-summarization/
 import itertools
+from typing import Dict
 
 import numpy as np
 import torch
@@ -91,23 +92,23 @@ def predict(
     source_language: str = "eng",
     min_length: int = 120,
     max_length: int = 512,
-):
+) -> Dict[str, str]:
     """
     Predict the summary of a text
 
     Args:
-      text (str): text to summarize
-      source_language (str): language of the text
-      min_len (int): minimum length of the summary
-      max_len (int): maximum length of the summary
+        text (str): text to summarize
+        source_language (str): language of the text
+        min_len (int): minimum length of the summary
+        max_len (int): maximum length of the summary
 
     Returns:
-      summary (str): summary
+        Dict[str, str]: summary of the text
     """
 
     summarization_model = get_summarizer_model()
 
-    summary = generate_abstractive_summary(
+    result = generate_abstractive_summary(
         summarization_model=summarization_model,
         text=text,
         type="beam",
@@ -118,4 +119,4 @@ def predict(
         no_repeat_ngram_size=4,
     )
 
-    return summary
+    return {"prediction": result, "prediction_raw": result}
