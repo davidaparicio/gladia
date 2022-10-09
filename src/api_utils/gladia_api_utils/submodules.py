@@ -927,7 +927,7 @@ async def clean_kwargs_based_on_router_inputs(
                     req = urllib.request.Request(url=url, headers=dummy_header)
                     kwargs[input_name] = urlopen(req).read()
                 except urllib.error.URLError:
-                    return ({}, False, "Couldn't reach provided url.")
+                    return ({}, False, f"Couldn't reach provided url : {url}.")
 
             # if not a bytes either, file is missing
             elif not isinstance(
