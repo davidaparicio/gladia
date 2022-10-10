@@ -31,5 +31,5 @@ output = {"name": "extracted_text", "type": "string", "example": "extracted_text
 router = APIRouter()
 
 TaskRouter(
-    router=router, input=inputs, output=output, default_model="tesseract-denoising"
+    router=router, input=inputs, output=output, default_model="textract-extractor"
 )
