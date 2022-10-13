@@ -21,4 +21,4 @@ def predict(address: str) -> Dict[str, str]:
 
     raw_prediction = location.raw
 
-    return {'prediction': location.address, 'raw_prediction': raw_prediction}
+    return {"prediction": location.address, "raw_prediction": raw_prediction}
