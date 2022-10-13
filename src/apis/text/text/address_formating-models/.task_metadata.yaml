@@ -2,7 +2,7 @@ summary: 'Format the input string as an clean adress using geopy'
 
 
 inputs_example:
-  sentence:
+  address:
     default_example: "Taj Mahal, Agra, Uttar Pradesh 282001"
     examples:
       - "Taj Mahal, Agra, Uttar Pradesh 282001"
