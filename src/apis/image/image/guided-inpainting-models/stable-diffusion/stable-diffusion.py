@@ -1,12 +1,12 @@
 from io import BytesIO
 
 import PIL
-from numpy import size
 import requests
 import torch
 from diffusers import StableDiffusionInpaintPipeline
 from gladia_api_utils import SECRETS
 from gladia_api_utils.io import _open
+from numpy import size
 from torch import autocast
 
 
