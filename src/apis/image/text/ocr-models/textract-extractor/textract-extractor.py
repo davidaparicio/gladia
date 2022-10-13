@@ -41,8 +41,7 @@ def predict(image: bytes, source_language: str) -> Dict[str, Union[str, List[str
         raw_prediction = []
         logger.debug("No text detected in pdf, trying to convert to image")
         # convert pdf file to image
-        pdfFile = wi(filename=file, resolution=300)
-        image = pdfFile.convert("jpeg")
+        image = wi(filename=file, resolution=300).convert("jpeg")
 
         images = []
 
