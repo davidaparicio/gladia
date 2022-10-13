@@ -1,6 +1,7 @@
 # format the input string as an clean adress using geopy
 
 from typing import Dict
+
 from geopy.geocoders import Nominatim
 
 
