@@ -4,6 +4,7 @@ from typing import Dict, List, Union
 
 import textract
 from cleantext import clean
+from wand.image import Image as wi
 from gladia_api_utils.file_management import get_file_extension, input_to_files
 
 logger = getLogger(__name__)
@@ -31,8 +32,34 @@ def predict(image: bytes, source_language: str) -> Dict[str, Union[str, List[str
     os.rename(image, file)
 
     result = textract.process(file).decode("utf-8")
-
     clean_result = clean(result)
+    raw_prediction = [clean_result]
+
+    # if the result is empty and the file is a pdf, try to extract the text from the pdf
+    # by converting it to an image and performing ocr on the image
+    if not result and get_file_extension(image) == "pdf":
+        raw_prediction = []
+        logger.info("No text detected in pdf, trying to convert to image")
+        # convert pdf file to image
+        pdfFile = wi(filename = file, resolution = 300)
+        image = pdfFile.convert('jpeg')
+
+        imageBlobs = []
+
+        for img in image.sequence:
+            imgPage = wi(image = img)
+            imageBlobs.append(imgPage.make_blob('jpeg'))
+
+        extract = []
+
+        for imgBlob in imageBlobs:
+            clean_result += clean(textract.process(file).decode("utf-8"))
+            raw_prediction.append(clean_result)
+            clean_result += "\n"
+
+        # remove the trailing newline
+        clean_result = clean_result[:-1]
+
     os.unlink(file)
 
-    return {"prediction": clean_result, "prediction_raw": [clean_result]}
+    return {"prediction": clean_result, "prediction_raw": raw_prediction}
