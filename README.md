@@ -66,10 +66,6 @@ Follow Gladia Twitter account to get the latest update
 
 [Join our Discord Community Server](https://discord.com/invite/HeuCTxnXrE)
 
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=gladiaio/gladia&type=Date)](https://star-history.com/#gladiaio/gladia&Date)
-
 
 # What's Gladia
 ## Why Gladia

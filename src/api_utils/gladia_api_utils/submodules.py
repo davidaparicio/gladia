@@ -440,21 +440,6 @@ def create_description_for_the_endpoint_parameter(endpoint_param: dict) -> dict:
     return parameters_to_add
 
 
-def get_error_reponse(code: int, message: str) -> JSONResponse:
-    """
-    Create a JSONResponse error response
-
-    Args:
-        code (int): error code
-        message (str): error message
-
-    Returns:
-        dict: error response
-    """
-
-    JSONResponse(status_code=code, content={"message": message})
-
-
 def get_task_examples(endpoint, models):
     task_example = dict()
     task_examples = dict()
@@ -613,7 +598,7 @@ class TaskRouter:
             ) = await clean_kwargs_based_on_router_inputs(kwargs, self.inputs)
 
             if not success:
-                return get_error_reponse(400, error_message)
+                raise HTTPException(status.HTTP_400_BAD_REQUEST, error_message)
 
             env_name = get_module_env_name(module_path)
             # if its a subprocess
@@ -938,8 +923,11 @@ async def clean_kwargs_based_on_router_inputs(
 
                 dummy_header = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) "}
 
-                req = urllib.request.Request(url=url, headers=dummy_header)
-                kwargs[input_name] = urlopen(req).read()
+                try:
+                    req = urllib.request.Request(url=url, headers=dummy_header)
+                    kwargs[input_name] = urlopen(req).read()
+                except (urllib.error.URLError, ValueError):
+                    return ({}, False, f"Couldn't reach provided url : {url}.")
 
             # if not a bytes either, file is missing
             elif not isinstance(

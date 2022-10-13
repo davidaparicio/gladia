@@ -2,7 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from main import app
-from tests import create_default_text_to_text_tests
+from tests import create_default_tests
 from tests.utils import get_inputs_to_test, get_models_to_test
 
 models = get_models_to_test()
@@ -10,7 +10,7 @@ inputs_to_test = get_inputs_to_test(["sentence", "top_k"])
 
 
 class TestsNextWordPrediction(
-    create_default_text_to_text_tests(
+    create_default_tests(
         class_name="BasicTestsNextWordPrediction",
         client=TestClient(app),
         target_url="/text/text/next-word-prediction/",

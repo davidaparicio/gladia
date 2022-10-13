@@ -1,0 +1,23 @@
+api:
+  content: ''
+  tags: []
+gladia:
+  accelerator: ''
+  example:
+    output:
+      prediction: Amanda can't find Betty's number. She wants to ask Larry to text her.
+      prediction_raw: Amanda can't find Betty's number. She wants to ask Larry to text her.
+  examples: {}
+  format: ''
+  latency: ''
+huggingface:
+  link: ''
+license:
+  content: ''
+  link: ''
+  title: ''
+paper:
+  authors: []
+  citation: ''
+  link: ''
+  title: ''
