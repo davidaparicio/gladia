@@ -95,6 +95,7 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
         python3-pil \
         tesseract-ocr-all \
         poppler-utils && \
+        imagemagick && \
     echo "== ADJUSTING binaries ==" && \ 
     mv /usr/bin/python3 /usr/bin/python38 && \
     ln -sf /usr/bin/python /usr/bin/python3 && \

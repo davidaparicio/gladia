@@ -44,18 +44,21 @@ def predict(image: bytes, source_language: str) -> Dict[str, Union[str, List[str
         pdfFile = wi(filename = file, resolution = 300)
         image = pdfFile.convert('jpeg')
 
-        imageBlobs = []
+        images = []
 
+        i = 0
         for img in image.sequence:
             imgPage = wi(image = img)
-            imageBlobs.append(imgPage.make_blob('jpeg'))
+            img_filename=f"{file}_{i}"+".jpg"
+            imgPage.save(filename=f"{file}_{i}"+".jpg")
+            images.append(img_filename)
+            i += 1
 
-        extract = []
-
-        for imgBlob in imageBlobs:
-            clean_result += clean(textract.process(file).decode("utf-8"))
+        for img in images:
+            clean_result += clean(textract.process(img).decode("utf-8"))
             raw_prediction.append(clean_result)
             clean_result += "\n"
+            os.unlink(img)
 
         # remove the trailing newline
         clean_result = clean_result[:-1]
