@@ -39,7 +39,7 @@ def predict(image: bytes, source_language: str) -> Dict[str, Union[str, List[str
     # by converting it to an image and performing ocr on the image
     if not result and get_file_extension(image) == "pdf":
         raw_prediction = []
-        logger.info("No text detected in pdf, trying to convert to image")
+        logger.debug("No text detected in pdf, trying to convert to image")
         # convert pdf file to image
         pdfFile = wi(filename=file, resolution=300)
         image = pdfFile.convert("jpeg")
