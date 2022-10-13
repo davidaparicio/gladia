@@ -17,7 +17,7 @@ def predict(address: str) -> Dict[str, str]:
 
     geolocator = Nominatim(user_agent="gladia")
 
-    location = geolocator.geocode(address, addressdetails=True))
+    location = geolocator.geocode(address, addressdetails=True)
 
     raw_prediction = location.raw
 
