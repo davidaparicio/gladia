@@ -4,8 +4,8 @@ from typing import Dict, List, Union
 
 import textract
 from cleantext import clean
-from wand.image import Image as wi
 from gladia_api_utils.file_management import get_file_extension, input_to_files
+from wand.image import Image as wi
 
 logger = getLogger(__name__)
 
@@ -41,16 +41,16 @@ def predict(image: bytes, source_language: str) -> Dict[str, Union[str, List[str
         raw_prediction = []
         logger.info("No text detected in pdf, trying to convert to image")
         # convert pdf file to image
-        pdfFile = wi(filename = file, resolution = 300)
-        image = pdfFile.convert('jpeg')
+        pdfFile = wi(filename=file, resolution=300)
+        image = pdfFile.convert("jpeg")
 
         images = []
 
         i = 0
         for img in image.sequence:
-            imgPage = wi(image = img)
-            img_filename=f"{file}_{i}"+".jpg"
-            imgPage.save(filename=f"{file}_{i}"+".jpg")
+            imgPage = wi(image=img)
+            img_filename = f"{file}_{i}" + ".jpg"
+            imgPage.save(filename=f"{file}_{i}" + ".jpg")
             images.append(img_filename)
             i += 1
 
