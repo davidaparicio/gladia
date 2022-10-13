@@ -6,6 +6,7 @@ import torch
 from diffusers import StableDiffusionInpaintPipeline
 from gladia_api_utils import SECRETS
 from gladia_api_utils.io import _open
+from numpy import size
 from torch import autocast
 
 
@@ -15,7 +16,9 @@ def download_image(url):
 
 
 def predict(original_image: bytes, mask_image: bytes, prompt: str = ""):
-    original_image = _open(original_image).convert("RGB").resize((512, 512))
+    original_image = _open(original_image)
+    width, height = original_image.size
+    original_image = original_image.convert("RGB").resize((512, 512))
     mask_image = _open(mask_image).convert("RGB").resize((512, 512))
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -37,4 +40,4 @@ def predict(original_image: bytes, mask_image: bytes, prompt: str = ""):
             strength=0.75,
         ).images
 
-    return images[0]
+    return images[0].resize((width, height))

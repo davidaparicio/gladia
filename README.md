@@ -160,6 +160,8 @@ cd unit-test
 python test.py -c
 ```
 
+To know more about test please check this [readme dedicated to test](https://github.com/gladiaio/gladia/blob/main/src/tests/README.md)
+
 ## As a new developer, very first steps in full control
 
 We created a [dedicated page](./src/howto101.md) with detailed instructions on how, as a new develper, to perform few first steps actions. The objective is for the new developer to be in full control while performing the following first steps :
