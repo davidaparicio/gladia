@@ -20,7 +20,7 @@ inputs = [
         "example": task_metadata["inputs_example"]["longitude"]["default_example"],
         "examples": task_metadata["inputs_example"]["longitude"]["examples"],
         "placeholder": "Insert the longitude of the address to fetch",
-    }
+    },
 ]
 
 output = {"name": "formated_address", "type": "string", "example": "formated_address"}
