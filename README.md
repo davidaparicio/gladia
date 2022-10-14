@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://gladia.io"><img src="https://i.ibb.co/BgD6s0x/Gladia.png" alt="Gladia" width="100%"></a>
+  <a href="https://gladia.io"><img src="https://i.ibb.co/WnqPZ9Q/Cover-Twitter.png" alt="Gladia" width="100%"></a>
 </p>
 <p align="center">
   <em>Gladia the fastest way to develop and deploy AI APIs.</em>
