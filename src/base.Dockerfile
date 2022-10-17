@@ -32,6 +32,7 @@ ENV TRANSFORMERS_CACHE=$GLADIA_TMP_MODEL_PATH/transformers \
     distro="ubuntu2004" \
     arch="x86_64" \
     TRITON_MODELS_PATH=$GLADIA_TMP_MODEL_PATH/triton \
+    TRITON_CHECKPOINTS_PATH=/triton-models-chkpt \
     TRITON_SERVER_PORT_HTTP=8000 \
     TRITON_SERVER_PORT_GRPC=8001 \
     TRITON_SERVER_PORT_METRICS=8002 \
@@ -58,12 +59,12 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
 ADD ./tools/docker/clean-layer.sh $CLEAN_LAYER_SCRIPT
 
 RUN mkdir -p $TRITON_MODELS_PATH && \
+    mkdir -p $TRITON_CHECKPOINTS_PATH && \
     mkdir -p $GLADIA_TMP_PATH && \
     mkdir -p $TRANSFORMERS_CACHE && \
     mkdir -p $PYTORCH_TRANSFORMERS_CACHE && \
     mkdir -p $PYTORCH_PRETRAINED_BERT_CACHE && \
     mkdir -p $NLTK_DATA && \
-    mkdir -p $TRITON_MODELS_PATH && \
     mkdir -p $PATH_TO_GLADIA_SRC && \
 # Update apt repositories - Add Nvidia GPG key
     apt-key del 7fa2af80 && \
@@ -73,6 +74,13 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
     sed -i 's/deb https:\/\/developer.download.nvidia.com\/compute\/cuda\/repos\/ubuntu2004\/x86_64.*//g' /etc/apt/sources.list && \
     add-apt-repository -y ppa:deadsnakes/ppa && \
     apt-get update --allow-insecure-repositories -y && \
+    wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null && \
+    apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main" && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6AF7F09730B3F0A4 && \
+    apt update && \
+    apt install kitware-archive-keyring && \
+    rm /etc/apt/trusted.gpg.d/kitware.gpg && \
+    apt update && \
     apt install -y \
         unzip \
         libssl-dev \
@@ -95,8 +103,9 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
         python3-pil \
         tesseract-ocr-all \
         poppler-utils \
-        imagemagick && \
-    echo "== ADJUSTING binaries ==" && \ 
+        imagemagick \
+        protobuf-compiler && \
+    echo "== ADJUSTING binaries ==" && \
     mv /usr/bin/python3 /usr/bin/python38 && \
     ln -sf /usr/bin/python /usr/bin/python3 && \
     echo "== INSTALLING GITLFS ==" && \
@@ -107,7 +116,25 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
     rm /tmp/install.sh && \
     echo "== INSTALLING UMAMBA ==" && \
     wget -qO- "https://micro.mamba.pm/api/micromamba/linux-64/latest" | tar -xvj bin/micromamba && \
-    mv bin/micromamba /usr/local/bin/micromamba && \ 
+    mv bin/micromamba /usr/local/bin/micromamba && \
     micromamba shell init -s bash && \
     micromamba config set always_softlink $MAMBA_ALWAYS_SOFTLINK && \
+    git clone https://github.com/Tencent/rapidjson.git && \
+    cd rapidjson && \
+    cmake . && \
+    make && \
+    make install && \
+    cd /tmp && \
+    git clone https://github.com/triton-inference-server/fastertransformer_backend.git && \
+    cd fastertransformer_backend && \
+    mkdir build -p && cd build && \
+        cmake \
+        -D CMAKE_EXPORT_COMPILE_COMMANDS=1 \
+        -D CMAKE_BUILD_TYPE=Release \
+        -D CMAKE_INSTALL_PREFIX=/opt/tritonserver \
+        -D TRITON_COMMON_REPO_TAG="r${NVIDIA_TRITON_SERVER_VERSION}" \
+        -D TRITON_CORE_REPO_TAG="r${NVIDIA_TRITON_SERVER_VERSION}" \
+        -D TRITON_BACKEND_REPO_TAG="r${NVIDIA_TRITON_SERVER_VERSION}" \
+        .. && \
+        make -j"$(grep -c ^processor /proc/cpuinfo)" install && \
     $CLEAN_LAYER_SCRIPT

@@ -16,6 +16,7 @@ def main():
     if os.getenv("TRITON_LAZY_DOWNLOAD", "True").lower() in ("false", "0", "no"):
         download_active_triton_models(
             triton_models_dir=os.environ["TRITON_MODELS_PATH"],
+            triton_chkpts_dir=os.environ["TRITON_CHECKPOINTS_PATH"],
             config_file_path="./config.json",
         )
 

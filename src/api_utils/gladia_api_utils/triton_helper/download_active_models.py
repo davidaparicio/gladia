@@ -143,6 +143,17 @@ def download_triton_model(triton_models_dir: str, git_path: str) -> None:
 
     git_url = open(git_path).read()
 
+    path_to_the_file = os.path.join(
+        "/tmp/", git_url.replace("/", "-").replace(".", "-")
+    )
+
+    if os.path.exists(path_to_the_file):
+        logger.info(f"{git_url} is already cloned. Skipping download...")
+
+        return
+
+    open(path_to_the_file, "w+").close()
+
     clone_to_path = os.path.join("/tmp/", str(time()))
 
     subprocess.run(f"git clone {git_url} {clone_to_path}", shell=True, check=True)
@@ -167,12 +178,13 @@ def download_triton_model(triton_models_dir: str, git_path: str) -> None:
 
 
 def download_active_triton_models(
-    triton_models_dir: str, config_file_path: str
+    triton_models_dir: str, triton_chkpts_dir: str, config_file_path: str
 ) -> None:
     """Download every models stored in git (with lfs) by reading each `.git_path` files
 
     Args:
         triton_models_dir (str): Where to download and extract the models
+        triton_models_dir (str): Where to download and extract the models' checkpoints
         config_file_path (str): Config file describing wich task is activated
     """
 
@@ -180,3 +192,6 @@ def download_active_triton_models(
 
     for model_path in __get_active_models_path("./apis", config_file["active_tasks"]):
         download_triton_model(triton_models_dir, model_path)
+
+        if os.path.exists(f"{model_path}.checkpoints"):
+            download_triton_model(triton_chkpts_dir, f"{model_path}.checkpoints")

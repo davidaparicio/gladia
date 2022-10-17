@@ -58,9 +58,9 @@ def predict(
     # {'sample': [<PIL.Image.Image image mode=RGB size=512x512 at 0x7F546A97A070>], 'nsfw_content_detected': [False]}
 
     if samples == 1:
-        return images_list["sample"][0]
+        return images_list["images"][0]
     else:
         output = list()
-        for image in images_list["sample"]:
+        for image in images_list["images"]:
             output.append(convert_image_to_base64(image))
         return output

@@ -55,12 +55,26 @@ class TritonClient:
 
         self.__preload_model: bool = kwargs.get("preload_model", False)
 
-        if os.getenv("TRITON_MODELS_PATH") == "":
+        if os.getenv("TRITON_MODELS_PATH", "") == "":
+            logger.fatal("TRITON_MODELS_PATH is not set, can't use use triton models")
+
+        if os.getenv("TRITON_CHECKPOINTS_PATH", "") == "":
+            logger.fatal(
+                "TRITON_CHECKPOINTS_PATH is not set, can't use use checkpoints"
+            )
+
+        if os.getenv("TRITON_MODELS_PATH", "") == "":
             warn(
                 "[DEBUG] TRITON_MODELS_PATH is not set, please specify it in order to be able to download models."
             )
 
         self.__download_model(os.path.join(self.__current_path, ".git_path"))
+
+        if os.path.exists(os.path.join(self.__current_path, ".git_path.checkpoints")):
+            download_triton_model(
+                triton_models_dir=os.getenv("TRITON_CHECKPOINTS_PATH"),
+                git_path=os.path.join(self.__current_path, ".git_path.checkpoints"),
+            )
 
         if self.__preload_model and not self.load_model():
             logger.error(
