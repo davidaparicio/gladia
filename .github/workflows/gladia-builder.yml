@@ -97,11 +97,11 @@ jobs:
         run: >-
           docker build --pull	
           ${{env.DOCKER_BUILD_CACHE}}
-          -t ${DOCKER_GLADIA_FQDN}/gladia-base:${{env.DOCKER_BUILD_TAG}}
+          -t ${DOCKER_GLADIA_FQDN}/gladia/base:${{env.DOCKER_BUILD_TAG}}
           -f base.Dockerfile
           . &&
-          docker push ${DOCKER_GLADIA_FQDN}/gladia-base:${{env.DOCKER_BUILD_TAG}} &&
-          echo "DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE=${DOCKER_GLADIA_FQDN}/gladia-base:${{env.DOCKER_BUILD_TAG}}" >> $GITHUB_ENV
+          docker push ${DOCKER_GLADIA_FQDN}/gladia/base:${{env.DOCKER_BUILD_TAG}} &&
+          echo "DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE=${DOCKER_GLADIA_FQDN}/gladia/base:${{env.DOCKER_BUILD_TAG}}" >> $GITHUB_ENV
 
       # if label is force-build-gladia or gpu.Dockerfile or *env.yaml changed :
       # build the gladia image
@@ -117,10 +117,10 @@ jobs:
         run: >-
           docker build --pull	${{env.DOCKER_BUILD_CACHE}}
           --build-arg GLADIA_BASE_IMAGE=${{env.DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE}}
-          -t ${DOCKER_GLADIA_FQDN}/gladia:${{env.DOCKER_BUILD_TAG}}
+          -t ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{env.DOCKER_BUILD_TAG}}
           -f gpu.Dockerfile
           . &&
-          docker push ${DOCKER_GLADIA_FQDN}/gladia:${{env.DOCKER_BUILD_TAG}}
+          docker push ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{env.DOCKER_BUILD_TAG}}
 
       # if label is not force-build-gladia and gpu.Dockerfile nor *env.yaml changed :
       - name: Push and Tag Gladia image if label is not force-build-gladia nor gpu.Dockerfile nor env.yaml changed
@@ -133,12 +133,12 @@ jobs:
         working-directory: ./src
         run: |-
           { docker build --pull ${{env.DOCKER_BUILD_CACHE}}	-t ${DOCKER_GLADIA_FQDN}/gladia:${{env.DOCKER_BUILD_TAG}} -f - . <<-EOF
-              FROM ${DOCKER_GLADIA_FQDN}/gladia:latest
+              FROM ${DOCKER_GLADIA_FQDN}/gladia/gladia/:latest
               COPY . /app/
               ENTRYPOINT ["micromamba", "run", "-n", "server"]
               CMD ["/app/run_server.sh"]
           EOF
-          } && docker push ${DOCKER_GLADIA_FQDN}/gladia:${{env.DOCKER_BUILD_TAG}}
+          } && docker push ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{env.DOCKER_BUILD_TAG}}
 
       - name: Set output for later jobs
         id: setoutput
@@ -222,7 +222,7 @@ jobs:
           -v /data/volumes/${{steps.gpuid.outputs.gpuid}}/:/tmp/gladia/
           --pull always
           --name test-pr-${{ github.event.pull_request.number }}
-          ${DOCKER_GLADIA_FQDN}/gladia:${{ needs.build.outputs.dockerimage }}
+          ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ needs.build.outputs.dockerimage }}
 
       - name: Gladia container readiness
         id: gladia-ready
