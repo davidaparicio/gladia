@@ -162,18 +162,6 @@ jobs:
         id: retrieve-image
         run: echo ${{ needs.build.outputs.dockerimage }}
           
-      # set the GPU device to use based on the runner label
-      - name: Get GPU ID
-        id: gpuid
-        run: |
-          N=$(echo ${{ runner.name }} )
-          if [[ ${N: -1} =~ [0-9] ]]; then 
-            echo ::set-output name=gpuid::$(echo ${N: -1} )
-          else 
-            echo "Error : unexpected GPU ID"
-            exit 1
-          fi
-          
       # Set test parameters
       - name: Set log debug Level
         working-directory: ./src
@@ -210,16 +198,13 @@ jobs:
         working-directory: ./src
         run: >-
           docker run -d
-          --cpus 14
-          --memory 32g
           --gpus all
           --shm-size=5g
           -e HUGGINGFACE_ACCESS_TOKEN=${HUGGINGFACE_ACCESS_TOKEN}
           -e STABILITY_KEY=${STABILITY_KEY}
-          -e NVIDIA_VISIBLE_DEVICES=${{steps.gpuid.outputs.gpuid}}
-          -e CUDA_VISIBLE_DEVICES=${{steps.gpuid.outputs.gpuid}}
+          -e NVIDIA_VISIBLE_DEVICES=all
+          -e CUDA_VISIBLE_DEVICES=all
           -e MODE=standalone
-          -v /data/volumes/${{steps.gpuid.outputs.gpuid}}/:/tmp/gladia/
           --pull always
           --name test-pr-${{ github.event.pull_request.number }}
           ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ needs.build.outputs.dockerimage }}
