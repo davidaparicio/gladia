@@ -132,7 +132,7 @@ jobs:
           DOCKER_BUILDKIT: 1
         working-directory: ./src
         run: |-
-          { docker build --pull ${{env.DOCKER_BUILD_CACHE}}	-t ${DOCKER_GLADIA_FQDN}/gladia:${{env.DOCKER_BUILD_TAG}} -f - . <<-EOF
+          { docker build --pull ${{env.DOCKER_BUILD_CACHE}}	-t ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{env.DOCKER_BUILD_TAG}} -f - . <<-EOF
               FROM ${DOCKER_GLADIA_FQDN}/gladia/gladia/:latest
               COPY . /app/
               ENTRYPOINT ["micromamba", "run", "-n", "server"]
