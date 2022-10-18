@@ -150,7 +150,7 @@ jobs:
     if: |
         !contains(github.event.pull_request.labels.*.name, 'ci') &&
         !contains(github.event.pull_request.labels.*.name, 'doc')
-    runs-on: [self-hosted, build, persist]
+    runs-on: [self-hosted, gladia, test]
     timeout-minutes: 90
     steps:
       - name: Checkout
