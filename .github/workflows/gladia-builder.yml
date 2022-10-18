@@ -11,7 +11,7 @@ concurrency:
 env:
   DOCKER_BUILD_CACHE: ""
   DOCKER_BUILD_TAG: ci-${{ github.event.pull_request.number }}
-  DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE: ${DOCKER_GLADIA_FQDN}/gladia-base:latest
+  DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE: ${DOCKER_GLADIA_FQDN}/gladia/base:latest
   DOCKER_GLADIA_BUILD_NEEDED: false
   DOCKER_BASE_BUILD_NEEDED: false
   TEST_DEFAULT_MODELS_ONLY: '--default-models-only'
@@ -32,7 +32,7 @@ jobs:
     if: |
         !contains(github.event.pull_request.labels.*.name, 'ci') &&
         !contains(github.event.pull_request.labels.*.name, 'doc')
-    runs-on: [self-hosted, linux, STD, builder]
+    runs-on: [self-hosted, build, persist]
     # map steps output to job output
     outputs:
       dockerimage: ${{ steps.setoutput.outputs.dockerimage }}
@@ -150,7 +150,7 @@ jobs:
     if: |
         !contains(github.event.pull_request.labels.*.name, 'ci') &&
         !contains(github.event.pull_request.labels.*.name, 'doc')
-    runs-on: [self-hosted, linux, GPU, tester]
+    runs-on: [self-hosted, build, persist]
     timeout-minutes: 90
     steps:
       - name: Checkout
