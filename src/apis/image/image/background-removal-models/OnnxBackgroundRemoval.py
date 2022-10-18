@@ -51,7 +51,7 @@ class OnnxBackgroundRemoval(object):
         width, height = image.size
         resize_ratio = 1.0 * self.model_input_size / max(width, height)
         target_size = (int(resize_ratio * width), int(resize_ratio * height))
-        resized_image = image.convert("RGB").resize(target_size, Image.ANTIALIAS)
+        resized_image = image.convert("RGB").resize(target_size, Image.LANCZOS)
 
         ort_sess = ort.InferenceSession(self.model_path)
         seg_map = ort_sess.run(
