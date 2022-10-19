@@ -50,7 +50,9 @@ class TestBackgroundReplacement:
             },
         )
 
-        assert response.status_code == 200, f"expected 200 but received {response.status_code}, body: {response.content}"
+        assert (
+            response.status_code == 200
+        ), f"expected 200 but received {response.status_code}, body: {response.content}"
 
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)
@@ -76,7 +78,9 @@ class TestBackgroundReplacement:
             },
         )
 
-        assert response.status_code == 200, f"expected 200 but received {response.status_code}, body: {response.content}"
+        assert (
+            response.status_code == 200
+        ), f"expected 200 but received {response.status_code}, body: {response.content}"
 
     @pytest.mark.parametrize("model", models)
     def test_invalid_original_image_input_task(self, model: str) -> bool:
