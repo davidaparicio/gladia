@@ -202,7 +202,7 @@ jobs:
       - name: Get Logs
         if: always()
         run: |
-           /tmp/kubectl logs aipi-test-${{env.DOCKER_BUILD_TAG}} -n $KNS
+          /tmp/kubectl logs aipi-test-${{env.DOCKER_BUILD_TAG}} -n $KNS
 
       # we need to docker run to remove root artefact directories
       # this should be done better in the future.
