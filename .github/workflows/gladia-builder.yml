@@ -140,11 +140,6 @@ jobs:
           EOF
           } && docker push ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{env.DOCKER_BUILD_TAG}}
 
-      - name: Set output for later jobs
-        id: setoutput
-        run: |
-          echo ::set-output name=dockerimage::${{env.DOCKER_BUILD_TAG}}
-
   test:
     needs: build
     if: |
@@ -153,15 +148,21 @@ jobs:
     runs-on: [self-hosted, gladia, test]
     timeout-minutes: 90
     steps:
+      - name: Assert Template and NS
+        run: |
+          echo "KUBE_NAMESPACE=$KNS" >> $GITHUB_ENV
+          sed "s/PRN/${{env.DOCKER_BUILD_TAG}}/g" /ci/test-aipi-podTemplate.yml > /tmp/test.yml
+
+      - name: Start test pod
+        run: |
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/${KVERSION}/bin/linux/amd64/kubectl
+          chmod +x kubectl
+          kubectl apply -f /tmp/test.yml
+
       - name: Checkout
         id: checkout
         uses: actions/checkout@v2
-
-      # retrieve the image built in the previous job
-      - name: Retrieve image built in previous job
-        id: retrieve-image
-        run: echo ${{ needs.build.outputs.dockerimage }}
-          
+         
       # Set test parameters
       - name: Set log debug Level
         working-directory: ./src
@@ -192,52 +193,28 @@ jobs:
         run: |
           echo "TEST_DEFAULT_MODELS_ONLY=" >> $GITHUB_ENV
 
-      # Start container
-      - name: Test Gladia Container
-        id: test-gladia
-        working-directory: ./src
-        run: >-
-          docker run -d
-          --gpus all
-          --shm-size=5g
-          -e HUGGINGFACE_ACCESS_TOKEN=${HUGGINGFACE_ACCESS_TOKEN}
-          -e STABILITY_KEY=${STABILITY_KEY}
-          -e NVIDIA_VISIBLE_DEVICES=all
-          -e CUDA_VISIBLE_DEVICES=all
-          -e MODE=standalone
-          --pull always
-          --name test-pr-${{ github.event.pull_request.number }}
-          ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ needs.build.outputs.dockerimage }}
-
+      # Start test
       - name: Gladia container readiness
         id: gladia-ready
         uses: nick-fields/retry@v2
         with:
           timeout_seconds: 5
-          max_attempts: 12
+          max_attempts: 60
           retry_on: error
-          command: docker exec -i test-pr-${{ github.event.pull_request.number }} curl http://localhost:8000/v2/health/ready --connect-timeout 5
+          command: curl http://aipi-test-${{env.DOCKER_BUILD_TAG}}:8000/v2/health/ready --connect-timeout 5
 
       # Start test
       - name: Run Tests
         id: test
         run: >-
-          docker exec -i
-          -e PR=${{ github.event.pull_request.number }}
-          -e TRITON_SERVER_PORT_HTTP=8000
-          -e TRITON_SERVER_URL=localhost
-          -e TEST_DEFAULT_MODELS_ONLY=${{ env.TEST_DEFAULT_MODELS_ONLY }}
-          -e TEST_DEFAULT_INPUTS_ONLY=${{ env.TEST_DEFAULT_INPUTS_ONLY }}
-          -e TEST_STOP_AT_FAIL=${{ env.TEST_STOP_AT_FAIL }}
-          -e TEST_MARKERS=${{ env.TEST_MARKERS }}
-          test-pr-${{ github.event.pull_request.number }}
-          /bin/bash -c 'eval "$(micromamba shell hook --shell=bash)" && micromamba activate server &&python -m pytest -o log_cli=true --log-cli-level=DEBUG ./ $TEST_DEFAULT_MODELS_ONLY $TEST_DEFAULT_INPUTS_ONLY $TEST_STOP_AT_FAIL $TEST_MARKERS'
+          kubectl exec -i aipi-test-${{env.DOCKER_BUILD_TAG}}
+          /bin/bash -c 'eval "$(micromamba shell hook --shell=bash)" && micromamba activate server &&python -m pytest -o log_cli=true --log-cli-level=DEBUG ./ ${{ env.TEST_DEFAULT_MODELS_ONLY }} ${{ env.TEST_DEFAULT_INPUTS_ONLY }} ${{ env.TEST_STOP_AT_FAIL }} ${{ env.TEST_MARKERS }}'
 
       - name: Logs
         id: logs
         if: always()
         run: |
-           docker logs test-pr-${{ github.event.pull_request.number }}
+           kubectl logs aipi-test-${{env.DOCKER_BUILD_TAG}}
 
       # we need to docker run to remove root artefact directories
       # this should be done better in the future.
@@ -246,6 +223,4 @@ jobs:
         if: always()
         continue-on-error: True
         run: >-
-          docker stop test-pr-${{ github.event.pull_request.number }} &&
-          docker run -d -v $PWD:/app ${DOCKER_GLADIA_FQDN}/gladia:${{ needs.build.outputs.dockerimage }} bash -c 'rm -rf /app' &&
-          docker rm test-pr-${{ github.event.pull_request.number }}
+          kubectl delete -f /tmp/test.yml
