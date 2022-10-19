@@ -1,6 +1,5 @@
 from _pytest.config.argparsing import Parser
 
-
 gladia_server_process = None
 
 
@@ -20,7 +19,6 @@ def pytest_addoption(parser: Parser) -> None:
     parser.addoption("--deactivate-automated-tests", action="store_true", default=False)
 
 
-
 def pytest_sessionstart(session):
     """
     Called after the Session object has been created and
@@ -28,10 +26,11 @@ def pytest_sessionstart(session):
     """
 
     import os
+    from multiprocessing import Process
+
     import uvicorn
 
     from main import app
-    from multiprocessing import Process
 
     global gladia_server_process
 
@@ -41,7 +40,7 @@ def pytest_sessionstart(session):
         kwargs={
             "host": os.getenv("TEST_CLIENT_HOST", "0.0.0.0"),
             "port": int(os.getenv("TEST_CLIENT_PORT", "8000")),
-        }
+        },
     )
 
     gladia_server_process.start()

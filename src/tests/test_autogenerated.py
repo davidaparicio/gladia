@@ -4,10 +4,8 @@ from logging import getLogger
 from os.path import join as join_path
 
 import pytest
-import os
-from gladia_api_utils.task_management import get_task_metadata
-
 import requests
+from gladia_api_utils.task_management import get_task_metadata
 
 from main import app
 from tests.default_tests import create_default_tests
@@ -65,6 +63,7 @@ def task_is_activated(
 
 def autogenerate_tests(path_to_api: str, path_to_config: str):
     import requests
+
     activated_tasks = json.load(open(path_to_config))["active_tasks"]
 
     tests = []

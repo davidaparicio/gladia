@@ -1,6 +1,6 @@
-import pytest
 import os
 
+import pytest
 import requests
 
 from main import app
