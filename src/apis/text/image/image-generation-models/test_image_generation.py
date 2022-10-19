@@ -1,14 +1,12 @@
+import os
 from typing import Any, Dict, List
 
 import pytest
 import requests
-from fastapi.testclient import TestClient
 
 from main import app
 from tests.constants import HOST_TO_EXAMPLE_STORAGE
 from tests.utils import get_inputs_to_test, get_models_to_test
-
-client = TestClient(app)
 
 models = get_models_to_test()
 inputs_to_test = get_inputs_to_test(["prompt", "samples", "steps", "seed"])
@@ -19,7 +17,7 @@ class TestImageGeneration:
     Class to test the image generation endpoint
     """
 
-    target_url = "/text/image/image-generation/"
+    target_url = f"http://{os.getenv('TEST_CLIENT_HOST', '127.0.0.1')}:{int(os.getenv('TEST_CLIENT_PORT', '8080'))}/text/image/image-generation/"
 
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)
@@ -36,7 +34,7 @@ class TestImageGeneration:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={
@@ -63,7 +61,7 @@ class TestImageGeneration:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={
@@ -88,7 +86,7 @@ class TestImageGeneration:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={
@@ -113,7 +111,7 @@ class TestImageGeneration:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={
@@ -138,7 +136,7 @@ class TestImageGeneration:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={
@@ -163,7 +161,7 @@ class TestImageGeneration:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={"image_url": f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp4"},
@@ -184,7 +182,7 @@ class TestImageGeneration:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={},

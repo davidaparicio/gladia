@@ -1,7 +1,8 @@
-import pytest
-from fastapi.testclient import TestClient
+import os
 
-from main import app
+import pytest
+import requests
+
 from tests import create_default_tests
 from tests.utils import get_inputs_to_test, get_models_to_test
 
@@ -14,8 +15,8 @@ inputs_to_test = get_inputs_to_test(
 class TestsWordAlignment(
     create_default_tests(
         class_name="BasicTestsWordAlignment",
-        client=TestClient(app),
-        target_url="/text/text/word-alignment/",
+        client=requests,
+        target_url=f"http://{os.getenv('TEST_CLIENT_HOST', '127.0.0.1')}:{int(os.getenv('TEST_CLIENT_PORT', '8080'))}/text/text/word-alignment/",
         models_to_test=models,
         inputs_to_test=inputs_to_test,
     )

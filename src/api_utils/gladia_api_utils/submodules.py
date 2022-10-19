@@ -897,7 +897,7 @@ async def clean_kwargs_based_on_router_inputs(
 
     """
     success = True
-    error_message = ""
+    error_message = "Empty error message"
 
     for input in inputs:
         input_name = input["name"]
