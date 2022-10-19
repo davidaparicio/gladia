@@ -156,9 +156,9 @@ jobs:
 
       - name: Start test pod
         run: |
-          curl -L -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${KVERSION}/bin/linux/amd64/kubectl && \
-          chmod +x /usr/local/bin/kubectl
-          kubectl apply -f /tmp/test.yml
+          curl -L -o /tmp/kubectl https://storage.googleapis.com/kubernetes-release/release/${KVERSION}/bin/linux/amd64/kubectl
+          chmod +x /tmp/kubectl
+          /tmp/kubectl apply -f /tmp/test.yml
          
       # Set test parameters
       - name: Set log debug Level
