@@ -191,7 +191,7 @@ jobs:
           timeout_seconds: 5
           max_attempts: 60
           retry_on: error
-          command: curl http://aipi-test-${{env.DOCKER_BUILD_TAG}}:8000/v2/health/ready --connect-timeout 5
+          command: curl http://aipi-test-${{env.DOCKER_BUILD_TAG}}.$KNS:8000/v2/health/ready --connect-timeout 5
 
       # Start test
       - name: Run Tests
