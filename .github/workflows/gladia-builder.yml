@@ -155,8 +155,8 @@ jobs:
 
       - name: Start test pod
         run: |
-          curl -LO https://storage.googleapis.com/kubernetes-release/release/${KVERSION}/bin/linux/amd64/kubectl
-          chmod +x kubectl
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/${KVERSION}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
+          chmod +x /usr/local/bin/kubectl
           kubectl apply -f /tmp/test.yml
 
       - name: Checkout
