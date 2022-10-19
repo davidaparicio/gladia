@@ -123,7 +123,7 @@ def autogenerate_tests(path_to_api: str, path_to_config: str):
                         create_default_tests(
                             class_name=f"{input_modality.capitalize()}{output_modality.capitalize()}{task.replace('-models', '').replace('-', '').capitalize()}",
                             client=requests,
-                            target_url=f"http://{os.getenv('TEST_CLIENT_HOST', '127.0.0.1')}:{int(os.getenv('TEST_CLIENT_PORT', '8000'))}/{input_modality}/{output_modality}/{task.replace('-models', '')}/",
+                            target_url=f"http://{os.getenv('TEST_CLIENT_HOST', '127.0.0.1')}:{int(os.getenv('TEST_CLIENT_PORT', '8080'))}/{input_modality}/{output_modality}/{task.replace('-models', '')}/",
                             models_to_test=get_models_to_test(
                                 path_to_task=join_path(
                                     path_to_api, input_modality, output_modality, task

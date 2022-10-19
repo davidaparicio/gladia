@@ -17,7 +17,7 @@ class TestsSummarization(
     create_default_tests(
         class_name="BasicTestsSummarization",
         client=requests,
-        target_url=f"http://{os.getenv('TEST_CLIENT_HOST', '127.0.0.1')}:{int(os.getenv('TEST_CLIENT_PORT', '8000'))}/text/text/summarization/",
+        target_url=f"http://{os.getenv('TEST_CLIENT_HOST', '127.0.0.1')}:{int(os.getenv('TEST_CLIENT_PORT', '8080'))}/text/text/summarization/",
         models_to_test=models,
         inputs_to_test=inputs_to_test,
     )

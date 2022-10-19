@@ -18,7 +18,7 @@ class TestOcr:
     Class to test the ocr endpoint
     """
 
-    target_url = f"http://{os.getenv('TEST_CLIENT_HOST', '127.0.0.1')}:{int(os.getenv('TEST_CLIENT_PORT', '8000'))}/image/text/ocr/"
+    target_url = f"http://{os.getenv('TEST_CLIENT_HOST', '127.0.0.1')}:{int(os.getenv('TEST_CLIENT_PORT', '8080'))}/image/text/ocr/"
 
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)
