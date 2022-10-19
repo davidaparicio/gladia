@@ -1,16 +1,12 @@
+import os
 from typing import Any, Dict, List
 
-import os
 import pytest
-import requests
-
 import requests
 
 from main import app
 from tests.constants import HOST_TO_EXAMPLE_STORAGE
 from tests.utils import get_inputs_to_test, get_models_to_test
-
-import requests
 
 models = get_models_to_test()
 inputs_to_test = get_inputs_to_test(["prompt", "samples", "steps", "seed"])

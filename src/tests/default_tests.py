@@ -4,7 +4,6 @@ from typing import Any, Callable, Dict, List
 
 import pytest
 import requests
-import os
 
 
 def __apply_decorators(func, *decorators):

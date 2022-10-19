@@ -4,15 +4,10 @@ from typing import Any, Dict
 
 import pytest
 import requests
-import os
-
-import requests
 
 from main import app
 from tests.constants import HOST_TO_EXAMPLE_STORAGE
 from tests.utils import get_inputs_to_test, get_models_to_test
-
-import requests
 
 models = get_models_to_test()
 inputs_to_test = get_inputs_to_test(["image_url", "source_language"])
