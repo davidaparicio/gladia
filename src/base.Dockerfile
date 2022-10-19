@@ -1,5 +1,5 @@
 #https://www.docker.com/blog/advanced-dockerfiles-faster-builds-and-smaller-images-using-buildkit-and-multistage-builds/
-ARG GLADIA_DOCKER_BASE=nvcr.io/nvidia/tritonserver:22.03-py3
+ARG GLADIA_DOCKER_BASE=gladiaio/fastertransformer-triton-backend
 
 FROM $GLADIA_DOCKER_BASE
 
@@ -124,17 +124,4 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
     cmake . && \
     make && \
     make install && \
-    cd /tmp && \
-    git clone https://github.com/triton-inference-server/fastertransformer_backend.git && \
-    cd fastertransformer_backend && \
-    mkdir build -p && cd build && \
-        cmake \
-        -D CMAKE_EXPORT_COMPILE_COMMANDS=1 \
-        -D CMAKE_BUILD_TYPE=Release \
-        -D CMAKE_INSTALL_PREFIX=/opt/tritonserver \
-        -D TRITON_COMMON_REPO_TAG="r${NVIDIA_TRITON_SERVER_VERSION}" \
-        -D TRITON_CORE_REPO_TAG="r${NVIDIA_TRITON_SERVER_VERSION}" \
-        -D TRITON_BACKEND_REPO_TAG="r${NVIDIA_TRITON_SERVER_VERSION}" \
-        .. && \
-        make -j"$(grep -c ^processor /proc/cpuinfo)" install && \
     $CLEAN_LAYER_SCRIPT
