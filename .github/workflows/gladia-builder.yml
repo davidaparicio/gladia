@@ -160,11 +160,6 @@ jobs:
           /tmp/kubectl apply -f /tmp/test.yml -n $KNS
          
       # Set test parameters
-      - name: Set log debug Level
-        working-directory: ./src
-        run: >-
-          sed -i 's/"log_level": "info",/"log_level": "debug",/' config.json
-
       - name: Set env variables to select which tests to execute
         if: |
           contains(github.event.pull_request.labels.*.name, 'ci: force-execute-all-test')
