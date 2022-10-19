@@ -148,6 +148,7 @@ jobs:
     runs-on: [self-hosted, gladia, test]
     timeout-minutes: 90
     steps:
+      # Prepare and start test env
       - name: Assert Template and NS
         run: |
           echo "KUBE_NAMESPACE=$KNS" >> $GITHUB_ENV
@@ -155,13 +156,9 @@ jobs:
 
       - name: Start test pod
         run: |
-          curl -LO https://storage.googleapis.com/kubernetes-release/release/${KVERSION}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
-          chmod +x /usr/local/bin/kubectl
-          kubectl apply -f /tmp/test.yml
-
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@v2
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/${KVERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
+          chmod +x /tmp/kubectl
+          /tmp/kubectl apply -f /tmp/test.yml
          
       # Set test parameters
       - name: Set log debug Level
@@ -193,9 +190,8 @@ jobs:
         run: |
           echo "TEST_DEFAULT_MODELS_ONLY=" >> $GITHUB_ENV
 
-      # Start test
+      # Wait for pod to start
       - name: Gladia container readiness
-        id: gladia-ready
         uses: nick-fields/retry@v2
         with:
           timeout_seconds: 5
@@ -205,21 +201,18 @@ jobs:
 
       # Start test
       - name: Run Tests
-        id: test
         run: >-
           kubectl exec -i aipi-test-${{env.DOCKER_BUILD_TAG}}
           /bin/bash -c 'eval "$(micromamba shell hook --shell=bash)" && micromamba activate server &&python -m pytest -o log_cli=true --log-cli-level=DEBUG ./ ${{ env.TEST_DEFAULT_MODELS_ONLY }} ${{ env.TEST_DEFAULT_INPUTS_ONLY }} ${{ env.TEST_STOP_AT_FAIL }} ${{ env.TEST_MARKERS }}'
 
-      - name: Logs
-        id: logs
+      - name: Get Logs
         if: always()
         run: |
            kubectl logs aipi-test-${{env.DOCKER_BUILD_TAG}}
 
       # we need to docker run to remove root artefact directories
       # this should be done better in the future.
-      - name: Clean Docker Test Env
-        id: clean
+      - name: Clean test pod
         if: always()
         continue-on-error: True
         run: >-
