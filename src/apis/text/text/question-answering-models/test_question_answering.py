@@ -15,7 +15,7 @@ class TestsQuestionAnswering(
     create_default_tests(
         class_name="BasicTestsQuestionAnswering",
         client=requests,
-        target_url=f"http://{os.getenv('TEST_CLIENT_HOST', '0.0.0.0')}:{int(os.getenv('TEST_CLIENT_PORT', '8000'))}/text/text/question-answering/",
+        target_url=f"http://{os.getenv('TEST_CLIENT_HOST', '127.0.0.1')}:{int(os.getenv('TEST_CLIENT_PORT', '8000'))}/text/text/question-answering/",
         models_to_test=models,
         inputs_to_test=inputs_to_test,
     )

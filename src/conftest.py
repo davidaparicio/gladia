@@ -38,7 +38,7 @@ def pytest_sessionstart(session):
         target=uvicorn.run,
         args=(app,),
         kwargs={
-            "host": os.getenv("TEST_CLIENT_HOST", "0.0.0.0"),
+            "host": os.getenv("TEST_CLIENT_HOST", "127.0.0.1"),
             "port": int(os.getenv("TEST_CLIENT_PORT", "8000")),
         },
     )

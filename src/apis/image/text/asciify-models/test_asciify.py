@@ -18,7 +18,7 @@ class TestAsciify:
     Class to test the asciify endpoint
     """
 
-    target_url = f"http://{os.getenv('TEST_CLIENT_HOST', '0.0.0.0')}:{int(os.getenv('TEST_CLIENT_PORT', '8000'))}/image/text/asciify/"
+    target_url = f"http://{os.getenv('TEST_CLIENT_HOST', '127.0.0.1')}:{int(os.getenv('TEST_CLIENT_PORT', '8000'))}/image/text/asciify/"
 
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)

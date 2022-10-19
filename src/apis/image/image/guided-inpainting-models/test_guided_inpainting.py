@@ -17,7 +17,7 @@ class TestGuidedInpainting:
     Class to test the guided inpainting endpoint
     """
 
-    target_url = f"http://{os.getenv('TEST_CLIENT_HOST', '0.0.0.0')}:{int(os.getenv('TEST_CLIENT_PORT', '8000'))}/image/image/guided-inpainting/"
+    target_url = f"http://{os.getenv('TEST_CLIENT_HOST', '127.0.0.1')}:{int(os.getenv('TEST_CLIENT_PORT', '8000'))}/image/image/guided-inpainting/"
 
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)
