@@ -196,7 +196,7 @@ jobs:
       # Start test
       - name: Run Tests
         run: >-
-          /tmp/kubectl exec -i -n $KNS aipi-test-${{env.DOCKER_BUILD_TAG}}
+          /tmp/kubectl exec -i -n $KNS aipi-test-${{env.DOCKER_BUILD_TAG}} --
           /bin/bash -c 'eval "$(micromamba shell hook --shell=bash)" && micromamba activate server &&python -m pytest -o log_cli=true --log-cli-level=DEBUG ./ ${{ env.TEST_DEFAULT_MODELS_ONLY }} ${{ env.TEST_DEFAULT_INPUTS_ONLY }} ${{ env.TEST_STOP_AT_FAIL }} ${{ env.TEST_MARKERS }}'
 
       - name: Get Logs
