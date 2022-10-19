@@ -156,7 +156,7 @@ jobs:
 
       - name: Start test pod
         run: |
-          curl -sSL -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${KVERSION}/bin/linux/amd64/kubectl
+          curl -L -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${KVERSION}/bin/linux/amd64/kubectl && \
           chmod +x /usr/local/bin/kubectl
           kubectl apply -f /tmp/test.yml
          
