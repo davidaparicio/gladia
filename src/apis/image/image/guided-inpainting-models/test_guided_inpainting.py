@@ -2,13 +2,15 @@ from typing import Any, Dict
 
 import pytest
 import requests
-from fastapi.testclient import TestClient
+import os
+
+import requests
 
 from main import app
 from tests.constants import HOST_TO_EXAMPLE_STORAGE
 from tests.utils import get_inputs_to_test, get_models_to_test
 
-client = TestClient(app)
+import requests
 
 models = get_models_to_test()
 inputs_to_test = get_inputs_to_test(["original_image_url", "mask_image_url", "prompt"])
@@ -19,7 +21,7 @@ class TestGuidedInpainting:
     Class to test the guided inpainting endpoint
     """
 
-    target_url = "/image/image/guided-inpainting/"
+    target_url = f"http://{os.getenv('TEST_CLIENT_HOST', '0.0.0.0')}:{int(os.getenv('TEST_CLIENT_PORT', '8000'))}/image/image/guided-inpainting/"
 
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)
@@ -36,7 +38,7 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             files={
@@ -64,7 +66,7 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={
@@ -88,7 +90,7 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             files={
@@ -118,7 +120,7 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             files={
@@ -148,7 +150,7 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={
@@ -173,7 +175,7 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={
@@ -197,7 +199,7 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={},

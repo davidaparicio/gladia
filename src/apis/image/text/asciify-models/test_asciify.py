@@ -4,13 +4,15 @@ from typing import Any, Dict
 
 import pytest
 import requests
-from fastapi.testclient import TestClient
+import os
+
+import requests
 
 from main import app
 from tests.constants import HOST_TO_EXAMPLE_STORAGE
 from tests.utils import get_inputs_to_test, get_models_to_test
 
-client = TestClient(app)
+import requests
 
 models = get_models_to_test()
 inputs_to_test = get_inputs_to_test(["image_url"])
@@ -21,7 +23,7 @@ class TestAsciify:
     Class to test the asciify endpoint
     """
 
-    target_url = "/image/text/asciify/"
+    target_url = f"http://{os.getenv('TEST_CLIENT_HOST', '0.0.0.0')}:{int(os.getenv('TEST_CLIENT_PORT', '8000'))}/image/text/asciify/"
 
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)
@@ -41,7 +43,7 @@ class TestAsciify:
         tmp_image_file = tempfile.NamedTemporaryFile(mode="wb", delete=False)
         tmp_image_file.write(requests.get(inputs["image_url"]).content)
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             files={
@@ -67,7 +69,7 @@ class TestAsciify:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={
@@ -96,7 +98,7 @@ class TestAsciify:
             requests.get(f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp3").content
         )
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             files={
@@ -125,7 +127,7 @@ class TestAsciify:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={"image_url": f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp4"},
@@ -146,7 +148,7 @@ class TestAsciify:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={},

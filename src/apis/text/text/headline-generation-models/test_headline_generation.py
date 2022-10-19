@@ -1,5 +1,7 @@
 import pytest
-from fastapi.testclient import TestClient
+import os
+
+import requests
 
 from main import app
 from tests import create_default_tests
@@ -12,8 +14,8 @@ inputs_to_test = get_inputs_to_test(["text", "max_length"])
 class TestsHeadlineGeneration(
     create_default_tests(
         class_name="BasicTestsHeadlineGeneration",
-        client=TestClient(app),
-        target_url="/text/text/headline-generation/",
+        client=requests,
+        target_url=f"http://{os.getenv('TEST_CLIENT_HOST', '0.0.0.0')}:{int(os.getenv('TEST_CLIENT_PORT', '8000'))}/text/text/headline-generation/",
         models_to_test=models,
         inputs_to_test=inputs_to_test,
     )

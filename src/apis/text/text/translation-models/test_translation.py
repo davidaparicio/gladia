@@ -1,5 +1,7 @@
 import pytest
-from fastapi.testclient import TestClient
+import os
+
+import requests
 
 from main import app
 from tests import create_default_tests
@@ -14,8 +16,8 @@ inputs_to_test = get_inputs_to_test(
 class TestsTranslation(
     create_default_tests(
         class_name="BasicTestsTranslation",
-        client=TestClient(app),
-        target_url="/text/text/translation/",
+        client=requests,
+        target_url=f"http://{os.getenv('TEST_CLIENT_HOST', '0.0.0.0')}:{int(os.getenv('TEST_CLIENT_PORT', '8000'))}/text/text/translation/",
         models_to_test=models,
         inputs_to_test=inputs_to_test,
     )
