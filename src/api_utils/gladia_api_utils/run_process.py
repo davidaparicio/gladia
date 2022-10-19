@@ -56,5 +56,4 @@ if __name__ == "__main__":
         with open(f"{output_tmp_result}", "wb") as f:
             f.write(output)
     else:
-        with open(f"{output_tmp_result}", "w") as f:
-            f.write(str(output))
+        json.dump(output, open(output_tmp_result, "w"))

@@ -831,13 +831,11 @@ class TaskRouter:
             )
 
         if is_binary_file(output_tmp_result):
-            output_file = open(output_tmp_result, "rb")
+            result = open(output_tmp_result, "rb").read()
         else:
-            output_file = open(output_tmp_result, "r")
-
-        result = output_file.read()
-
-        output_file.close()
+            # We can't use eval due to code injection
+            # (nor pickle as is use eval)
+            result = json.load((open(output_tmp_result)))
 
         os.system(f"rm {output_tmp_result}")
 
