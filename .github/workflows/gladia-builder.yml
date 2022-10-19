@@ -151,14 +151,13 @@ jobs:
       # Prepare and start test env
       - name: Assert Template and NS
         run: |
-          echo "KUBE_NAMESPACE=$KNS" >> $GITHUB_ENV
           sed "s/PRN/${{env.DOCKER_BUILD_TAG}}/g" /ci/test-aipi-podTemplate.yml > /tmp/test.yml
 
       - name: Start test pod
         run: |
           curl -L -o /tmp/kubectl https://storage.googleapis.com/kubernetes-release/release/${KVERSION}/bin/linux/amd64/kubectl
           chmod +x /tmp/kubectl
-          /tmp/kubectl apply -f /tmp/test.yml
+          /tmp/kubectl apply -f /tmp/test.yml -n $KNS
          
       # Set test parameters
       - name: Set log debug Level
@@ -202,18 +201,18 @@ jobs:
       # Start test
       - name: Run Tests
         run: >-
-          kubectl exec -i aipi-test-${{env.DOCKER_BUILD_TAG}}
+          /tmp/kubectl exec -i -n $KNS aipi-test-${{env.DOCKER_BUILD_TAG}}
           /bin/bash -c 'eval "$(micromamba shell hook --shell=bash)" && micromamba activate server &&python -m pytest -o log_cli=true --log-cli-level=DEBUG ./ ${{ env.TEST_DEFAULT_MODELS_ONLY }} ${{ env.TEST_DEFAULT_INPUTS_ONLY }} ${{ env.TEST_STOP_AT_FAIL }} ${{ env.TEST_MARKERS }}'
 
       - name: Get Logs
         if: always()
         run: |
-           kubectl logs aipi-test-${{env.DOCKER_BUILD_TAG}}
+           /tmp/kubectl logs aipi-test-${{env.DOCKER_BUILD_TAG}} -n $KNS
 
       # we need to docker run to remove root artefact directories
       # this should be done better in the future.
       - name: Clean test pod
         if: always()
         continue-on-error: True
-        run: >-
-          kubectl delete -f /tmp/test.yml
+        run: |
+          /tmp/kubectl delete -f /tmp/test.yml -n $KNS
