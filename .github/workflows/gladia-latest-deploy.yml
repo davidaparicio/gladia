@@ -18,44 +18,45 @@ env:
 jobs:
 
   promote-gladia-image:
-    runs-on: [self-hosted, linux, STD]
+    runs-on: [self-hosted, build, ephemeral]
     if: github.event.pull_request.merged == true
     env:
       REGISTRY_URL: https://${DOCKER_GLADIA_FQDN}
-      CONTENT_TYPE: application/vnd.docker.distribution.manifest.v2+json
     steps:
       - name: Promote *gladia-base* image to Gladia Registry
         if: |
           contains(github.event.pull_request.labels.*.name, 'ci: build-base')
         env:
-          REPOSITORY: gladia-base
+          REPOSITORY: base
         run: |
-          MANIFEST=$(curl -u ${DOCKER_GLADIA_USERNAME}:${DOCKER_GLADIA_ACCESS_TOKEN} -H "Accept: ${{ env.CONTENT_TYPE }}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTED }}")
-          curl -u ${DOCKER_GLADIA_USERNAME}:${DOCKER_GLADIA_ACCESS_TOKEN} -X PUT -H "Content-Type: ${{ env.CONTENT_TYPE }}" -d "${MANIFEST}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTE }}"
+          MANIFEST="${$(curl -n -X GET "${{ env.REGISTRY_URL }}/api/v2.0/projects/gladia/repositories/${{ env.REPOSITORY }}/artifacts/${{ env.TAG_PROMOTED }}/tags" | sed "s/${{ env.TAG_PROMOTED }}/latest/" ):1:-1}"
+          curl -n -X DELETE "${{ env.REGISTRY_URL }}/api/v2.0/projects/gladia/repositories/${{ env.REPOSITORY }}/artifacts/latest/tags/latest"
+          curl -n -X POST "${{ env.REGISTRY_URL }}/api/v2.0/projects/gladia/repositories/${{ env.REPOSITORY }}/artifacts/${{ env.TAG_PROMOTED }}/tags" -H "Content-Type: application/json" -d "${MANIFEST}"
 
       - name: Promote *gladia* image to Gladia Registry
         env:
           REPOSITORY: gladia
         run: |
-          MANIFEST=$(curl -u ${DOCKER_GLADIA_USERNAME}:${DOCKER_GLADIA_ACCESS_TOKEN} -H "Accept: ${{ env.CONTENT_TYPE }}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTED }}")
-          curl -u ${DOCKER_GLADIA_USERNAME}:${DOCKER_GLADIA_ACCESS_TOKEN} -X PUT -H "Content-Type: ${{ env.CONTENT_TYPE }}" -d "${MANIFEST}" "${{ env.REGISTRY_URL }}/v2/${{ env.REPOSITORY }}/manifests/${{ env.TAG_PROMOTE }}"
+          MANIFEST="${$(curl -n -X GET "${{ env.REGISTRY_URL }}/api/v2.0/projects/gladia/repositories/${{ env.REPOSITORY }}/artifacts/${{ env.TAG_PROMOTED }}/tags" | sed "s/${{ env.TAG_PROMOTED }}/latest/" ):1:-1}"
+          curl -n -X DELETE "${{ env.REGISTRY_URL }}/api/v2.0/projects/gladia/repositories/${{ env.REPOSITORY }}/artifacts/latest/tags/latest"
+          curl -n -X POST "${{ env.REGISTRY_URL }}/api/v2.0/projects/gladia/repositories/${{ env.REPOSITORY }}/artifacts/${{ env.TAG_PROMOTED }}/tags" -H "Content-Type: application/json" -d "${MANIFEST}"
 
   promote-gladia-to-DH:
     needs: promote-gladia-image
-    runs-on: [self-hosted, linux, STD]
+    runs-on: [self-hosted, build, persist]
     steps:
       - name: Promote *gladia-base* image to DH Registry
         if: |
           contains(github.event.pull_request.labels.*.name, 'ci: build-base')
         run: |
-          docker pull ${DOCKER_GLADIA_FQDN}/gladia-base:${{ env.TAG_PROMOTE }} &&
-          docker tag ${DOCKER_GLADIA_FQDN}/gladia-base:${{ env.TAG_PROMOTE }} gladiaio/gladia-base:latest &&
+          docker pull ${DOCKER_GLADIA_FQDN}/gladia/base:${{ env.TAG_PROMOTE }} &&
+          docker tag ${DOCKER_GLADIA_FQDN}/gladia/base:${{ env.TAG_PROMOTE }} gladiaio/gladia-base:latest &&
           docker push gladiaio/gladia-base:latest
 
       - name: Promote *gladia* image to DH Registry
         run: |
-          docker pull ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }} &&
-          docker tag ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }} gladiaio/gladia:latest &&
+          docker pull ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }} &&
+          docker tag ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }} gladiaio/gladia:latest &&
           docker push gladiaio/gladia:latest
 
   deploy-aipi-1:
@@ -82,7 +83,7 @@ jobs:
             -e HUGGINGFACE_ACCESS_TOKEN=${HUGGINGFACE_ACCESS_TOKEN} \
             -e STABILITY_KEY=${STABILITY_KEY} \
             -e MODE=server \
-            ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
+            ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }}
 
       - name: Gladia AIPI-1 readiness
         uses: nick-fields/retry@v2
@@ -116,7 +117,7 @@ jobs:
             -e HUGGINGFACE_ACCESS_TOKEN=${HUGGINGFACE_ACCESS_TOKEN} \
             -e STABILITY_KEY=${STABILITY_KEY} \
             -e MODE=server \
-            ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
+            ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }}
 
       - name: Gladia AIPI-2 readiness
         uses: nick-fields/retry@v2
@@ -125,3 +126,18 @@ jobs:
           max_attempts: 10
           retry_on: error
           command: curl localhost:${AIPI_SERVICE_PORT}/${AIPI_READINESS_PATH} --connect-timeout 5
+
+  deploy:
+    name: Deploy
+    needs: [build]
+    runs-on: [self-hosted, gladia, deploy]
+    steps:
+      - name: Assert Configs
+        run: |
+          echo "KUBE_NAMESPACE=$KNS" >> $GITHUB_ENV
+      - name: deploy to cluster
+        uses: steebchen/kubectl@v2.0.0
+        with:
+          version: v1.24.4
+          config: ${{ secrets.KUBE_CONFIG_DATA }}
+          command: rollout restart deployment aipi-heavy -n ${{ env.KUBE_NAMESPACE }}

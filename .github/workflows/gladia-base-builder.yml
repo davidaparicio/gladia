@@ -9,45 +9,34 @@ concurrency:
   group: '${{ github.workflow }}'
   cancel-in-progress: false
 
+env:
+  DOCKER_BUILD_OPT: "--no-cache"
+  DOCKER_BUILD_IMAGE_PROJECT: gladia
+  DOCKER_BUILD_IMAGE_NAME: base
+  DOCKER_BUILD_IMAGE_TAG: latest
+
 jobs:
 
   build:
-    runs-on: [self-hosted, linux, GPU, builder]
+    runs-on: [self-hosted, build, persist]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-      - name: Login to NVCR Registry
-        uses: docker/login-action@v2
-        with:
-          registry: nvcr.io
-          username: ${{ secrets.NVCR_USERNAME }}
-          password: ${{ secrets.NVCR_ACCESS_TOKEN }}
-
+         
       - name: Build Gladia Base image
         env:
           DOCKER_BUILDKIT: 1
         working-directory: ./src
-        run: docker build --no-cache -t docker.gladia.io/gladia-base:latest -f base.Dockerfile .
-
-      - name: Login to Gladia Registry
-        uses: docker/login-action@v1
-        with:
-          registry: docker.gladia.io
-          username: ${{ secrets.DOCKER_GLADIA_USERNAME }}
-          password: ${{ secrets.DOCKER_GLADIA_ACCESS_TOKEN }}
+        run: >-
+          docker build --pull	
+          ${{env.DOCKER_BUILD_OPT}}
+          -t ${DOCKER_GLADIA_FQDN}/${{env.DOCKER_BUILD_IMAGE_NAME}}/${{env.DOCKER_BUILD_IMAGE_NAME}}:${{env.DOCKER_BUILD_IMAGE_TAG}}
 
       - name: Push new base latest to Gladia registry
-        run: docker push docker.gladia.io/gladia-base:latest
+        run: docker push ${DOCKER_GLADIA_FQDN}/${{env.DOCKER_BUILD_IMAGE_NAME}}/${{env.DOCKER_BUILD_IMAGE_NAME}}:${{env.DOCKER_BUILD_IMAGE_TAG}}
         
       - name: Tag new base latest to Docker registry
-        run: docker tag docker.gladia.io/gladia-base:latest gladiaio/gladia-base:latest    
+        run: docker tag ${DOCKER_GLADIA_FQDN}/${{env.DOCKER_BUILD_IMAGE_NAME}}/${{env.DOCKER_BUILD_IMAGE_NAME}}:${{env.DOCKER_BUILD_IMAGE_TAG}} gladiaio/gladia-base:latest    
         
       - name: Push new base latest to Docker registry
         run: docker push gladiaio/gladia-base:latest
