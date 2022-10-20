@@ -51,6 +51,9 @@ def predict(
     output_base64_list = list()
 
     try:
+        # had to disable the logger from the stability_sdk because it is raising error at the GRPC level
+        # when prompt is inappropriated
+        # while the request is still working
         stability_sdk_logger.disabled = True
         stability_sdk_logger.propagate = False
         response = stability_api.generate(
@@ -66,10 +69,10 @@ def predict(
     for resp in response:
         for artifact in resp.artifacts:
             if artifact.finish_reason == generation.FILTER:
-                #logger.warning(
-                #    "Your request activated the API's safety filters and could not be processed."
-                #    "Please modify the prompt and try again."
-                #)
+                logger.warning(
+                    "Your request activated the API's safety filters and could not be processed."
+                    "Please modify the prompt and try again."
+                )
                 img = Image.open(os.path.join(cwd, "unsafe.png"))
 
             elif artifact.type == generation.ARTIFACT_IMAGE:
