@@ -2,4 +2,5 @@ name: image-deoldify
 
 dependencies:
     - pip:
+        - protobuf==3.20.*
         - git+https://github.com/jqueguiner/DeOldify.git@master#egg=DeOldify
