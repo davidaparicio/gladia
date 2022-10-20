@@ -1,5 +1,6 @@
-import io, sys
-import os, logging
+import io
+import logging
+import os
 from logging import getLogger
 from typing import List, Union
 
@@ -11,6 +12,7 @@ from stability_sdk import client
 
 logger = getLogger(__name__)
 stability_sdk_logger = logging.getLogger("stability_sdk.client")
+
 
 def predict(
     prompt="A high tech solarpunk utopia in the Amazon rainforest",
