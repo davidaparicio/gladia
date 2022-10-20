@@ -129,7 +129,6 @@ jobs:
 
   deploy:
     name: Deploy
-    needs: [build]
     runs-on: [self-hosted, gladia, deploy]
     steps:
       - name: Assert Configs
