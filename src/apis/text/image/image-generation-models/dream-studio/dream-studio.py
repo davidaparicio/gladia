@@ -1,4 +1,5 @@
-import io
+import io, sys
+import os, logging
 from logging import getLogger
 from typing import List, Union
 
@@ -9,7 +10,7 @@ from PIL import Image
 from stability_sdk import client
 
 logger = getLogger(__name__)
-
+stability_sdk_logger = logging.getLogger("stability_sdk.client").setLevel(0)
 
 def predict(
     prompt="A high tech solarpunk utopia in the Amazon rainforest",
@@ -39,22 +40,37 @@ def predict(
         Union[Image.Image, List[str]]: A PIL Image if samples=1 or a list of base64 images if samples > 1
     """
 
+    # get the current file absolute path
+    cwd = os.path.dirname(os.path.abspath(__file__))
+
     stability_api = client.StabilityInference(
         key=SECRETS["STABILITY_KEY"],
         verbose=True,
     )
 
     output_base64_list = list()
-    for resp in stability_api.generate(
-        prompt=prompt, samples=samples, steps=steps, cfg_scale=scale
-    ):
+
+    try:
+        stability_sdk_logger.disabled = True
+        stability_sdk_logger.propagate = False
+        response = stability_api.generate(
+            prompt=prompt, samples=samples, steps=steps, cfg_scale=scale
+        )
+        stability_sdk_logger.propagate = True
+        stability_sdk_logger.disabled = False
+    except Exception as e:
+        #logger.error(e)
+        logger.error("Error while generating the image")
+        return Image.open(os.path.join(cwd, "unsafe.png"))
+
+    for resp in response:
         for artifact in resp.artifacts:
             if artifact.finish_reason == generation.FILTER:
-                logger.warning(
-                    "Your request activated the API's safety filters and could not be processed."
-                    "Please modify the prompt and try again."
-                )
-                img = Image.open("unsafe.png")
+                #logger.warning(
+                #    "Your request activated the API's safety filters and could not be processed."
+                #    "Please modify the prompt and try again."
+                #)
+                img = Image.open(os.path.join(cwd, "unsafe.png"))
 
             elif artifact.type == generation.ARTIFACT_IMAGE:
                 bytes_img = io.BytesIO(artifact.binary)
