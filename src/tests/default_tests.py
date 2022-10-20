@@ -4,7 +4,6 @@ from typing import Any, Callable, Dict, List
 
 import pytest
 import requests
-from fastapi.testclient import TestClient
 
 
 def __apply_decorators(func, *decorators):
@@ -273,7 +272,7 @@ def get_test_empty_input_task(models_to_test: List[str]) -> Callable[[str], bool
 
 def create_default_tests(
     class_name: str,
-    client: TestClient,
+    client,
     target_url: str,
     models_to_test: List[str],
     inputs_to_test: List[Dict[str, Any]],

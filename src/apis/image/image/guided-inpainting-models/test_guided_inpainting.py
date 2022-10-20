@@ -1,14 +1,12 @@
+import os
 from typing import Any, Dict
 
 import pytest
 import requests
-from fastapi.testclient import TestClient
 
 from main import app
 from tests.constants import HOST_TO_EXAMPLE_STORAGE
 from tests.utils import get_inputs_to_test, get_models_to_test
-
-client = TestClient(app)
 
 models = get_models_to_test()
 inputs_to_test = get_inputs_to_test(["original_image_url", "mask_image_url", "prompt"])
@@ -19,7 +17,7 @@ class TestGuidedInpainting:
     Class to test the guided inpainting endpoint
     """
 
-    target_url = "/image/image/guided-inpainting/"
+    target_url = f"http://{os.getenv('TEST_CLIENT_HOST', '127.0.0.1')}:{int(os.getenv('TEST_CLIENT_PORT', '8080'))}/image/image/guided-inpainting/"
 
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)
@@ -36,7 +34,7 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             files={
@@ -48,7 +46,9 @@ class TestGuidedInpainting:
             },
         )
 
-        assert response.status_code == 200
+        assert (
+            response.status_code == 200
+        ), f"expected 200 but received {response.status_code}, body: {response.content}"
 
     @pytest.mark.mandatory
     @pytest.mark.parametrize("model", models)
@@ -64,7 +64,7 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={
@@ -74,7 +74,9 @@ class TestGuidedInpainting:
             },
         )
 
-        assert response.status_code == 200
+        assert (
+            response.status_code == 200
+        ), f"expected 200 but received {response.status_code}, body: {response.content}"
 
     @pytest.mark.parametrize("model", models)
     def test_invalid_original_image_input_task(self, model: str, tmp_path) -> bool:
@@ -88,7 +90,7 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             files={
@@ -118,7 +120,7 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             files={
@@ -148,7 +150,7 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={
@@ -173,7 +175,7 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={
@@ -197,7 +199,7 @@ class TestGuidedInpainting:
             bool: True if the test passed, False otherwise
         """
 
-        response = client.post(
+        response = requests.post(
             url=self.target_url,
             params={"model": model} if model else {},
             data={},
