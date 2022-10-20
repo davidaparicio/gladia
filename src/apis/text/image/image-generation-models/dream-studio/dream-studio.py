@@ -10,7 +10,7 @@ from PIL import Image
 from stability_sdk import client
 
 logger = getLogger(__name__)
-stability_sdk_logger = logging.getLogger("stability_sdk.client").setLevel(0)
+stability_sdk_logger = logging.getLogger("stability_sdk.client")
 
 def predict(
     prompt="A high tech solarpunk utopia in the Amazon rainforest",
@@ -62,7 +62,7 @@ def predict(
         stability_sdk_logger.propagate = True
         stability_sdk_logger.disabled = False
     except Exception as e:
-        #logger.error(e)
+        logger.error(e)
         logger.error("Error while generating the image")
         return Image.open(os.path.join(cwd, "unsafe.png"))
 
