@@ -39,7 +39,7 @@ def pytest_sessionstart(session):
         args=(app,),
         kwargs={
             "host": os.getenv("TEST_CLIENT_HOST", "127.0.0.1"),
-            "port": int(os.getenv("TEST_CLIENT_PORT", "8000")),
+            "port": int(os.getenv("TEST_CLIENT_PORT", "8080")),
         },
     )
 
