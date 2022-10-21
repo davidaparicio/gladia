@@ -29,7 +29,7 @@ Pattern should be like :
 4. Looking for model pattern
 - `InputmodalityOutputmodalityTaskModel-name`
 - Example: `TextTextSentimentAnalysis` to test all Text to Text Sentiment Analysis models similar to /text/text/sentiment-analysis/?model=my-model api endpoints
-- `python -m pytest ./ -k TextTextSentimentAnalysiszero -k my-model`
+- `python -m pytest ./ -k TextTextSentimentAnalysis -k my-model`
 
 
 
