@@ -26,12 +26,17 @@ Pattern should be like :
 - Example: `TextTextSentimentAnalysis` to test all Text to Text Sentiment Analysis models similar to /text/text/sentiment-analysis api endpoints
 - `python -m pytest ./ -k TextTextSentimentAnalysis`
 
-4. Looking for model pattern (not available yet see: [Issue 853](https://github.com/gladiaio/gladia/issues/853))
+4. Looking for model pattern
 - `InputmodalityOutputmodalityTaskModel-name`
 - Example: `TextTextSentimentAnalysis` to test all Text to Text Sentiment Analysis models similar to /text/text/sentiment-analysis/?model=my-model api endpoints
-- `python -m pytest ./ -k TextTextSentimentAnalysiszero-shot-classification-facebook-bart-large-mnli`
+- `python -m pytest ./ -k TextTextSentimentAnalysis -k my-model`
 
+5. Search for a specified test in a task model and specify a model
+- `InputmodalityOutputmodality-TaskModel-test-model`
+- Example:  `TestBackgroundReplacement` to test all background replacement models similar to /image/image/background-replacement api endpoints
+- `python -m pytest folder::TestBackgroundReplacement::specified_test -k my-model`
 
+<br/>
 
 > How add tests for a new task
 
