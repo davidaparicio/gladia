@@ -1,0 +1,10 @@
+summary: 'Repaire the input sentence punctuation'
+
+
+inputs_example:
+  sentence:
+    default_example: "My name is Clara and I live in Berkeley California"
+    examples:
+      - "My name is Clara and I live in Berkeley California"
+      - "My name is Sarah and I live in London"
+      - "My name is Clara and I live in Berkeley, California."
