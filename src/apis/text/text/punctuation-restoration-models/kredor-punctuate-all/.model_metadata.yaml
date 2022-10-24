@@ -1,0 +1,50 @@
+api:
+  content: ''
+  tags: []
+gladia:
+  accelerator: ''
+  example:
+    output: "My name is Clara and I live in Berkeley, California."
+  examples: {}
+  format: ''
+  latency: ''
+huggingface:
+  link: 'https://huggingface.co/kredor/punctuate-all'
+license:
+  content: 'MIT License
+
+Copyright (c) 2022 Oliver Guhr
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.'
+  link: 'https://github.com/oliverguhr/deepmultilingualpunctuation/blob/main/LICENSE'
+  title: 'MIT'
+paper:
+  authors: []
+  citation: '@article{guhr-EtAl:2021:fullstop,
+  title={FullStop: Multilingual Deep Models for Punctuation Prediction},
+  author    = {Guhr, Oliver  and  Schumann, Anne-Kathrin  and  Bahrmann, Frank  and  Böhme, Hans Joachim},
+  booktitle      = {Proceedings of the Swiss Text Analytics Conference 2021},
+  month          = {June},
+  year           = {2021},
+  address        = {Winterthur, Switzerland},
+  publisher      = {CEUR Workshop Proceedings},  
+  url       = {http://ceur-ws.org/Vol-2957/sepp_paper4.pdf}
+}'
+  link: ''
+  title: ''

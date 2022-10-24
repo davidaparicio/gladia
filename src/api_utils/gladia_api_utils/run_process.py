@@ -3,8 +3,11 @@ import json
 import os
 import sys
 import urllib.parse
+from logging import getLogger
 
 from PIL import Image
+
+logger = getLogger(__name__)
 
 HELP_STRING = """
 python <PATH_TO_FILE>/run_process.py <module_path> <model> <output_tmp_result> <kwargs for predict>
