@@ -11,7 +11,7 @@ gladia:
   format: ''
   latency: ''
 huggingface:
-  link: 'https://huggingface.co/openai/whisper-tiny'
+  link: 'https://huggingface.co/pyannote'
 license:
   content: 'MIT License
 
@@ -37,23 +37,20 @@ SOFTWARE.'
   link: 'https://github.com/pyannote/pyannote-audio/blob/develop/LICENSE'
   title: 'MIT License'
 paper:
-  authors: []
-  citation: '@article{https://cdn.openai.com/papers/whisper.pdf,
-  doi = {10.5281/ZENODO.7104526},
-  
-  url = {https://zenodo.org/record/7104526},
-  
-  author = {Alec Radford, Jong Wook Kim, Tao Xu, Greg Brockman, Christine McLeavey,
-Ilya Sutskever},
-  
-  title = {Robust Speech Recognition via Large-Scale Weak Supervision},
-  
-  publisher = {OpenAI},
-  
-  year = {2022},
-  
-  copyright = {Unknow},
-}
-'
-  link: 'https://cdn.openai.com/papers/whisper.pdf'
-  title: 'Robust Speech Recognition via Large-Scale Weak Supervision'
+  authors: [Bredin, Laurent, Yin, Coria, Gelly, Korshunov, Lavechin, Fustes, Titeux, Bouaziz, Gill]
+  citation: [
+    "@inproceedings{Bredin2020,
+      Title = {{pyannote.audio: neural building blocks for speaker diarization}},
+      Author = {{Bredin}, Herv{\'e} and {Yin}, Ruiqing and {Coria}, Juan Manuel and {Gelly}, Gregory and {Korshunov}, Pavel and {Lavechin}, Marvin and {Fustes}, Diego and {Titeux}, Hadrien and {Bouaziz}, Wassim and {Gill}, Marie-Philippe},
+      Booktitle = {ICASSP 2020, IEEE International Conference on Acoustics, Speech, and Signal Processing},
+      Year = {2020},
+    }",
+    "@inproceedings{Bredin2021,
+      Title = {{End-to-end speaker segmentation for overlap-aware resegmentation}},
+      Author = {{Bredin}, Herv{\'e} and {Laurent}, Antoine},
+      Booktitle = {Proc. Interspeech 2021},
+      Year = {2021},
+    }"
+  ]
+  link: 'https://arxiv.org/abs/1911.01255'
+  title: 'pyannote.audio: neural building blocks for speaker diarization'
