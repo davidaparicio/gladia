@@ -1,4 +1,12 @@
-name: audio-base
+name: audio-torchaudio
 
 dependencies:
   - conda-forge::torchaudio
+  - conda-forge::pyannote.core
+  - conda-forge::pyannote.database
+  - conda-forge::pyannote.metrics
+  - conda-forge::transformers
+  - conda-forge::pydub
+  - conda-forge::ffmpeg
+  - pip:
+    - pyannote.audio

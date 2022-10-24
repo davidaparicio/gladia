@@ -45,22 +45,22 @@
 
     "active_tasks": {
         "image": {
-            "image":["*"],
-            "text": ["*"],
-            "video": ["*"],
-            "audio": ["*"]
+            "image":[],
+            "text": [],
+            "video": [],
+            "audio": []
         },
         "video": {
-            "image":["*"],
-            "text": ["*"],
-            "video": ["*"],
-            "audio": ["*"]
+            "image":[],
+            "text": [],
+            "video": [],
+            "audio": []
         },
         "text": {
-            "image":["*"],
-            "text": ["*"],
-            "video": ["*"],
-            "audio": ["*"]
+            "image":[],
+            "text": [],
+            "video": [],
+            "audio": []
         },
         "audio": {
             "image":["*"],
@@ -87,6 +87,5 @@
         ]
     },
     "subprocess_to_apify": [
-        "/image/text/ocr-models/textract-extractor/"
     ]
 }

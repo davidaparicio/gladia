@@ -104,6 +104,7 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
         tesseract-ocr-all \
         poppler-utils \
         imagemagick \
+        libsndfile1 \
         protobuf-compiler && \
     echo "== ADJUSTING binaries ==" && \
     mv /usr/bin/python3 /usr/bin/python38 && \
