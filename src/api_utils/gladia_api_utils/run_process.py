@@ -1,10 +1,9 @@
-from asyncio.log import logger
 import importlib.util
 import json
 import os
 import sys
 import urllib.parse
-
+from asyncio.log import logger
 from logging import getLogger
 
 from PIL import Image

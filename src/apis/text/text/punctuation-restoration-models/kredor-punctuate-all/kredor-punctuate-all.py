@@ -1,7 +1,9 @@
 from typing import Dict
+
 from deepmultilingualpunctuation import PunctuationModel
 
-model = PunctuationModel(model = "kredor/punctuate-all")
+model = PunctuationModel(model="kredor/punctuate-all")
+
 
 def predict(sentence: str) -> Dict[str, str]:
     """
@@ -13,4 +15,7 @@ def predict(sentence: str) -> Dict[str, str]:
         Dict[str, str]: The punctuation-restored string
     """
 
-    return {"prediction": model.restore_punctuation(sentence), "raw_prediction": model.predict(model.preprocess(sentence))}
+    return {
+        "prediction": model.restore_punctuation(sentence),
+        "raw_prediction": model.predict(model.preprocess(sentence)),
+    }

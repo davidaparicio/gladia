@@ -18,4 +18,6 @@ inputs = [
 
 output = {"name": "restored_sentence", "type": "string", "example": "restored_sentence"}
 
-TaskRouter(router=router, input=inputs, output=output, default_model="kredor-punctuate-all")
+TaskRouter(
+    router=router, input=inputs, output=output, default_model="kredor-punctuate-all"
+)
