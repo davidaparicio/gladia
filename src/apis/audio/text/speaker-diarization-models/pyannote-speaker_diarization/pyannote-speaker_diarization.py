@@ -1,13 +1,18 @@
-from typing import Dict
-from pyannote.audio import Pipeline
-from gladia_api_utils.file_management import input_to_files, get_tmp_filename, delete_file
-from pydub import AudioSegment
-import io
 from logging import getLogger
+from typing import Dict
+
+from gladia_api_utils.file_management import (
+    delete_file,
+    get_tmp_filename,
+    input_to_files,
+)
+from pyannote.audio import Pipeline
+from pydub import AudioSegment
 
 logger = getLogger(__name__)
 
 pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization@2022.07")
+
 
 @input_to_files
 def predict(audio: str) -> Dict[str, str]:
@@ -36,11 +41,7 @@ def predict(audio: str) -> Dict[str, str]:
     segments = list()
 
     for segment, _, label in diarization.itertracks(yield_label=True):
-        segments.append({
-            "start": segment.start,
-            "end": segment.end,
-            "label": label
-            })
+        segments.append({"start": segment.start, "end": segment.end, "label": label})
 
     prediction = {"labels": labels, "segments": segments}
 

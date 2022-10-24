@@ -23,5 +23,8 @@ output = {
 router = APIRouter()
 
 TaskRouter(
-    router=router, input=inputs, output=output, default_model="pyannote-speaker_diarization"
+    router=router,
+    input=inputs,
+    output=output,
+    default_model="pyannote-speaker_diarization",
 )
