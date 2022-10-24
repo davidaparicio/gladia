@@ -4,7 +4,7 @@ api:
 gladia:
   accelerator: ''
   example:
-    output: http://files.gladia.io/output/text/image/image-generation/stable-diffusion/example/output.png
+    output: "My name is Clara and I live in Berkeley, California."
   examples: {}
   format: ''
   latency: ''
