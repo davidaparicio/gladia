@@ -6,14 +6,20 @@ on:
       - main
     types:
       - closed
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: 'Force promote & deploy this PR'
+        required: true
 
 concurrency:
   group: '${{ github.workflow }}'
   cancel-in-progress: false
 
 env:
-  TAG_PROMOTED: ci-${{ github.event.pull_request.number }}
+  TAG_PROMOTED: ""
   TAG_PROMOTE: latest
+  TAG: ${{ inputs.pr }}
   
 jobs:
 
@@ -23,6 +29,14 @@ jobs:
     env:
       REGISTRY_URL: https://${DOCKER_GLADIA_FQDN}
     steps:
+      - name: Assert Image, TAG and NS
+        run: |
+          if [ "$TAG" == "" ]; then
+            echo "TAG_PROMOTED=ci-${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+          else
+            echo "TAG_PROMOTED=ci-$TAG" >> $GITHUB_ENV
+          fi
+
       - name: Promote *gladia-base* image to Gladia Registry
         if: |
           contains(github.event.pull_request.labels.*.name, 'ci: build-base')
@@ -131,6 +145,7 @@ jobs:
 
   deploy:
     name: Deploy
+    needs: promote-gladia-image
     runs-on: [self-hosted, gladia, deploy]
     steps:
       - name: Assert Configs
@@ -142,3 +157,7 @@ jobs:
           version: v1.24.4
           config: ${{ secrets.KUBE_CONFIG_DATA }}
           command: rollout restart deployment aipi-heavy -n ${{ env.KUBE_NAMESPACE }}
+        run: |
+          curl -L -o /tmp/kubectl https://storage.googleapis.com/kubernetes-release/release/${KVERSION}/bin/linux/amd64/kubectl
+          chmod +x /tmp/kubectl
+          /tmp/kubectl rollout restart deployment aipi-heavy -n $KNS
