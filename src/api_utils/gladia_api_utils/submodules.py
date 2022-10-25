@@ -33,8 +33,6 @@ versions = list()
 available_versions = list()
 logger = getLogger(__name__)
 
-LC_LETTERS = string.ascii_lowercase
-
 PATH_TO_GLADIA_SRC = os.getenv("PATH_TO_GLADIA_SRC", "/app")
 ENV_YAML = "env.yaml"
 
