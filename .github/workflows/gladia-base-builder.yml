@@ -11,8 +11,7 @@ concurrency:
 
 env:
   DOCKER_BUILD_OPT: "--no-cache"
-  DOCKER_BUILD_IMAGE_PROJECT: gladia
-  DOCKER_BUILD_IMAGE_NAME: base
+  DOCKER_BUILD_IMAGE_NAME: gladia/base
   DOCKER_BUILD_IMAGE_TAG: latest
 
 jobs:
@@ -30,13 +29,13 @@ jobs:
         run: >-
           docker build --pull	
           ${{env.DOCKER_BUILD_OPT}}
-          -t ${DOCKER_GLADIA_FQDN}/${{env.DOCKER_BUILD_IMAGE_NAME}}/${{env.DOCKER_BUILD_IMAGE_NAME}}:${{env.DOCKER_BUILD_IMAGE_TAG}}
+          -t ${DOCKER_GLADIA_FQDN}/${{env.DOCKER_BUILD_IMAGE_NAME}}:${{env.DOCKER_BUILD_IMAGE_TAG}} -f base.Dockerfile .
 
       - name: Push new base latest to Gladia registry
-        run: docker push ${DOCKER_GLADIA_FQDN}/${{env.DOCKER_BUILD_IMAGE_NAME}}/${{env.DOCKER_BUILD_IMAGE_NAME}}:${{env.DOCKER_BUILD_IMAGE_TAG}}
+        run: docker push ${DOCKER_GLADIA_FQDN}/${{env.DOCKER_BUILD_IMAGE_NAME}}:${{env.DOCKER_BUILD_IMAGE_TAG}}
         
       - name: Tag new base latest to Docker registry
-        run: docker tag ${DOCKER_GLADIA_FQDN}/${{env.DOCKER_BUILD_IMAGE_NAME}}/${{env.DOCKER_BUILD_IMAGE_NAME}}:${{env.DOCKER_BUILD_IMAGE_TAG}} gladiaio/gladia-base:latest    
+        run: docker tag ${DOCKER_GLADIA_FQDN}/${{env.DOCKER_BUILD_IMAGE_NAME}}:${{env.DOCKER_BUILD_IMAGE_TAG}} gladiaio/gladia-base:latest    
         
       - name: Push new base latest to Docker registry
         run: docker push gladiaio/gladia-base:latest
