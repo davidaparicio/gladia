@@ -1,7 +1,6 @@
 import importlib
 import json
 import os
-import random
 import subprocess
 import sys
 import tempfile
@@ -698,8 +697,7 @@ class TaskRouter:
             if isinstance(value["type"], EnumMeta):
                 enum_values = {v: v for v in value["examples"]}
                 # make the list of the enum values
-                random_id = "".join(random.choice(LC_LETTERS) for _ in range(10))
-                this_type = Enum(f"DynamicEnum_{random_id}", enum_values)
+                this_type = Enum(f"DynamicEnum_{time()}", enum_values)
             else:
                 this_type = value["type"]
 
