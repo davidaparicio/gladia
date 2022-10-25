@@ -2,7 +2,6 @@ import importlib
 import json
 import os
 import random
-from time import time
 import subprocess
 import sys
 import tempfile
