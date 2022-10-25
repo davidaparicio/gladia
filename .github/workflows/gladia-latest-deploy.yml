@@ -43,7 +43,7 @@ jobs:
         env:
           REPOSITORY: base
         run: |
-          MANIFEST=$(curl -ns -X GET "https://${DOCKER_GLADIA_FQDN}/api/v2.0/projects/gladia/repositories/gladia/artifacts/ci-872/tags" | sed "s/ci-866/latest/g" | tr -d "[]")
+          MANIFEST=$(curl -ns -X GET "https://${DOCKER_GLADIA_FQDN}/api/v2.0/projects/gladia/repositories/${{ env.REPOSITORY }}/artifacts/${{ env.TAG_PROMOTED }}/tags" | sed "s/${{ env.TAG_PROMOTED }}/latest/g" | tr -d "[]")
           curl -n -X DELETE "${{ env.REGISTRY_URL }}/api/v2.0/projects/gladia/repositories/${{ env.REPOSITORY }}/artifacts/latest/tags/latest"
           curl -n -X POST "${{ env.REGISTRY_URL }}/api/v2.0/projects/gladia/repositories/${{ env.REPOSITORY }}/artifacts/${{ env.TAG_PROMOTED }}/tags" -H "Content-Type: application/json" -d "${MANIFEST}"
 
@@ -51,7 +51,7 @@ jobs:
         env:
           REPOSITORY: gladia
         run: |
-          MANIFEST=$(curl -ns -X GET "https://${DOCKER_GLADIA_FQDN}/api/v2.0/projects/gladia/repositories/gladia/artifacts/ci-872/tags" | sed "s/ci-866/latest/g" | tr -d "[]")
+          MANIFEST=$(curl -ns -X GET "https://${DOCKER_GLADIA_FQDN}/api/v2.0/projects/gladia/repositories/${{ env.REPOSITORY }}/artifacts/${{ env.TAG_PROMOTED }}/tags" | sed "s/${{ env.TAG_PROMOTED }}/latest/g" | tr -d "[]")
           curl -n -X DELETE "${{ env.REGISTRY_URL }}/api/v2.0/projects/gladia/repositories/${{ env.REPOSITORY }}/artifacts/latest/tags/latest"
           curl -n -X POST "${{ env.REGISTRY_URL }}/api/v2.0/projects/gladia/repositories/${{ env.REPOSITORY }}/artifacts/${{ env.TAG_PROMOTED }}/tags" -H "Content-Type: application/json" -d "${MANIFEST}"
 
