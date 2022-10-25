@@ -701,8 +701,8 @@ class TaskRouter:
             if isinstance(value["type"], EnumMeta):
                 enum_values = {v: v for v in value["examples"]}
                 # make the list of the enum values
-                id = "".join(random.choice(LC_LETTERS) for i in range(10))
-                this_type = Enum(f"DynamicEnum_{id}", enum_values)
+                random_id = "".join(random.choice(LC_LETTERS) for _ in range(10))
+                this_type = Enum(f"DynamicEnum_{random_id}", enum_values)
             else:
                 this_type = value["type"]
 
