@@ -78,7 +78,7 @@ jobs:
     runs-on: [self-hosted, linux, aipi-1]
     steps:
       - name: pull gladia image
-        run: docker pull ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
+        run: docker pull ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }}
 
       - name: stop docker gladia
         run: docker kill gladia-aipi && docker rm gladia-aipi
@@ -112,7 +112,7 @@ jobs:
     runs-on: [self-hosted, linux, aipi-2]
     steps:
       - name: pull gladia image
-        run: docker pull ${DOCKER_GLADIA_FQDN}/gladia:${{ env.TAG_PROMOTE }}
+        run: docker pull ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }}
 
       - name: stop docker gladia
         run: docker kill gladia-aipi && docker rm gladia-aipi
