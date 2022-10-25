@@ -1,13 +1,13 @@
-from ast import operator
-from typing import Dict
 import json
+from logging import getLogger
+from typing import Dict
+
 import spacy
 from presidio_analyzer import AnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine
 
 # import Mask
-from presidio_anonymizer.operators import Mask, Redact, Hash, Encrypt
-from logging import getLogger
+from presidio_anonymizer.operators import Encrypt, Hash, Mask, Redact
 
 logger = getLogger(__name__)
 
@@ -47,14 +47,14 @@ language_model_mapping = {
 }
 
 
-def predict(text: str, language: str="xx", entities: str="") -> Dict[str, str]:
+def predict(text: str, language: str = "xx", entities: str = "") -> Dict[str, str]:
     """
     Anonymize the given text.
 
     Args:
         text (str): The text to anonymize.
         language (str): The language of the text. Optional, default is "xx" multilingual.
-        entities (str): The csv list of entities to anonymize. Optional (default: all, 
+        entities (str): The csv list of entities to anonymize. Optional (default: all,
             see https://microsoft.github.io/presidio/supported_entities/
             can be a subset of:
                 Entity Type	Description	Detection Method
@@ -95,7 +95,9 @@ def predict(text: str, language: str="xx", entities: str="") -> Dict[str, str]:
         try:
             spacy.load(language_model_mapping[language])
         except:
-            logger.info(f'Language {language} loading failing trying to download from cli.')
+            logger.info(
+                f"Language {language} loading failing trying to download from cli."
+            )
 
             spacy.cli.download(language_model_mapping[language])
             spacy.load(language_model_mapping[language])
@@ -104,7 +106,9 @@ def predict(text: str, language: str="xx", entities: str="") -> Dict[str, str]:
 
         # Call analyzer to get results
         if entities:
-            results = analyzer.analyze(text=text, entities=entities.split(','), language=language)
+            results = analyzer.analyze(
+                text=text, entities=entities.split(","), language=language
+            )
         else:
             results = analyzer.analyze(text=text, language=language)
 
@@ -112,9 +116,18 @@ def predict(text: str, language: str="xx", entities: str="") -> Dict[str, str]:
 
         anonymizer = AnonymizerEngine()
 
-        anonymized_text = json.loads(anonymizer.anonymize(text=text, analyzer_results=results).to_json())
+        anonymized_text = json.loads(
+            anonymizer.anonymize(text=text, analyzer_results=results).to_json()
+        )
 
-        return {"prediction": anonymized_text["text"], "prediction_raw": anonymized_text}
+        return {
+            "prediction": anonymized_text["text"],
+            "prediction_raw": anonymized_text,
+        }
     else:
-        return {"prediction": "unsupported language", "prediction_raw": "list of supported languages: {}".format(language_model_mapping.keys())}
-
+        return {
+            "prediction": "unsupported language",
+            "prediction_raw": "list of supported languages: {}".format(
+                language_model_mapping.keys()
+            ),
+        }

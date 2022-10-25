@@ -27,7 +27,7 @@ inputs = [
         "example": task_metadata["inputs_example"]["entities"]["default_example"],
         "examples": task_metadata["inputs_example"]["entities"]["examples"],
         "placeholder": "Entities to anonymize (default: None=all)",
-    }
+    },
 ]
 
 output = {"name": "anonymized_text", "type": "string", "example": "anonymized_text"}
