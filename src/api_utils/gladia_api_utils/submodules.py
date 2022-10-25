@@ -4,6 +4,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import string
 import urllib.parse
 from enum import Enum, EnumMeta
 from logging import getLogger
@@ -11,6 +12,7 @@ from pathlib import Path
 from shlex import quote
 from typing import Any, List, Optional, Tuple, Union
 from urllib.request import urlopen
+import random
 
 import forge
 import starlette
@@ -30,6 +32,8 @@ from .responses import AudioResponse, ImageResponse, VideoResponse
 versions = list()
 available_versions = list()
 logger = getLogger(__name__)
+
+LC_LETTERS = string.ascii_lowercase
 
 PATH_TO_GLADIA_SRC = os.getenv("PATH_TO_GLADIA_SRC", "/app")
 ENV_YAML = "env.yaml"
@@ -697,7 +701,8 @@ class TaskRouter:
             if isinstance(value["type"], EnumMeta):
                 enum_values = {v: v for v in value["examples"]}
                 # make the list of the enum values
-                this_type = Enum("DynamicEnum", enum_values)
+                id = ''.join(random.choice(LC_LETTERS) for i in range(10))
+                this_type = Enum(f"DynamicEnum_{id}", enum_values)
             else:
                 this_type = value["type"]
 
