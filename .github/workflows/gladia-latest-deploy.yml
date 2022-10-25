@@ -25,7 +25,7 @@ jobs:
 
   promote-gladia-image:
     runs-on: [self-hosted, build, ephemeral]
-    if: github.event.pull_request.merged == true
+    if: ${{ (github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch') }}
     env:
       REGISTRY_URL: https://${DOCKER_GLADIA_FQDN}
     steps:
