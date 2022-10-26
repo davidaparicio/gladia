@@ -5,7 +5,6 @@ from typing import Dict
 import spacy
 from presidio_analyzer import AnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine
-
 from presidio_anonymizer.operators import Encrypt, Hash, Mask, Redact
 
 logger = getLogger(__name__)
