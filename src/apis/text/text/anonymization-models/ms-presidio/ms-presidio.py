@@ -6,7 +6,6 @@ import spacy
 from presidio_analyzer import AnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine
 
-# import Mask
 from presidio_anonymizer.operators import Encrypt, Hash, Mask, Redact
 
 logger = getLogger(__name__)
@@ -94,7 +93,7 @@ def predict(text: str, language: str = "xx", entities: str = "") -> Dict[str, st
     if language in language_model_mapping:
         try:
             spacy.load(language_model_mapping[language])
-        except:
+        except RuntimeError:
             logger.info(
                 f"Language {language} loading failing trying to download from cli."
             )
