@@ -8,5 +8,6 @@ dependencies:
   - conda-forge::transformers
   - conda-forge::pydub
   - conda-forge::ffmpeg
+  - conda-forge::pysoundfile
   - pip:
     - pyannote.audio
