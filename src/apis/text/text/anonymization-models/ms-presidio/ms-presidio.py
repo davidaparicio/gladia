@@ -88,11 +88,12 @@ def predict(text: str, language: str = "xx", entities: str = "") -> Dict[str, st
         Dict[str, str]: The anonymized text.
     """
     language = language.lower()
+    entities = entities.upper().replace(" ", "").split(",")
 
     if language in language_model_mapping:
         try:
             spacy.load(language_model_mapping[language])
-        except RuntimeError:
+        except:
             logger.info(
                 f"Language {language} loading failing trying to download from cli."
             )
@@ -105,7 +106,7 @@ def predict(text: str, language: str = "xx", entities: str = "") -> Dict[str, st
         # Call analyzer to get results
         if entities:
             results = analyzer.analyze(
-                text=text, entities=entities.split(","), language=language
+                text=text, entities=entities, language=language
             )
         else:
             results = analyzer.analyze(text=text, language=language)
