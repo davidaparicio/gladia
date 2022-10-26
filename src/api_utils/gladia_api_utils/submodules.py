@@ -4,7 +4,7 @@ import os
 import subprocess
 import sys
 import tempfile
-import time
+from time import time
 import urllib.parse
 from enum import Enum, EnumMeta
 from logging import getLogger
