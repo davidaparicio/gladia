@@ -9,6 +9,7 @@ from enum import Enum, EnumMeta
 from logging import getLogger
 from pathlib import Path
 from shlex import quote
+from time import time
 from typing import Any, List, Optional, Tuple, Union
 from urllib.request import urlopen
 
@@ -697,7 +698,7 @@ class TaskRouter:
             if isinstance(value["type"], EnumMeta):
                 enum_values = {v: v for v in value["examples"]}
                 # make the list of the enum values
-                this_type = Enum("DynamicEnum", enum_values)
+                this_type = Enum(f"DynamicEnum_{time()}", enum_values)
             else:
                 this_type = value["type"]
 
