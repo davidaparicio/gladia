@@ -23,10 +23,9 @@ def predict(audio: str, language: str = "en") -> Dict[str, str]:
     prediction = model.transcribe(audio, **transcribe_options)
 
     prediction_raw = list()
-    for _, segment in enumerate(prediction['segments']):
-            prediction_raw.append({'start': segment['start'],
-            'end': segment['end'],
-            'text': segment['text']
-                            })
+    for _, segment in enumerate(prediction["segments"]):
+        prediction_raw.append(
+            {"start": segment["start"], "end": segment["end"], "text": segment["text"]}
+        )
 
     return {"prediction": prediction["text"], "prediction_raw": prediction_raw}
