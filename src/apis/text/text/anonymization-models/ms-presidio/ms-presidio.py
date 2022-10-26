@@ -105,9 +105,7 @@ def predict(text: str, language: str = "xx", entities: str = "") -> Dict[str, st
 
         # Call analyzer to get results
         if entities:
-            results = analyzer.analyze(
-                text=text, entities=entities, language=language
-            )
+            results = analyzer.analyze(text=text, entities=entities, language=language)
         else:
             results = analyzer.analyze(text=text, language=language)
 
