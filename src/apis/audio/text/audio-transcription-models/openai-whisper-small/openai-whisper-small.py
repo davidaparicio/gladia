@@ -3,6 +3,9 @@ from typing import Dict
 import whisper
 from gladia_api_utils.file_management import input_to_files
 
+# pin model to GPU
+model = whisper.load_model("small")
+
 
 @input_to_files
 def predict(audio: str, language: str = "en") -> Dict[str, str]:
@@ -16,8 +19,13 @@ def predict(audio: str, language: str = "en") -> Dict[str, str]:
     Outputs:
         Dict[str, str]: The text transcription of the audio.
     """
-    model = whisper.load_model("small")
+    transcribe_options = dict(beam_size=5, best_of=5, without_timestamps=False)
+    prediction = model.transcribe(audio, **transcribe_options)
 
-    result = model.transcribe(audio)
+    prediction_raw = list()
+    for _, segment in enumerate(prediction["segments"]):
+        prediction_raw.append(
+            {"start": segment["start"], "end": segment["end"], "text": segment["text"]}
+        )
 
-    return {"prediction": result["text"], "prediction_raw": result["text"]}
+    return {"prediction": prediction["text"], "prediction_raw": prediction_raw}
