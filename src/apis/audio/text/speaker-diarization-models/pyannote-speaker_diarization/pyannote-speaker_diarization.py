@@ -8,10 +8,11 @@ from gladia_api_utils.file_management import (
 )
 from pyannote.audio import Pipeline
 from pydub import AudioSegment
+from gladia_api_utils import SECRETS
 
 logger = getLogger(__name__)
 
-pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization@2022.07")
+pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization", use_auth_token=SECRETS["HUGGINGFACE_ACCESS_TOKEN"])
 
 
 @input_to_files
@@ -28,14 +29,15 @@ def predict(audio: str) -> Dict[str, str]:
 
     audio_segment = AudioSegment.from_file(audio)
 
-    f = get_tmp_filename()
+    tmp_file = get_tmp_filename()
     # unfortunately, pyannote.audio only accepts wav files
     # so we need to convert the audio to wav
     # and then delete the file
     # Bytes are said to be supported but it doesn't work
-    audio_segment.export(f, format="wav")
-    diarization = pipeline(f)
-    delete_file(f)
+    audio_segment.export(tmp_file, format="wav")
+
+    diarization = pipeline(tmp_file)
+    delete_file(tmp_file)
 
     labels = diarization.labels()
     segments = list()
