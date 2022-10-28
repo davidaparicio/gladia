@@ -116,7 +116,8 @@ Access the service through [http://localhost:8080/docs](http://localhost:8080/do
 /!\ The First API call of each endpoint might/will be slower as its preforming lazy model caching (after the first call should be ok).
 ## Model Licenses pre-requisites
 - Stable Diffusion: [Need to Compvis Accept Terms of Service](https://huggingface.co/CompVis/stable-diffusion)
-- Spearker Diarization: [Need to Pyannote Accept Terms of Service](https://huggingface.co/pyannote/speaker-diarization)
+- Speaker Diarization: [Need to Pyannote Accept Terms of Service](https://huggingface.co/pyannote/speaker-diarization)
+- Speaker Segmentation: [Need to Pyannote Accept Terms of Service](https://huggingface.co/pyannote/segmentation)
 
 ## What's behind the Quickstart scene
 ```sh

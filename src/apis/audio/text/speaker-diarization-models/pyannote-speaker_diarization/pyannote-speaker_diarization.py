@@ -12,8 +12,15 @@ from gladia_api_utils import SECRETS
 
 logger = getLogger(__name__)
 
-pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization", use_auth_token=SECRETS["HUGGINGFACE_ACCESS_TOKEN"])
-
+error_msg = """Error while loading pipeline: {e}
+    Please check your HuggingFace credentials in the environment variables HUGGINGFACE_ACCESS_TOKEN
+    Also make sure that you have approved the terms of use for the segmentation and diarization models
+    for the HUGGINGFACE_ACCESS_TOKEN related token
+    """
+try:
+    pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization", use_auth_token=SECRETS["HUGGINGFACE_ACCESS_TOKEN"])
+except Exception as e:
+    logger.error(error_msg.format(e=e))
 
 @input_to_files
 def predict(audio: str) -> Dict[str, str]:
@@ -35,9 +42,13 @@ def predict(audio: str) -> Dict[str, str]:
     # and then delete the file
     # Bytes are said to be supported but it doesn't work
     audio_segment.export(tmp_file, format="wav")
-
-    diarization = pipeline(tmp_file)
-    delete_file(tmp_file)
+    try:
+        diarization = pipeline(tmp_file)
+    except Exception as e:
+        logger.error(f"Error while running pipeline: {e}")
+        return {"prediction": "Error while running pipeline", "prediction_raw": error_msg.format(e=e)}
+    finally:
+        delete_file(tmp_file)
 
     labels = diarization.labels()
     segments = list()
