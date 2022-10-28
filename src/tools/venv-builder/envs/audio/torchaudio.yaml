@@ -1,7 +1,7 @@
 name: audio-torchaudio
 
 dependencies:
-  - conda-forge::torchaudio
+  - pytorch::torchaudio
   - conda-forge::pyannote.core
   - conda-forge::pyannote.database
   - conda-forge::pyannote.metrics
