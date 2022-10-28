@@ -1,6 +1,7 @@
 from logging import getLogger
 from typing import Dict
 
+from gladia_api_utils import SECRETS
 from gladia_api_utils.file_management import (
     delete_file,
     get_tmp_filename,
@@ -8,7 +9,6 @@ from gladia_api_utils.file_management import (
 )
 from pyannote.audio import Pipeline
 from pydub import AudioSegment
-from gladia_api_utils import SECRETS
 
 logger = getLogger(__name__)
 
@@ -18,9 +18,13 @@ error_msg = """Error while loading pipeline: {e}
     for the HUGGINGFACE_ACCESS_TOKEN related token
     """
 try:
-    pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization", use_auth_token=SECRETS["HUGGINGFACE_ACCESS_TOKEN"])
+    pipeline = Pipeline.from_pretrained(
+        "pyannote/speaker-diarization",
+        use_auth_token=SECRETS["HUGGINGFACE_ACCESS_TOKEN"],
+    )
 except Exception as e:
     logger.error(error_msg.format(e=e))
+
 
 @input_to_files
 def predict(audio: str) -> Dict[str, str]:
@@ -46,7 +50,10 @@ def predict(audio: str) -> Dict[str, str]:
         diarization = pipeline(tmp_file)
     except Exception as e:
         logger.error(f"Error while running pipeline: {e}")
-        return {"prediction": "Error while running pipeline", "prediction_raw": error_msg.format(e=e)}
+        return {
+            "prediction": "Error while running pipeline",
+            "prediction_raw": error_msg.format(e=e),
+        }
     finally:
         delete_file(tmp_file)
 
