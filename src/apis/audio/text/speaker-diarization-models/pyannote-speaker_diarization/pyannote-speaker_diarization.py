@@ -17,14 +17,6 @@ error_msg = """Error while loading pipeline: {e}
     Also make sure that you have approved the terms of use for the segmentation and diarization models
     for the HUGGINGFACE_ACCESS_TOKEN related token
     """
-try:
-    pipeline = Pipeline.from_pretrained(
-        "pyannote/speaker-diarization",
-        use_auth_token=SECRETS["HUGGINGFACE_ACCESS_TOKEN"],
-    )
-except Exception as e:
-    logger.error(error_msg.format(e=e))
-
 
 @input_to_files
 def predict(audio: str) -> Dict[str, str]:
@@ -37,6 +29,15 @@ def predict(audio: str) -> Dict[str, str]:
     Outputs:
         Dict[str, str]: The text of the audio splitted into segmented speakers.
     """
+
+    try:
+        pipeline = Pipeline.from_pretrained(
+            "pyannote/speaker-diarization",
+            use_auth_token=SECRETS["HUGGINGFACE_ACCESS_TOKEN"],
+        )
+    except Exception as e:
+        logger.error(error_msg.format(e=e))
+
 
     audio_segment = AudioSegment.from_file(audio)
 
