@@ -18,6 +18,7 @@ error_msg = """Error while loading pipeline: {e}
     for the HUGGINGFACE_ACCESS_TOKEN related token
     """
 
+
 @input_to_files
 def predict(audio: str) -> Dict[str, str]:
     """
@@ -37,7 +38,6 @@ def predict(audio: str) -> Dict[str, str]:
         )
     except Exception as e:
         logger.error(error_msg.format(e=e))
-
 
     audio_segment = AudioSegment.from_file(audio)
 
