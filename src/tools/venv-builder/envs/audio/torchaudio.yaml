@@ -2,16 +2,3 @@ name: audio-torchaudio
 
 dependencies:
     - conda-forge::pip
-    - conda-forge::matplotlib
-    - conda-forge::torch==1.12.1+cu102
-    - conda-forge::torchvision==0.13.1+cu102
-    - conda-forge::pyannote.core
-    - conda-forge::pyannote.database
-    - conda-forge::pyannote.metrics
-    - conda-forge::transformers
-    - conda-forge::pydub
-    - conda-forge::ffmpeg
-    - conda-forge::pysoundfile
-    - pip:
-        - torchaudio
-        - pyannote.audio
