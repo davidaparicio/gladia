@@ -199,7 +199,7 @@ jobs:
       - name: Run Audio Tests
         run: >-
           /tmp/kubectl exec -i -n $KNS aipi-test-${{env.DOCKER_BUILD_TAG}} --
-          /bin/bash -c 'eval "$(micromamba shell hook --shell=bash)" && micromamba activate server && python -m pytest ./ -k Audio -o log_cli=true --log-cli-level=DEBUG ./ ${{ env.TEST_DEFAULT_MODELS_ONLY }} ${{ env.TEST_DEFAULT_INPUTS_ONLY }} ${{ env.TEST_STOP_AT_FAIL }} ${{ env.TEST_MARKERS }} && kill -9 $(ps aux | grep "/opt/conda/envs/server/bin/gunicorn main:app" | head -n 1 | grep -v grep | awk {"print $2"} | xargs)
+          /bin/bash -c 'eval "$(micromamba shell hook --shell=bash)" && micromamba activate server && python -m pytest ./ -k Audio -o log_cli=true --log-cli-level=DEBUG ./ ${{ env.TEST_DEFAULT_MODELS_ONLY }} ${{ env.TEST_DEFAULT_INPUTS_ONLY }} ${{ env.TEST_STOP_AT_FAIL }} ${{ env.TEST_MARKERS }} && kill -9 $(ps aux | grep "/opt/conda/envs/server/bin/gunicorn main:app" | head -n 1 | grep -v grep | awk {"print $2"} | xargs)'
 
       - name: Run Image Tests
         run: >-
