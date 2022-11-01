@@ -32,7 +32,7 @@ jobs:
     if: |
         !contains(github.event.pull_request.labels.*.name, 'ci') &&
         !contains(github.event.pull_request.labels.*.name, 'doc')
-    runs-on: [self-hosted, build, ephemeral]
+    runs-on: [self-hosted, build]
     # map steps output to job output
     outputs:
       dockerimage: ${{ steps.setoutput.outputs.dockerimage }}
