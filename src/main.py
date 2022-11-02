@@ -185,10 +185,10 @@ def __add_router(module: ModuleType, module_path: str) -> None:
         apis_folder_name, ""
     )[1:].split(".")
 
-    module_task = to_task_name(module_task).upper()
+    module_task = to_task_name(module_task)
     module_config = config["active_tasks"][module_input][module_output]
 
-    active_task_list = list(map(lambda each: to_task_name(each).upper(), module_config))
+    active_task_list = set(map(lambda each: to_task_name(each.split("?")[0]), module_config))
 
     if ("NONE" not in active_task_list and "NONE" not in module_config) and (
         module_task in active_task_list or "*" in module_config
