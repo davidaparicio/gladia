@@ -36,7 +36,7 @@ from ldm.util import (
     log_txt_as_img,
     mean_flat,
 )
-from pytorch_lightning.utilities.distributed import rank_zero_only
+from pytorch_lightning.utilities.rank_zero import rank_zero_only
 from torch.optim.lr_scheduler import LambdaLR
 from torchvision.utils import make_grid
 from tqdm import tqdm
