@@ -1,5 +1,5 @@
 #https://www.docker.com/blog/advanced-dockerfiles-faster-builds-and-smaller-images-using-buildkit-and-multistage-builds/
-ARG GLADIA_DOCKER_BASE=gladiaio/fastertransformer-triton-backend
+ARG GLADIA_DOCKER_BASE=nvcr.io/nvidia/tritonserver:22.03-py3
 
 FROM $GLADIA_DOCKER_BASE
 
