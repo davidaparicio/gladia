@@ -154,3 +154,6 @@ jobs:
           curl -L -o /tmp/kubectl https://storage.googleapis.com/kubernetes-release/release/${KVERSION}/bin/linux/amd64/kubectl
           chmod +x /tmp/kubectl
           /tmp/kubectl rollout restart deployment aipi-heavy -n $KNS
+          /tmp/kubectl rollout restart deployment aipi-slow -n $KNS
+          /tmp/kubectl rollout restart deployment aipi-fast -n $KNS
+          /tmp/kubectl rollout restart deployment aipi-triton-client -n $KNS
