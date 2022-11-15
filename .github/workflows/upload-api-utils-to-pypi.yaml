@@ -27,8 +27,11 @@ jobs:
   upload:
     if: ${{ (needs.check_if_need_to_rebuild.outputs.update_api_utils  == 'true') }}
 
-    - name: build dist
-      run: python setup.py sdist
+    runs-on: [self-hosted, build, ephemeral]
 
-    - name: upload dist
-      run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }} dist/*
+    steps:
+      - name: build dist
+        run: python setup.py sdist
+
+      - name: upload dist
+        run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }} dist/*
