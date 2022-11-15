@@ -1,16 +1,21 @@
-import os
-import sys
-import logging
-import pkgutil
 import importlib
-
-from typing import List, Dict, Any
+import logging
+import os
+import pkgutil
+import sys
 from types import ModuleType
+from typing import Any, Dict, List
 
 from .submodules import to_task_name
 
 
-def __add_router(app, module: ModuleType, module_path: str, active_tasks: Dict[str, Any], apis_folder_name: str) -> None:
+def __add_router(
+    app,
+    module: ModuleType,
+    module_path: str,
+    active_tasks: Dict[str, Any],
+    apis_folder_name: str,
+) -> None:
     """
     Add the module router to the API app
 
@@ -143,7 +148,13 @@ def __module_is_subprocess(module_path: str) -> bool:
     return os.path.exists(os.path.join(module_path, "env.yaml"))
 
 
-def add_routes_to_router(app, apis_folder_name: str, active_tasks: Dict[str, Any], package: ModuleType, recursive: bool = True) -> None:
+def add_routes_to_router(
+    app,
+    apis_folder_name: str,
+    active_tasks: Dict[str, Any],
+    package: ModuleType,
+    recursive: bool = True,
+) -> None:
     """
     Import every task presents in the API by loading each submodule (recursively by default)
 

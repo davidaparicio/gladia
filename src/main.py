@@ -1,21 +1,20 @@
-import os
 import json
-import apis
-import nltk
 import logging
-
+import os
 from logging import StreamHandler
 from logging.handlers import RotatingFileHandler
-from gladia_api_utils import add_routes_to_router
 
+import nltk
 from fastapi import FastAPI
-from fastapi.responses import ORJSONResponse
-from starlette.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import ORJSONResponse
 from fastapi_utils.timing import add_timing_middleware
-from prometheus_fastapi_instrumentator import Instrumentator
+from gladia_api_utils import add_routes_to_router
 from gladia_api_utils.apis_for_subprocess import build_all_subprocesses_apis
+from prometheus_fastapi_instrumentator import Instrumentator
+from starlette.responses import RedirectResponse
 
+import apis
 
 
 def __init_config() -> dict:
@@ -187,8 +186,5 @@ if config["prometheus"]["active"]:
 build_all_subprocesses_apis()
 
 add_routes_to_router(
-    app=app,
-    apis_folder_name="apis",
-    active_tasks=config["active_tasks"],
-    package=apis
+    app=app, apis_folder_name="apis", active_tasks=config["active_tasks"], package=apis
 )
