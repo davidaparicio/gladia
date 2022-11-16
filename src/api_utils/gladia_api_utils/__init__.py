@@ -4,6 +4,7 @@ import os
 from logging import StreamHandler
 from logging.handlers import RotatingFileHandler
 
+from .add_routes_to_router import add_routes_to_router
 from .get_activated_task_path import get_activated_task_path
 from .secret_management import SECRETS
 
