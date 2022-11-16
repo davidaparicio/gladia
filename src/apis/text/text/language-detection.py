@@ -22,5 +22,5 @@ TaskRouter(
     router=router,
     input=inputs,
     output=output,
-    default_model="xlm-roberta-base-language-detection",
+    default_model="toftrup-etal-2021",
 )
