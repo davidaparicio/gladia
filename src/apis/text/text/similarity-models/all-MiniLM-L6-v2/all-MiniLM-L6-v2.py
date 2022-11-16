@@ -15,4 +15,4 @@ def predict(sentence_1: str, sentence_2: str) -> dict:
 
     cosine_scores = util.pytorch_cos_sim(embedding1, embedding2)
 
-    return {"score": cosine_scores.item()}
+    return {"prediction": cosine_scores.item(), "prediction_raw": cosine_scores.item()}
