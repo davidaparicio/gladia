@@ -1,0 +1,37 @@
+name: "Upload gladia-api-utils to Pypi"
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  check_if_need_to_rebuild:
+    name: Check changed files
+    outputs:
+      update_api_utils: ${{ steps.changed-api-utils.outputs.any_changed }}
+    runs-on: [self-hosted, build, ephemeral]
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files in the api_utils folder
+        id: changed-default
+        uses: tj-actions/changed-files@v34
+        with:
+          files: |
+            src/api_utils/**
+
+  upload:
+    if: ${{ (needs.check_if_need_to_rebuild.outputs.update_api_utils  == 'true') }}
+
+    runs-on: [self-hosted, build, ephemeral]
+
+    steps:
+      - name: build dist
+        run: python setup.py sdist
+
+      - name: upload dist
+        run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }} dist/*
