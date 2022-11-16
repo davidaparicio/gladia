@@ -22,5 +22,5 @@ TaskRouter(
     router=router,
     input=inputs,
     output=output,
-    default_model="nlptown-bert-base-multilingual-uncased-sentiment",
+    default_model="distilbert-base-uncased-finetuned-sst-2-english",
 )

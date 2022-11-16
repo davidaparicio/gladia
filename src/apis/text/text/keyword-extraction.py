@@ -30,5 +30,5 @@ TaskRouter(
     router=router,
     input=inputs,
     output=output,
-    default_model="keybert-paraphrase-MiniLM-L6-v2",
+    default_model="keybert-paraphrase-multilingual-MiniLM-L12-v2",
 )
