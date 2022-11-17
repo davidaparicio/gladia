@@ -1,4 +1,10 @@
 name: common-torch
 
 dependencies:
-  - conda-forge::pytorch=1.11.0 
+  - conda-forge::tqdm
+  - conda-forge::pillow
+  - conda-forge::mkl
+  - conda-forge::mkl-service
+  - pytorch::pytorch=1.12.1
+  - conda-forge::cudatoolkit
+  - conda-forge::cudnn

@@ -16,7 +16,7 @@ inputs = [
     }
 ]
 
-output = {"name": "formated_address", "type": "string", "example": "formated_address"}
+output = {"name": "formatted_address", "type": "string", "example": "formatted_address"}
 
 TaskRouter(
     router=router,

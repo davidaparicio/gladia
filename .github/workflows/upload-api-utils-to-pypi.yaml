@@ -9,7 +9,7 @@ jobs:
     name: Check changed files
     outputs:
       update_api_utils: ${{ steps.changed-api-utils.outputs.any_changed }}
-    runs-on: [self-hosted, build, ephemeral]
+    runs-on: ubuntu-latest
     steps:
 
       - name: Checkout code
@@ -27,7 +27,7 @@ jobs:
   upload:
     if: ${{ (needs.check_if_need_to_rebuild.outputs.update_api_utils  == 'true') }}
 
-    runs-on: [self-hosted, build, ephemeral]
+    runs-on: ubuntu-latest
 
     steps:
       - name: build dist
