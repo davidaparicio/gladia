@@ -175,7 +175,7 @@ async def docs_redirect():
     return RedirectResponse(url="/docs")
 
 
-@app.get("/", include_in_schema=False)
+@app.get("/health", include_in_schema=False)
 async def health():
     return None
 
