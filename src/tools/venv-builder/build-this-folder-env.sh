@@ -1,0 +1,1 @@
+micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality $PWD.*"
