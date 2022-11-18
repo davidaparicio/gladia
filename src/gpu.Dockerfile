@@ -39,10 +39,6 @@ ENV GLADIA_TMP_PATH=$GLADIA_TMP_PATH \
     LANG="C.UTF-8" \
     distro="ubuntu2004" \
     arch="x86_64" \
-    TRITON_MODELS_PATH=$GLADIA_TMP_PATH/triton \
-    TRITON_SERVER_PORT_HTTP=8000 \
-    TRITON_SERVER_PORT_GRPC=8001 \
-    TRITON_SERVER_PORT_METRICS=8002 \
     API_SERVER_WORKERS=1 \
     API_SERVER_PORT_HTTP=$API_SERVER_PORT_HTTP \
     MAMBA_ROOT_PREFIX="/opt/conda" \
@@ -67,6 +63,8 @@ WORKDIR $PATH_TO_GLADIA_SRC
 
 RUN micromamba create -f env.yaml && \
     $PATH_TO_GLADIA_SRC/tools/docker/clean-layer.sh
+    
+ENV LD_LIBRARY_PATH=/opt/conda/envs/server/lib/python3.8/site-packages/nvidia/cublas/lib/:$LD_LIBRARY_PATH
 
 RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then \
         micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*/apis/text/[a-zA-Z ]+/[a-rA-R].*'"; \
@@ -98,8 +96,8 @@ RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then \
     fi && \
     $CLEAN_LAYER_SCRIPT
 
-ENV LD_PRELOAD="/opt/tritonserver/backends/pytorch/libmkl_rt.so" \
-    LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/"
+ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/"
+ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/nvidia/cublas/lib/"
 
 RUN echo "== FIXING PROTOBUH ==" && \
     wget https://raw.githubusercontent.com/protocolbuffers/protobuf/main/python/google/protobuf/internal/builder.py -O $MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/google/protobuf/internal/builder.py
@@ -107,8 +105,6 @@ RUN echo "== FIXING PROTOBUH ==" && \
 RUN echo "== ADJUSTING binaries ==" && \
     mv /usr/bin/python3 /usr/bin/python38 && \
     ln -sf /usr/bin/python3.8 /usr/bin/python3 && \
-    echo "== ADJUSTING entrypoint ==" && \
-    mv $PATH_TO_GLADIA_SRC/tools/docker/entrypoint.sh /opt/nvidia/nvidia_entrypoint.sh && \
     echo "== ADJUSTING path rights ==" && \
     chown -R $DOCKER_USER:$DOCKER_GROUP $PATH_TO_GLADIA_SRC && \
     chown -R $DOCKER_USER:$DOCKER_GROUP $GLADIA_TMP_PATH && \

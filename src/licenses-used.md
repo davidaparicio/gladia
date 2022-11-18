@@ -83,7 +83,6 @@
 | threadpoolctl                     | 3.1.0       | BSD License                                        |
 | tifffile                          | 2022.7.28   | BSD License                                        |
 | torch                             | 1.12.0      | BSD License                                        |
-| tritonclient                      | 2.21.0      | BSD License                                        |
 | uvicorn                           | 0.14.0      | BSD License                                        |
 | wrapt                             | 1.14.1      | BSD License                                        |
 | xxhash                            | 3.0.0       | BSD License                                        |

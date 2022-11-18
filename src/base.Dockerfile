@@ -1,5 +1,6 @@
 #https://www.docker.com/blog/advanced-dockerfiles-faster-builds-and-smaller-images-using-buildkit-and-multistage-builds/
-ARG GLADIA_DOCKER_BASE=nvcr.io/nvidia/tritonserver:22.03-py3
+ARG GLADIA_DOCKER_BASE=nvcr.io/nvidia/cuda:11.6.2-devel-ubuntu20.04
+
 
 FROM $GLADIA_DOCKER_BASE
 
@@ -31,11 +32,6 @@ ENV TRANSFORMERS_CACHE=$GLADIA_TMP_MODEL_PATH/transformers \
     LANG="C.UTF-8" \
     distro="ubuntu2004" \
     arch="x86_64" \
-    TRITON_MODELS_PATH=$GLADIA_TMP_MODEL_PATH/triton \
-    TRITON_CHECKPOINTS_PATH=/triton-models-chkpt \
-    TRITON_SERVER_PORT_HTTP=8000 \
-    TRITON_SERVER_PORT_GRPC=8001 \
-    TRITON_SERVER_PORT_METRICS=8002 \
     PATH_TO_GLADIA_SRC="/app" \
     API_SERVER_WORKERS=1 \
     TORCH_HOME=$GLADIA_TMP_MODEL_PATH/torch/hub \
@@ -47,19 +43,17 @@ ENV TRANSFORMERS_CACHE=$GLADIA_TMP_MODEL_PATH/transformers \
     PATH_TO_GLADIA_SRC=$PATH_TO_GLADIA_SRC \
     API_SERVER_PORT_HTTP=$API_SERVER_PORT_HTTP
 
-RUN mkdir -p $TRITON_MODELS_PATH && \
-    mkdir -p $GLADIA_TMP_PATH && \
+RUN mkdir -p $GLADIA_TMP_PATH && \
     mkdir -p $TRANSFORMERS_CACHE && \
     mkdir -p $PYTORCH_TRANSFORMERS_CACHE && \
     mkdir -p $PYTORCH_PRETRAINED_BERT_CACHE && \
     mkdir -p $NLTK_DATA && \
-    mkdir -p $TRITON_MODELS_PATH && \
     mkdir -p $PATH_TO_GLADIA_SRC
 
 ADD ./tools/docker/clean-layer.sh $CLEAN_LAYER_SCRIPT
 
-RUN mkdir -p $TRITON_MODELS_PATH && \
-    mkdir -p $TRITON_CHECKPOINTS_PATH && \
+ENV TZ="UTC"
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
     mkdir -p $GLADIA_TMP_PATH && \
     mkdir -p $TRANSFORMERS_CACHE && \
     mkdir -p $PYTORCH_TRANSFORMERS_CACHE && \
@@ -68,10 +62,8 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
     mkdir -p $PATH_TO_GLADIA_SRC && \
 # Update apt repositories - Add Nvidia GPG key
     apt-key del 7fa2af80 && \
-    apt-get install -y apt-transport-https && \
-    wget https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/cuda-keyring_1.0-1_all.deb && \
-    dpkg -i cuda-keyring_1.0-1_all.deb && \
-    sed -i 's/deb https:\/\/developer.download.nvidia.com\/compute\/cuda\/repos\/ubuntu2004\/x86_64.*//g' /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -y apt-transport-https software-properties-common wget && \
     add-apt-repository -y ppa:deadsnakes/ppa && \
     apt-get update --allow-insecure-repositories -y && \
     wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null && \
@@ -80,8 +72,10 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
     apt update && \
     apt install kitware-archive-keyring && \
     rm /etc/apt/trusted.gpg.d/kitware.gpg && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6AF7F09730B3F0A4 && \
     apt update && \
     apt install -y \
+        curl \
         unzip \
         libssl-dev \
         libpng-dev \
@@ -106,6 +100,7 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
         imagemagick \
         libsndfile1 \
         ffmpeg \
+        nvidia-cuda-toolkit \
         protobuf-compiler && \
     echo "== ADJUSTING binaries ==" && \
     mv /usr/bin/python3 /usr/bin/python38 && \
