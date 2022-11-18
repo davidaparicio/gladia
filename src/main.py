@@ -160,10 +160,6 @@ def __set_app_middlewares(api_app: FastAPI, api_config: dict) -> None:
 
 nltk.download("punkt")
 
-os.environ["TRITON_MODELS_PATH"] = os.getenv(
-    "TRITON_MODELS_PATH", default="/tmp/gladia/triton"
-)
-
 config = __init_config()
 logger = __init_logging(config)
 

@@ -14,5 +14,3 @@ dependencies:
   - conda-forge::fastapi
   - pip:
     - -e /app/api_utils/
-    - tritonclient[http]
-    - tritonclient==2.21.0

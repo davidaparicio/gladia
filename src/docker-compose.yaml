@@ -4,10 +4,6 @@ services:
   gladia:
     image: gladiaio/gladia:latest
     environment:
-      - TRITON_SERVER_PORT_HTTP=8000
-      - TRITON_SERVER_URL=0.0.0.0
-      - TRITON_LAZY_DOWNLOAD=false
-      - TRITON_MODELS_PATH=/tmp/gladia/triton
       - API_SERVER_WORKERS=2
     volumes:
       - /tmp/gladia/:/tmp/gladia/
