@@ -1,6 +1,7 @@
 #https://www.docker.com/blog/advanced-dockerfiles-faster-builds-and-smaller-images-using-buildkit-and-multistage-builds/
 ARG GLADIA_DOCKER_BASE=nvcr.io/nvidia/cuda:11.6.2-devel-ubuntu20.04
 
+
 FROM $GLADIA_DOCKER_BASE
 
 ARG SKIP_CUSTOM_ENV_BUILD="false"
@@ -97,6 +98,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
         tesseract-ocr-all \
         poppler-utils \
         imagemagick \
+        libsndfile1 \
+        ffmpeg \
         nvidia-cuda-toolkit \
         protobuf-compiler && \
     echo "== ADJUSTING binaries ==" && \

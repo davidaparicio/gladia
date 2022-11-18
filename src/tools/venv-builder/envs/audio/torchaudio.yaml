@@ -1,4 +1,4 @@
-name: audio-base
+name: audio-torchaudio
 
 dependencies:
-  - conda-forge::torchaudio
+    - conda-forge::pip
