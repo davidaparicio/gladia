@@ -99,9 +99,6 @@ RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then \
 ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/"
 ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/nvidia/cublas/lib/"
 
-RUN echo "== FIXING PROTOBUH ==" && \
-    wget https://raw.githubusercontent.com/protocolbuffers/protobuf/main/python/google/protobuf/internal/builder.py -O $MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/google/protobuf/internal/builder.py
-   
 RUN echo "== ADJUSTING binaries ==" && \
     mv /usr/bin/python3 /usr/bin/python38 && \
     ln -sf /usr/bin/python3.8 /usr/bin/python3 && \
