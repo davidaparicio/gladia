@@ -160,10 +160,6 @@ def __set_app_middlewares(api_app: FastAPI, api_config: dict) -> None:
 
 nltk.download("punkt")
 
-os.environ["TRITON_MODELS_PATH"] = os.getenv(
-    "TRITON_MODELS_PATH", default="/tmp/gladia/triton"
-)
-
 config = __init_config()
 logger = __init_logging(config)
 
@@ -175,7 +171,7 @@ async def docs_redirect():
     return RedirectResponse(url="/docs")
 
 
-@app.get("/", include_in_schema=False)
+@app.get("/health", include_in_schema=False)
 async def health():
     return None
 

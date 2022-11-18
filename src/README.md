@@ -1,9 +1,8 @@
-# `./run_server.sh` 
+# `./run_server.sh`
 
 This script start the Gladia server. It does mainly three things :
 
 * Setup some environment variables
-* Start the [triton server](https://developer.nvidia.com/nvidia-triton-inference-server) using [micromamba](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html),
 * Start the [FASTAPI web server](https://www.uvicorn.org/) using the `app` object instanciated in `main.py` (see [here](https://github.com/gladiaio/gladia/blob/a832381dfa79ed7974fed090fd549fd7abe2c9ee/src/main.py#L199)).
 
 # `main.py`

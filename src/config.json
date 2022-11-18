@@ -77,15 +77,6 @@
         "api_location": "{protocol}{full_host_name}:{port_number}"
     },
 
-    "triton" : {
-        "models_to_preload": [
-            "language-detection_papluca_xlm-roberta-base-language-detection_tensorrt_inference",
-            "named-entity-recognition_dbmdz_bert-large-cased-finetuned-conll03-english_tensorrt_inference",
-            "sentiment-analyses_nlptown_bert-base-multilingual-uncased-sentiment_tensorrt_inference",
-            "sentence-transformers_all-MiniLM-L6-v2_tensorrt_inference",
-            "sentence-transformers_paraphrase-MiniLM-L6-v2_tensorrt_inference"
-        ]
-    },
     "subprocess_to_apify": [
         "/image/text/ocr-models/textract-extractor/"
     ]

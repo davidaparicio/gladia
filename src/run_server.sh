@@ -13,32 +13,8 @@ service supervisor start
 # initialize the nltk database
 micromamba run -n server python -c "import nltk; nltk.download('punkt')"
 
-if [ $MODE = "standalone" ]
-then
-  micromamba run -n server python warm_up.py
-  micromamba run -n server tritonserver \
-    --http-port ${TRITON_SERVER_PORT_HTTP} \
-    --grpc-port ${TRITON_SERVER_PORT_GRPC} \
-    --metrics-port ${TRITON_SERVER_PORT_METRICS} \
-    --model-repository=${TRITON_MODELS_PATH} \
-    --exit-on-error=false \
-    --model-control-mode=explicit \
-    --repository-poll-secs 10 \
-    --allow-metrics=false & \
-  gunicorn main:app \
-    -b 0.0.0.0:${API_SERVER_PORT_HTTP} \
-    --workers ${API_SERVER_WORKERS} \
-    --worker-class uvicorn.workers.UvicornWorker \
-    --timeout ${API_SERVER_TIMEOUT}
-    
-elif [ $MODE = "server" ]
-then
-  micromamba run -n server gunicorn main:app \
-  -b 0.0.0.0:${API_SERVER_PORT_HTTP} \
-  --workers ${API_SERVER_WORKERS} \
-  --worker-class uvicorn.workers.UvicornWorker \
-  --timeout ${API_SERVER_TIMEOUT}
-else
-  echo "Error: "$MODE" in an unknown mode"
-  exit 1
-fi
+micromamba run -n server gunicorn main:app \
+-b 0.0.0.0:${API_SERVER_PORT_HTTP} \
+--workers ${API_SERVER_WORKERS} \
+--worker-class uvicorn.workers.UvicornWorker \
+--timeout ${API_SERVER_TIMEOUT}

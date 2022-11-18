@@ -1,24 +1,5 @@
-import os
-
-from gladia_api_utils.triton_helper import download_active_triton_models
-
-
 def main():
-    """
-    In this script we download the active models from the Triton server.
-    """
-    os.environ["TRITON_MODELS_PATH"] = os.getenv(
-        "TRITON_MODELS_PATH", default="/tmp/gladia/triton"
-    )
-    if not os.path.exists(os.environ["TRITON_MODELS_PATH"]):
-        os.makedirs(os.environ["TRITON_MODELS_PATH"])
-
-    if os.getenv("TRITON_LAZY_DOWNLOAD", "True").lower() in ("false", "0", "no"):
-        download_active_triton_models(
-            triton_models_dir=os.environ["TRITON_MODELS_PATH"],
-            triton_chkpts_dir=os.environ["TRITON_CHECKPOINTS_PATH"],
-            config_file_path="./config.json",
-        )
+    pass
 
 
 if __name__ == "__main__":
