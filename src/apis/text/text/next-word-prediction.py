@@ -10,16 +10,16 @@ inputs = [
     {
         "type": "string",
         "name": "sentence",
-        "example": task_metadata["inputs_example"]["sentence"]["default_example"],
-        "examples": task_metadata["inputs_example"]["sentence"]["examples"],
+        "example": task_metadata["inputs"]["sentence"]["examples"][0],
+        "examples": task_metadata["inputs"]["sentence"]["examples"],
         "placeholder": "Insert the text to find the next word from.",
     },
     {
         "type": "integer",
         "name": "top_k",
-        "default": task_metadata["inputs_example"]["top_k"]["default_example"],
-        "example": task_metadata["inputs_example"]["top_k"]["default_example"],
-        "examples": task_metadata["inputs_example"]["top_k"]["examples"],
+        "default": task_metadata["inputs"]["top_k"]["examples"][0],
+        "example": task_metadata["inputs"]["top_k"]["examples"][0],
+        "examples": task_metadata["inputs"]["top_k"]["examples"],
         "placeholder": "Top K",
     },
 ]

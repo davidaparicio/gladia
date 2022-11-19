@@ -8,16 +8,16 @@ inputs = [
     {
         "type": "image",
         "name": "image",
-        "example": task_metadata["inputs_example"]["image_url"]["default_example"],
-        "examples": task_metadata["inputs_example"]["image_url"]["examples"],
+        "example": task_metadata["inputs"]["image_url"]["examples"][0],
+        "examples": task_metadata["inputs"]["image_url"]["examples"],
         "placeholder": "Image to classify",
     },
     {
         "type": "integer",
         "name": "top_k",
-        "default": task_metadata["inputs_example"]["top_k"]["default_example"],
-        "example": task_metadata["inputs_example"]["top_k"]["default_example"],
-        "examples": task_metadata["inputs_example"]["top_k"]["examples"],
+        "default": task_metadata["inputs"]["top_k"]["examples"][0],
+        "example": task_metadata["inputs"]["top_k"]["examples"][0],
+        "examples": task_metadata["inputs"]["top_k"]["examples"],
         "placeholder": "Top K",
     },
 ]

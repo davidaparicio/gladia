@@ -1,8 +1,8 @@
 summary: ''
 
 
-inputs_example:
+inputs:
   text:
-    default_example: "def is_palendrome(s):"
+    
     examples:
       - "def is_palendrome(s):"

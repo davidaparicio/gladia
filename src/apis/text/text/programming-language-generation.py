@@ -10,8 +10,8 @@ inputs = [
     {
         "type": "string",
         "name": "code_snippet",
-        "example": task_metadata["inputs_example"]["code_snippet"]["default_example"],
-        "examples": task_metadata["inputs_example"]["code_snippet"]["examples"],
+        "example": task_metadata["inputs"]["code_snippet"]["examples"][0],
+        "examples": task_metadata["inputs"]["code_snippet"]["examples"],
         "placeholder": "Insert the code to generate from",
     }
 ]

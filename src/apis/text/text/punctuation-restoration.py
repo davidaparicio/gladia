@@ -10,8 +10,8 @@ inputs = [
     {
         "type": "string",
         "name": "sentence",
-        "example": task_metadata["inputs_example"]["sentence"]["default_example"],
-        "examples": task_metadata["inputs_example"]["sentence"]["examples"],
+        "example": task_metadata["inputs"]["sentence"]["examples"][0],
+        "examples": task_metadata["inputs"]["sentence"]["examples"],
         "placeholder": "Insert the text to restore punctation from",
     }
 ]

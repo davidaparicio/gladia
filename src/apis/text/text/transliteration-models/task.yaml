@@ -1,13 +1,13 @@
 summary: ''
 
 
-inputs_example:
+inputs:
   text:
-    default_example: "Лорем ипсум долор сит амет"
+    
     examples:
       - "Лорем ипсум долор сит амет"
 
   language:
-    default_example: "ru"
+    
     examples:
       - "ru"

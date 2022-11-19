@@ -10,15 +10,15 @@ inputs = [
     {
         "type": "float",
         "name": "latitude",
-        "example": task_metadata["inputs_example"]["latitude"]["default_example"],
-        "examples": task_metadata["inputs_example"]["latitude"]["examples"],
+        "example": task_metadata["inputs"]["latitude"]["examples"][0],
+        "examples": task_metadata["inputs"]["latitude"]["examples"],
         "placeholder": "Insert the latitude of the address to fetch",
     },
     {
         "type": "float",
         "name": "longitude",
-        "example": task_metadata["inputs_example"]["longitude"]["default_example"],
-        "examples": task_metadata["inputs_example"]["longitude"]["examples"],
+        "example": task_metadata["inputs"]["longitude"]["examples"][0],
+        "examples": task_metadata["inputs"]["longitude"]["examples"],
         "placeholder": "Insert the longitude of the address to fetch",
     },
 ]

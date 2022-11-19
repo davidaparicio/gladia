@@ -8,26 +8,22 @@ inputs = [
     {
         "type": "image",
         "name": "original_image",
-        "example": task_metadata["inputs_example"]["original_image_url"][
-            "default_example"
-        ],
-        "examples": task_metadata["inputs_example"]["original_image_url"]["examples"],
+        "example": task_metadata["inputs"]["original_image_url"]["examples"][0],
+        "examples": task_metadata["inputs"]["original_image_url"]["examples"],
         "placeholder": "Image to replace the background from",
     },
     {
         "type": "image",
         "name": "background_image",
-        "example": task_metadata["inputs_example"]["background_image_url"][
-            "default_example"
-        ],
-        "examples": task_metadata["inputs_example"]["background_image_url"]["examples"],
+        "example": task_metadata["inputs"]["background_image_url"]["examples"][0],
+        "examples": task_metadata["inputs"]["background_image_url"]["examples"],
         "placeholder": "Image the background will be replaced with",
     },
     {
         "type": "list",
         "name": "alignment",
-        "example": task_metadata["inputs_example"]["alignment"]["default_example"],
-        "examples": task_metadata["inputs_example"]["alignment"]["examples"],
+        "example": task_metadata["inputs"]["alignment"]["examples"][0],
+        "examples": task_metadata["inputs"]["alignment"]["examples"],
         "placeholder": "original image insertion position in the background image",
     },
 ]

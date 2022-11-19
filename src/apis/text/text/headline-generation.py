@@ -10,15 +10,15 @@ inputs = [
     {
         "type": "string",
         "name": "text",
-        "example": task_metadata["inputs_example"]["text"]["default_example"],
-        "examples": task_metadata["inputs_example"]["text"]["examples"],
+        "example": task_metadata["inputs"]["text"]["examples"][0],
+        "examples": task_metadata["inputs"]["text"]["examples"],
         "placeholder": "Insert text here to generate the headline from",
     },
     {
         "type": "integer",
         "name": "max_length",
-        "example": task_metadata["inputs_example"]["max_length"]["default_example"],
-        "examples": task_metadata["inputs_example"]["max_length"]["examples"],
+        "example": task_metadata["inputs"]["max_length"]["examples"][0],
+        "examples": task_metadata["inputs"]["max_length"]["examples"],
         "placeholder": "Maximum length for the headline",
     },
 ]

@@ -1,9 +1,8 @@
 summary: ''
 
 
-inputs_example:
+inputs:
   image_url:
-    default_example: "http://files.gladia.io/image/image/enhancement/enhancement_retouching.png"
     examples:
       - "http://files.gladia.io/image/image/enhancement/enhancement_retouching.png"
       - "http://files.gladia.io/image/image/enhancement/enhancement_retouching.jpg"

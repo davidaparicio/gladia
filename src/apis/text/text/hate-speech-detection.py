@@ -10,8 +10,8 @@ inputs = [
     {
         "type": "string",
         "name": "text",
-        "example": task_metadata["inputs_example"]["text"]["default_example"],
-        "examples": task_metadata["inputs_example"]["text"]["examples"],
+        "example": task_metadata["inputs"]["text"]["examples"][0],
+        "examples": task_metadata["inputs"]["text"]["examples"],
         "placeholder": "Insert the text to classify as hate or not",
     }
 ]

@@ -1,8 +1,7 @@
 summary: ''
 
 
-inputs_example:
+inputs:
   video_url:
-    default_example: "http://files.gladia.io/test/test.mp4"
     examples:
       - "http://files.gladia.io/test/test.mp4"

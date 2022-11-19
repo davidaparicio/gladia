@@ -8,17 +8,15 @@ inputs = [
     {
         "type": "image",
         "name": "original_image",
-        "example": task_metadata["inputs_example"]["original_image_url"][
-            "default_example"
-        ],
-        "examples": task_metadata["inputs_example"]["original_image_url"]["examples"],
+        "example": task_metadata["inputs"]["original_image_url"]["examples"][0],
+        "examples": task_metadata["inputs"]["original_image_url"]["examples"],
         "placeholder": "Image to inpaint",
     },
     {
         "type": "image",
         "name": "mask_image",
-        "example": task_metadata["inputs_example"]["mask_image_url"]["default_example"],
-        "examples": task_metadata["inputs_example"]["mask_image_url"]["examples"],
+        "example": task_metadata["inputs"]["mask_image_url"]["examples"][0],
+        "examples": task_metadata["inputs"]["mask_image_url"]["examples"],
         "placeholder": "Mask to guide inpainting",
     },
 ]

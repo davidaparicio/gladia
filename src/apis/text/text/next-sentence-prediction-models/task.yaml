@@ -1,12 +1,10 @@
 summary: ''
 
-inputs_example:
+inputs:
   sentence_1:
-    default_example: "I like you."
     examples:
       - "I like you."
 
   sentence_2:
-    default_example: "But it's not about you."
     examples:
       - "But it's not about you."

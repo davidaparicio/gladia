@@ -1,14 +1,12 @@
 summary: ''
 
-inputs_example:
+inputs:
   image_url:
-    default_example: "http://files.gladia.io/examples/image/text/classification/image.png"
     examples:
       - "http://files.gladia.io/examples/image/text/classification/image.png"
       - "http://files.gladia.io/examples/image/text/classification/image.jpg"
       - "http://files.gladia.io/examples/image/text/classification/image.gif"
   top_k:
-    default_example: 1
     examples:
       - 1
       - 2

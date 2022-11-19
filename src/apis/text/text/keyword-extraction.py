@@ -10,16 +10,16 @@ inputs = [
     {
         "type": "string",
         "name": "text",
-        "example": task_metadata["inputs_example"]["text"]["default_example"],
-        "examples": task_metadata["inputs_example"]["text"]["examples"],
+        "example": task_metadata["inputs"]["text"]["examples"][0],
+        "examples": task_metadata["inputs"]["text"]["examples"],
         "placeholder": "Insert the text to summarize here",
     },
     {
         "type": "integer",
         "name": "top_k",
-        "default": task_metadata["inputs_example"]["top_k"]["default_example"],
-        "example": task_metadata["inputs_example"]["top_k"]["default_example"],
-        "examples": task_metadata["inputs_example"]["top_k"]["examples"],
+        "default": task_metadata["inputs"]["top_k"]["examples"][0],
+        "example": task_metadata["inputs"]["top_k"]["examples"][0],
+        "examples": task_metadata["inputs"]["top_k"]["examples"],
         "placeholder": "Top K",
     },
 ]

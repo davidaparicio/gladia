@@ -1,9 +1,8 @@
 summary: ''
 
 
-inputs_example:
+inputs:
   image_url:
-    default_example: "http://files.gladia.io/examples/image/image/background-removal/owl2.png"
     examples:
       - "http://files.gladia.io/examples/image/image/background-removal/owl2.png"
       - "http://files.gladia.io/examples/image/image/background-removal/owl2.jpg"

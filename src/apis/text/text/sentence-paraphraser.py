@@ -10,8 +10,8 @@ inputs = [
     {
         "type": "string",
         "name": "context",
-        "example": task_metadata["inputs_example"]["context"]["default_example"],
-        "examples": task_metadata["inputs_example"]["context"]["examples"],
+        "example": task_metadata["inputs"]["context"]["examples"][0],
+        "examples": task_metadata["inputs"]["context"]["examples"],
         "placeholder": "Insert the text to paraphrase here",
     }
 ]

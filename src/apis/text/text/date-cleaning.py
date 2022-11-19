@@ -10,8 +10,8 @@ inputs = [
     {
         "type": "string",
         "name": "date",
-        "example": task_metadata["inputs_example"]["date"]["default_example"],
-        "examples": task_metadata["inputs_example"]["date"]["examples"],
+        "example": task_metadata["inputs"]["date"]["examples"][0],
+        "examples": task_metadata["inputs"]["date"]["examples"],
         "placeholder": "Insert the date to format",
     }
 ]

@@ -1,9 +1,8 @@
 summary: ''
 
 
-inputs_example:
+inputs:
   image_url:
-    default_example: "http://files.gladia.io/examples/image/image/colorization/rsz_paris.jpg"
     examples:
       - "http://files.gladia.io/examples/image/image/colorization/rsz_paris.jpg"
       - "http://files.gladia.io/examples/image/image/colorization/rsz_paris.png"

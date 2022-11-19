@@ -8,16 +8,16 @@ inputs = [
     {
         "type": "audio",
         "name": "audio",
-        "example": task_metadata["inputs_example"]["audio_url"]["default_example"],
-        "examples": task_metadata["inputs_example"]["audio_url"]["examples"],
+        "example": task_metadata["inputs"]["audio_url"]["examples"][0],
+        "examples": task_metadata["inputs"]["audio_url"]["examples"],
         "placeholder": "Audio to transcribe",
     },
     {
         "type": "string",
         "name": "language",
-        "default": task_metadata["inputs_example"]["language"]["default_example"],
-        "example": task_metadata["inputs_example"]["language"]["default_example"],
-        "examples": task_metadata["inputs_example"]["language"]["examples"],
+        "default": task_metadata["inputs"]["language"]["examples"][0],
+        "example": task_metadata["inputs"]["language"]["examples"][0],
+        "examples": task_metadata["inputs"]["language"]["examples"],
         "placeholder": "Language of the audio",
     },
 ]

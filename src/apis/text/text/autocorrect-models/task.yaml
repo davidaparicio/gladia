@@ -1,8 +1,8 @@
 summary: ''
 
 
-inputs_example:
+inputs:
   sentence:
-    default_example: "Text to corrcte"
+    
     examples:
       - "Text to corrcte"

@@ -8,8 +8,8 @@ inputs = [
     {
         "type": "video",
         "name": "video",
-        "example": task_metadata["inputs_example"]["video_url"]["default_example"],
-        "examples": task_metadata["inputs_example"]["video_url"]["examples"],
+        "example": task_metadata["inputs"]["video_url"]["examples"][0],
+        "examples": task_metadata["inputs"]["video_url"]["examples"],
         "placeholder": "File to the video to interpolate from",
     }
 ]

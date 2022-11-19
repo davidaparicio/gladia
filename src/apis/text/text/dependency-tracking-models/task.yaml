@@ -1,8 +1,7 @@
 summary: ''
 
 
-inputs_example:
+inputs:
   input_string:
-    default_example: "Text to analyze."
     examples:
       - "Text to analyze."

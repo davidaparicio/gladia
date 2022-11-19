@@ -1,8 +1,8 @@
 summary: 'Format the input string as a clean date'
 
 
-inputs_example:
+inputs:
   date:
-    default_example: "2/24/2003 0:00"
+    
     examples:
       - "2/24/2003 0:00"

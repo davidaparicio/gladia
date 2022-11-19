@@ -1,17 +1,17 @@
 summary: ''
 
-inputs_example:
+inputs:
   input_string:
-    default_example: "Text to translate"
+    
     examples:
       - "Text to translate"
 
   source_language:
-    default_example: "eng"
+    
     examples:
       - "eng"
 
   target_language:
-    default_example: "fra"
+    
     examples:
       - "fra"

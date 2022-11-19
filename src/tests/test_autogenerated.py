@@ -112,7 +112,7 @@ def autogenerate_tests(path_to_api: str, path_to_config: str):
                 )
 
                 inputs_to_test = get_inputs_to_test(
-                    input_names=list(task_metadata["inputs_example"].keys()),
+                    input_names=list(task_metadata["inputs"].keys()),
                     path_to_task=join_path(
                         path_to_api, input_modality, output_modality, task
                     ),

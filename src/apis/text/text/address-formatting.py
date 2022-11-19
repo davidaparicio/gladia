@@ -10,8 +10,8 @@ inputs = [
     {
         "type": "string",
         "name": "address",
-        "example": task_metadata["inputs_example"]["address"]["default_example"],
-        "examples": task_metadata["inputs_example"]["address"]["examples"],
+        "example": task_metadata["inputs"]["address"]["examples"][0],
+        "examples": task_metadata["inputs"]["address"]["examples"],
         "placeholder": "Insert the address to format",
     }
 ]

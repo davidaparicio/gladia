@@ -8,8 +8,8 @@ inputs = [
     {
         "type": "audio",
         "name": "audio",
-        "example": task_metadata["inputs_example"]["audio_url"]["default_example"],
-        "examples": task_metadata["inputs_example"]["audio_url"]["examples"],
+        "example": task_metadata["inputs"]["audio_url"]["examples"][0],
+        "examples": task_metadata["inputs"]["audio_url"]["examples"],
         "placeholder": "Audio to categorize the gender from",
     },
 ]

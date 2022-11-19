@@ -8,8 +8,8 @@ inputs = [
     {
         "type": "image",
         "name": "image",
-        "example": task_metadata["inputs_example"]["image_url"]["default_example"],
-        "examples": task_metadata["inputs_example"]["image_url"]["examples"],
+        "example": task_metadata["inputs"]["image_url"]["examples"][0],
+        "examples": task_metadata["inputs"]["image_url"]["examples"],
         "placeholder": "Image to restore",
     }
 ]

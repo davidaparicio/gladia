@@ -1,15 +1,13 @@
 summary: ''
 
 
-inputs_example:
+inputs:
   audio_url:
-    default_example: "http://files.gladia.io/examples/audio/text/audio-transcription/audio.mp3"
     examples:
       - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.mp3"
       - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.m4a"
       - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.wav"
 
   language:
-    default_example: "en"
     examples:
       - "en"

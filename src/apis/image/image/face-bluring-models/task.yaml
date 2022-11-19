@@ -1,9 +1,8 @@
 summary: ''
 
 
-inputs_example:
+inputs:
   image_url:
-    default_example: "http://files.gladia.io/examples/image/image/face-bluring/face-bluring.jpg"
     examples:
       - "http://files.gladia.io/examples/image/image/face-bluring/face-bluring.jpg"
       - "http://files.gladia.io/examples/image/image/face-bluring/face-bluring.png"

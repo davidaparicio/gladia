@@ -87,21 +87,19 @@ def get_inputs_to_test(
     else:
         return [{input_name: "" for input_name in input_names}]
 
-    task_metadata_file_path = os.path.join(path_to_task, ".task_metadata.yaml")
+    task_metadata_file_path = os.path.join(path_to_task, "task.yaml")
     task_metadata = yaml.safe_load(open(task_metadata_file_path, "r"))
 
     if PYTEST_CONFIG.getoption("--default-inputs-only"):
         return [
             {
-                input_name: task_metadata["inputs_example"][input_name][
-                    "default_example"
-                ]
+                input_name: task_metadata["inputs"][input_name]["examples"][0]
                 for input_name in input_names
             }
         ]
 
     possible_values_for_each_input = {
-        input_name: task_metadata["inputs_example"][input_name]["examples"]
+        input_name: task_metadata["inputs"][input_name]["examples"]
         for input_name in input_names
     }
 

@@ -10,15 +10,15 @@ inputs = [
     {
         "type": "string",
         "name": "text",
-        "example": task_metadata["inputs_example"]["text"]["default_example"],
-        "examples": task_metadata["inputs_example"]["text"]["examples"],
+        "example": task_metadata["inputs"]["text"]["examples"][0],
+        "examples": task_metadata["inputs"]["text"]["examples"],
         "placeholder": "Insert the text to transliterate here",
     },
     {
         "type": "string",
         "name": "language",
-        "example": task_metadata["inputs_example"]["language"]["default_example"],
-        "examples": task_metadata["inputs_example"]["language"]["examples"],
+        "example": task_metadata["inputs"]["language"]["examples"][0],
+        "examples": task_metadata["inputs"]["language"]["examples"],
         "placeholder": "Insert the language code here",
     },
 ]

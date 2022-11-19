@@ -10,8 +10,8 @@ inputs = [
     {
         "type": "string",
         "name": "input_string",
-        "example": task_metadata["inputs_example"]["input_string"]["default_example"],
-        "examples": task_metadata["inputs_example"]["input_string"]["examples"],
+        "example": task_metadata["inputs"]["input_string"]["examples"][0],
+        "examples": task_metadata["inputs"]["input_string"]["examples"],
         "placeholder": "Insert the text to analyze here",
     }
 ]

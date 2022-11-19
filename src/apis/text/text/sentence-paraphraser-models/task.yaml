@@ -1,8 +1,8 @@
 summary: ''
 
 
-inputs_example:
+inputs:
   context:
-    default_example: "Once, a group of frogs was roaming around the forest in search of water."
+    
     examples:
       - "Once, a group of frogs was roaming around the forest in search of water."

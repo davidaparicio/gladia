@@ -8,20 +8,16 @@ inputs = [
     {
         "type": "image",
         "name": "image",
-        "example": task_metadata["inputs_example"]["image_url"]["default_example"],
-        "examples": task_metadata["inputs_example"]["image_url"]["examples"],
+        "example": task_metadata["inputs"]["image_url"]["examples"][0],
+        "examples": task_metadata["inputs"]["image_url"]["examples"],
         "placeholder": "Image to extract text from",
     },
     {
         "type": "string",
         "name": "source_language",
-        "default": task_metadata["inputs_example"]["source_language"][
-            "default_example"
-        ],
-        "example": task_metadata["inputs_example"]["source_language"][
-            "default_example"
-        ],
-        "examples": task_metadata["inputs_example"]["source_language"]["examples"],
+        "default": task_metadata["inputs"]["source_language"]["examples"][0],
+        "example": task_metadata["inputs"]["source_language"]["examples"][0],
+        "examples": task_metadata["inputs"]["source_language"]["examples"],
         "placeholder": "ISO 639-2 Source language (3 letters)",
     },
 ]
