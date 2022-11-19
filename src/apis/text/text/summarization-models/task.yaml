@@ -1,5 +1,7 @@
 summary: ''
 
+default-model: "all-MiniLM-L6-v2"
+
 inputs:
   text:
     type: str
@@ -26,3 +28,8 @@ inputs:
     default: 512
     examples:
       - 512
+
+output:
+  name: text
+  type: text
+  example: ""

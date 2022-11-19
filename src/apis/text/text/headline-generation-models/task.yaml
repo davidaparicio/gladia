@@ -1,5 +1,6 @@
 summary: ''
 
+default-model: "michau-t5-base-en-generate-headline"
 
 inputs:
   text:
@@ -19,3 +20,8 @@ inputs:
     examples:
       - 16
       - 100
+
+output:
+  name: text
+  type: text
+  example: ""

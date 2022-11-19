@@ -1,8 +1,15 @@
 summary: ''
 
+default-model: "bloom-560m"
+
 inputs:
   text:
     type: str
     placeholder: "input text"
     examples:
       - "I'm currently driving while eating a"
+
+output:
+  name: text
+  type: text
+  example: ""

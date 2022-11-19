@@ -1,5 +1,7 @@
 summary: ''
 
+default-model: "bart-large-xsum-samsum"
+
 inputs:
   text:
     type: str
@@ -18,3 +20,8 @@ Amanda: Just text him 🙂
 Hannah: Urgh.. Alright
 Hannah: Bye
 Amanda: Bye bye"
+
+output:
+  name: text
+  type: text
+  example: ""

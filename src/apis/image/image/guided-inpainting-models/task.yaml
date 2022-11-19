@@ -1,5 +1,6 @@
 summary: ''
 
+default-model: "stable-diffusion"
 
 inputs:
   original_image:
@@ -17,3 +18,8 @@ inputs:
     type: str
     examples:
       - "a cat sitting on a bench"
+
+output:
+  name: image
+  type: image
+  example: ""

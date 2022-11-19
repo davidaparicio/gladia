@@ -1,5 +1,6 @@
 summary: ''
 
+default-model: "transliterate"
 
 inputs:
   text:
@@ -13,3 +14,8 @@ inputs:
     placeholder: "language"
     examples:
       - "ru"
+
+output:
+  name: text
+  type: text
+  example: ""

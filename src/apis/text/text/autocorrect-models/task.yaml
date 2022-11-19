@@ -1,5 +1,6 @@
 summary: ''
 
+default-model: "flexudy-t5-base-multi-sentence-doctor"
 
 inputs:
   sentence:
@@ -7,3 +8,8 @@ inputs:
     placeholder: "input text"
     examples:
       - "Text to corrcte"
+
+output:
+  name: text
+  type: text
+  example: ""

@@ -1,5 +1,6 @@
 summary: 'Replace the background of an image'
 
+default-model: "mobilenet"
 
 inputs:
   original_image:
@@ -32,3 +33,8 @@ inputs:
       - "bottom-center"
       - "bottom-right"
       - "cropped"
+
+output:
+  name: replaced_image
+  type: image
+  example: ""

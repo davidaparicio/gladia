@@ -1,5 +1,7 @@
 summary: ''
 
+default-model: "stable-diffusion"
+
 inputs:
   prompt:
     type: str
@@ -27,3 +29,8 @@ inputs:
     default: 396916372
     examples:
       - 396916372
+
+output:
+  name: image
+  type: image
+  example: ""

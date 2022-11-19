@@ -1,5 +1,6 @@
 summary: ''
 
+default-model: "zits"
 
 inputs:
   original_image:
@@ -12,3 +13,8 @@ inputs:
     type: image
     examples:
       - "https://raw.githubusercontent.com/CompVis/latent-diffusion/main/data/inpainting_examples/overture-creations-5sI6fQgYIuo_mask.png"
+
+output:
+  name: image
+  type: image
+  example: ""

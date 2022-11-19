@@ -1,5 +1,6 @@
 summary: ''
 
+default-model: "openai-whisper-tiny"
 
 inputs:
   audio:
@@ -15,3 +16,8 @@ inputs:
     type: str
     examples:
       - "en"
+
+output:
+  name: transcription
+  type: str
+  example: "I'm telling you that this is the tools i've seen so far."

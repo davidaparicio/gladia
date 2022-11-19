@@ -1,5 +1,7 @@
 summary: ''
 
+default-model: "bert-base-uncased"
+
 inputs:
   sentence_1:
     type: str
@@ -12,3 +14,8 @@ inputs:
     placeholder: "input text"
     examples:
       - "But it's not about you."
+
+output:
+  name: text
+  type: text
+  example: ""

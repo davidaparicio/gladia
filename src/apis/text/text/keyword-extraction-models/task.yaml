@@ -1,5 +1,7 @@
 summary: ''
 
+default-model: "keybert-paraphrase-multilingual-MiniLM-L12-v2"
+
 inputs:
   text:
     type: str
@@ -15,3 +17,8 @@ inputs:
       - 1
       - 10
       - 100
+
+output:
+  name: text
+  type: text
+  example: ""

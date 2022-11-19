@@ -1,5 +1,7 @@
 summary: ''
 
+default-model: "distilbert-base-uncased"
+
 inputs:
   sentence:
     type: str
@@ -14,3 +16,8 @@ inputs:
       - 1
       - 3
       - 10
+
+output:
+  name: text
+  type: text
+  example: ""

@@ -1,5 +1,6 @@
 summary: ''
 
+default-model: "byt5-base-tweet-hate-detection"
 
 inputs:
   text:
@@ -7,3 +8,8 @@ inputs:
     placeholder: "input text"
     examples:
       - "I hate you piece of shit"
+
+output:
+  name: text
+  type: text
+  example: ""

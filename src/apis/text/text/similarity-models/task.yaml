@@ -1,5 +1,6 @@
 summary: ''
 
+default-model: "all-MiniLM-L6-v2"
 
 inputs:
   sentence_1:
@@ -13,3 +14,8 @@ inputs:
     placeholder: "input text"
     examples:
       - "I hate banana"
+
+output:
+  name: text
+  type: text
+  example: ""

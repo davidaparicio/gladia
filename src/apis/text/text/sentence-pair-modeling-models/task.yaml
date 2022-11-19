@@ -1,5 +1,6 @@
 summary: ''
 
+default-model: "UKPLab-all-MiniLM-L6-v2"
 
 inputs:
   sentence:
@@ -7,3 +8,8 @@ inputs:
     placeholder: "input text"
     examples:
       - "Once, a group of frogs was roaming around the forest in search of water."
+
+output:
+  name: text
+  type: text
+  example: ""

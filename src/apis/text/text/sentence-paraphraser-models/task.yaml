@@ -1,5 +1,6 @@
 summary: ''
 
+default-model: "ramsrigouthamg-t5-large-paraphraser-diverse-high-quality"
 
 inputs:
   context:
@@ -7,3 +8,8 @@ inputs:
     placeholder: "input text"
     examples:
       - "Once, a group of frogs was roaming around the forest in search of water."
+
+output:
+  name: text
+  type: text
+  example: ""

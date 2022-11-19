@@ -459,7 +459,7 @@ class TaskRouter:
     """
 
     def __init__(
-        self, router: APIRouter, input: List[dict], output, default_model: str
+        self, router: APIRouter, input: List[dict], output, default_model: str, rel_path=None,
     ):
         """
         Initialize the TaskRouter class
@@ -479,13 +479,14 @@ class TaskRouter:
         self.output = output
         self.default_model = default_model
 
-        namespace = sys._getframe(1).f_globals
+        if not rel_path:
+            namespace = sys._getframe(1).f_globals
 
-        # concate the package name (i.e apis.text.text) with the model filename (i.e word-alignment.py) to obtain the relative path
-        rel_path = os.path.join(
-            namespace["__package__"].replace(".", "/"),
-            namespace["__file__"].split("/")[-1],
-        )
+            # concate the package name (i.e apis.text.text) with the model filename (i.e word-alignment.py) to obtain the relative path
+            rel_path = os.path.join(
+                namespace["__package__"].replace(".", "/"),
+                namespace["__file__"].split("/")[-1],
+            )
 
         full_path = os.path.join(os.getenv("PATH_TO_GLADIA_SRC", "/app"), rel_path)
 

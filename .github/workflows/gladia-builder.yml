@@ -34,7 +34,7 @@ jobs:
         !contains(github.event.pull_request.labels.*.name, 'doc')
     runs-on: [self-hosted, build, persist]
     # map steps output to job output
-    outputs:
+    output:
       dockerimage: ${{ steps.setoutput.outputs.dockerimage }}
     steps:
       - name: Checkout

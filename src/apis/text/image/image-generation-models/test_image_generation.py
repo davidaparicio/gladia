@@ -4,7 +4,6 @@ from typing import Any, Dict, List
 import pytest
 import requests
 
-from main import app
 from tests.constants import HOST_TO_EXAMPLE_STORAGE
 from tests.utils import get_inputs_to_test, get_models_to_test
 

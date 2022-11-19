@@ -1,5 +1,6 @@
 summary: 'Format the input string as a clean date'
 
+default-model: "dataprep-formatter"
 
 inputs:
   date:
@@ -7,3 +8,8 @@ inputs:
     placeholder: "date to clean"
     examples:
       - "2/24/2003 0:00"
+
+output:
+  name: text
+  type: text
+  example: ""

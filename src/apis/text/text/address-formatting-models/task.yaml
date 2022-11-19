@@ -1,5 +1,6 @@
 summary: 'Format the input string as an clean adress using geopy'
 
+default-model: "geopy-formatter"
 
 inputs:
   address:
@@ -7,3 +8,8 @@ inputs:
     placeholder: "adress to format"
     examples:
       - "Taj Mahal, Agra, Uttar Pradesh 282001"
+
+output:
+  name: text
+  type: text
+  example: ""

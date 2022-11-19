@@ -1,5 +1,6 @@
 summary: ''
 
+default-model: "distilbert-base-cased-distilled-squad"
 
 inputs:
   context:
@@ -21,3 +22,8 @@ inputs:
     examples:
       - 1
       - 10
+
+output:
+  name: text
+  type: text
+  example: ""

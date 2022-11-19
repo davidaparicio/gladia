@@ -1,5 +1,7 @@
 summary: ''
 
+default-model: "textract-extractor"
+
 inputs:
   image:
     type: image
@@ -14,3 +16,8 @@ inputs:
     examples:
       - "eng"
       - "fra"
+
+output:
+  name: image
+  type: str
+  example: ""

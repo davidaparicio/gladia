@@ -1,5 +1,6 @@
 summary: 'Format the input string as an clean adress using geopy'
 
+default-model: "geopy-formatter"
 
 inputs:
   latitude:
@@ -12,3 +13,8 @@ inputs:
     type: float
     examples:
       - 5.36978
+
+output:
+  name: text
+  type: text
+  example: ""

@@ -1,5 +1,7 @@
 summary: ''
 
+default-model: "alexnet"
+
 inputs:
   image:
     type: image
@@ -15,3 +17,8 @@ inputs:
       - 1
       - 2
       - 100
+
+output:
+  name: image
+  type: str
+  example: ""

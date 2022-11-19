@@ -1,5 +1,6 @@
 summary: ''
 
+default-model: v1
 
 inputs:
   image:
@@ -9,3 +10,8 @@ inputs:
       - "http://files.gladia.io/examples/image/image/uncolorization/landscape-pics-wallpapers.png"
       - "http://files.gladia.io/examples/image/image/uncolorization/landscape-pics-wallpapers.jpg"
       # - "http://files.gladia.io/examples/image/image/uncolorization/landscape-pics-wallpapers.gif" # FIXME: uncolorization doesn't support .gif files
+
+output:
+  name: image
+  type: image
+  example: ""

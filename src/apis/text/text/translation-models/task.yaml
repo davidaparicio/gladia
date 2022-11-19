@@ -1,5 +1,7 @@
 summary: ''
 
+default-model: "facebook-nllb-200-distilled-600M"
+
 inputs:
   input_string:
     type: str
@@ -18,3 +20,8 @@ inputs:
     placeholder: "ISO 639-2 Source language (3 letters)"
     examples:
       - "fra"
+
+output:
+  name: text
+  type: text
+  example: ""

@@ -1,5 +1,6 @@
 summary: ''
 
+default-model: "CMFNet"
 
 inputs:
   image:
@@ -8,3 +9,8 @@ inputs:
     examples:
       - "http://files.gladia.io/image/image/deblurring/deblurring.png"
       - "http://files.gladia.io/image/image/deblurring/deblurring.jpg"
+
+output:
+  name: deblurded_image
+  type: image
+  example: ""

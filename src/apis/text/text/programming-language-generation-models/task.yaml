@@ -1,8 +1,15 @@
 summary: ''
 
+default-model: "sentdex-GPyT"
+
 inputs:
   code_snippet:
     type: str
     placeholder: "input text"
     examples:
       - "def is_palendrome(s):"
+
+output:
+  name: text
+  type: text
+  example: ""

@@ -1,5 +1,6 @@
 summary: ''
 
+default-model: "LAL-Parser"
 
 inputs:
   input_string:
@@ -7,3 +8,8 @@ inputs:
     placeholder: "input text"
     examples:
       - "Text to analyze."
+
+output:
+  name: text
+  type: text
+  example: ""

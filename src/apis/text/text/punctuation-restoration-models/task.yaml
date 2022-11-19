@@ -1,5 +1,6 @@
 summary: 'Repaire the input sentence punctuation'
 
+default-model: "kredor-punctuate-all"
 
 inputs:
   sentence:
@@ -9,3 +10,8 @@ inputs:
       - "My name is Clara and I live in Berkeley California"
       - "My name is Sarah and I live in London"
       - "My name is Clara and I live in Berkeley, California."
+
+output:
+  name: text
+  type: text
+  example: ""
