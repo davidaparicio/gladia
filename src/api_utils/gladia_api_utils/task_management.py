@@ -17,7 +17,7 @@ def get_task_metadata(path_to_initializer_file: str) -> Any:
 
     task_metadata_file_path = os.path.join(
         os.path.split(path_to_initializer_file)[0],
-        os.path.split(path_to_initializer_file)[1].replace(".py", "-models"),
+        os.path.split(path_to_initializer_file)[1],
         "task.yaml",
     )
 

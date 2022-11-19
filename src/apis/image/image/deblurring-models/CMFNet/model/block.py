@@ -211,8 +211,6 @@ if __name__ == "__main__":
 
     layer = PAB(64, 3, 4, False, PReLU())
 
-    for idx, m in enumerate(layer.modules()):
-        print(idx, "-", m)
     s = time.time()
 
     rgb = ones(1, 64, 256, 256, dtype=torch_float, requires_grad=False)

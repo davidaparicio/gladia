@@ -6,8 +6,6 @@ import sys
 from types import ModuleType
 from typing import Any, Dict, List
 
-from .submodules import to_task_name
-
 
 def __add_router(
     app,
@@ -32,11 +30,10 @@ def __add_router(
         apis_folder_name, ""
     )[1:].split(".")
 
-    module_task = to_task_name(module_task)
     module_config = active_tasks[module_input][module_output]
 
     active_task_list = set(
-        map(lambda each: to_task_name(each.split("?")[0]), module_config)
+        map(lambda each: each.split("?")[0], module_config)
     )
 
     if ("NONE" not in active_task_list and "NONE" not in module_config) and (
@@ -48,10 +45,7 @@ def __add_router(
         from gladia_api_utils.submodules import TaskRouter
         from gladia_api_utils.task_management import get_task_metadata
 
-        print(module_path)
-
-        # assert False, module_path
-        task_metadata = get_task_metadata(module_path.replace(".", "/") + "-models")
+        task_metadata = get_task_metadata(module_path.replace(".", "/"))
 
         inputs = [{
             "name": input_name,
@@ -78,7 +72,7 @@ def __add_router(
             rel_path=module_path.replace(".", "/")
         )
 
-        module_prefix = module_path.replace(".", "/").replace(apis_folder_name, "")
+        module_prefix = module_path.replace(".", "/").replace(apis_folder_name, "").replace("-models", "")
 
         app.include_router(router, prefix=module_prefix)#
 
@@ -153,20 +147,6 @@ def __module_is_a_task(split_module_path: List[str], module_config: dict) -> boo
         or len(module_config) == 0
     )
 
-
-def __module_is_a_model(split_module_path: List[str]) -> bool:
-    """
-    Check if the module is a model with values like inception, resnet, etc.
-
-    Args:
-        split_module_path (list): module path split by "."
-
-    Returns:
-        bool: True if the module is a model, False otherwise
-    """
-    return len(split_module_path) == 4
-
-
 def __module_is_subprocess(module_path: str) -> bool:
     """
     Check if the module is a subprocess looking for env.yaml file within
@@ -221,7 +201,7 @@ def add_routes_to_router(
 
         module_relative_path = module_path.replace("apis", "")[1:]
 
-        if "module" in vars() and "router" in dir(module):
+        if "module" in vars() and len(module_path.split(".")) == 4 and "task.yaml" in os.listdir("apis/" + module_relative_path.replace(".", "/")):
             __add_router(app, module, module_path, active_tasks, apis_folder_name)
 
         if not recursive or not is_pkg:
@@ -238,7 +218,6 @@ def add_routes_to_router(
             __module_is_an_input_type(module_split)
             or __module_is_a_modality(module_split, module_config)
             or __module_is_a_task(module_split, module_config)
-            or __module_is_a_model(module_split)
         ) and (not __module_is_subprocess(module_file_path)):
             add_routes_to_router(app, apis_folder_name, active_tasks, module_path)
         else:

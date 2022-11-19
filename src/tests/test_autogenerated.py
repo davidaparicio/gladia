@@ -4,7 +4,7 @@ from logging import getLogger
 from os.path import join as join_path
 
 import pytest
-import requests
+from warnings import warn
 from gladia_api_utils.task_management import get_task_metadata
 
 from main import app
@@ -76,6 +76,7 @@ def autogenerate_tests(path_to_api: str, path_to_config: str):
         for output_modality in os.listdir(join_path(path_to_api, input_modality)):
 
             if os.path.isfile(join_path(path_to_api, input_modality, output_modality)):
+                # warn(f"A {input_modality} {output_modality}")
                 continue
 
             for task in os.listdir(
@@ -83,6 +84,7 @@ def autogenerate_tests(path_to_api: str, path_to_config: str):
             ):
 
                 if task.endswith("-models") is False:
+                    # warn(f"B {input_modality} {output_modality} {task}")
                     continue
 
                 if (
@@ -95,16 +97,18 @@ def autogenerate_tests(path_to_api: str, path_to_config: str):
                     )
                     is False
                 ):
+                    warn(f"C {input_modality} {output_modality} {task}")
                     continue
+
 
                 path_to_initializer_file = join_path(
                     path_to_api,
                     input_modality,
                     output_modality,
-                    f"{task[:-len('-models')]}.py",
+                    task,
                 )
 
-                if os.path.exists(path_to_initializer_file) is False:
+                if os.path.exists(join_path(path_to_initializer_file, "task.yaml")) is False:
                     continue
 
                 task_metadata = get_task_metadata(

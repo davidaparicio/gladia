@@ -35,8 +35,6 @@ logger = getLogger(__name__)
 PATH_TO_GLADIA_SRC = os.getenv("PATH_TO_GLADIA_SRC", "/app")
 ENV_YAML = "env.yaml"
 
-MODELS_FOLDER_SUFFIX = "models"
-
 FILE_TYPES = ["image", "audio", "video"]
 TEXT_TYPES = ["text", "str", "string"]
 LIST_TYPES = ["list", "tuple", "set"]
@@ -64,40 +62,6 @@ def merge_dicts(*args: dict) -> dict:
         sum_items += list(dictionary.items())
 
     return dict(sum_items)
-
-
-def to_task_name(folder_name: str) -> str:
-    """
-    Convert a folder name to a task name.
-
-    Args:
-        folder_name (str): name of the folder
-
-    Returns:
-        str: name of the task
-    """
-
-    # remove the models suffix
-    # remove 1 more character to remove the "-"
-    return folder_name[: -(len(MODELS_FOLDER_SUFFIX) + 1)]
-
-
-def to_models_folder_name(model_name: str) -> str:
-    """
-    This function is used to find the folder containing all
-    related models for a given task.
-    We use the -{MODELS_FOLDER_SUFFIX} in order to
-    avoid fastapi to be confused with the routing layer
-    defined by the task.py
-
-    Args:
-        model_name (str): name of the model
-
-    Returns:
-        str: name of the folder containing all related models
-
-    """
-    return f"{model_name}-{MODELS_FOLDER_SUFFIX}"
 
 
 def dict_model(name: str, dict_def: dict) -> BaseModel:
@@ -152,8 +116,6 @@ def get_module_infos(root_path=None) -> Tuple:
 def get_model_versions(root_path: str = None) -> Tuple[List[str], str]:
     """
     Get the list of available model versions.
-    We use the -{MODELS_FOLDER_SUFFIX} in order to
-    avoid fastapi to be confused with the routing layer
 
     Args:
         root_path (str): path to the root of the project
@@ -174,7 +136,6 @@ def get_model_versions(root_path: str = None) -> Tuple[List[str], str]:
         rel_path = os.path.join(cwd, rel_path)
 
     sub_dir_to_crawl = f"{os.path.splitext(os.path.basename(rel_path))[0]}"
-    sub_dir_to_crawl = to_models_folder_name(sub_dir_to_crawl)
 
     versions = dict()
     package_path = str(Path(rel_path).parent.joinpath(sub_dir_to_crawl))
@@ -187,9 +148,7 @@ def get_model_versions(root_path: str = None) -> Tuple[List[str], str]:
             # Retieve metadata from metadata file and push it to versions,
             # the output of the get road
             model = fname
-            endpoint = package_path.replace("apis", "").replace(
-                f"-{MODELS_FOLDER_SUFFIX}", ""
-            )
+            endpoint = package_path.replace("apis", "")
             model_metadata = get_model_metadata(endpoint, model)
             versions[fname] = model_metadata
 
@@ -208,7 +167,7 @@ def get_model_metadata(endpoint: str, model: str) -> dict:
         dict: metadata of the model
     """
     splited_endpoint = endpoint.split("/")
-    endpoint = f"/{splited_endpoint[1]}/{splited_endpoint[2]}/{splited_endpoint[3]}-{MODELS_FOLDER_SUFFIX}/"
+    endpoint = f"/{splited_endpoint[1]}/{splited_endpoint[2]}/{splited_endpoint[3]}/"
     path = f"apis{endpoint}{model}"
     file_name = ".model_metadata.yaml"
     fallback_file_name = ".metadata_model_template.yaml"
@@ -493,7 +452,7 @@ class TaskRouter:
         self.task_name, self.plugin, self.tags = get_module_infos(root_path=rel_path)
         self.versions, self.root_package_path = get_model_versions(full_path)
         self.endpoint = (
-            f"/{rel_path.split('/')[1]}/{rel_path.split('/')[2]}/{self.task_name}/"
+            f"/{rel_path.split('/')[1]}/{rel_path.split('/')[2]}/{self.task_name.replace('-models', '')}/"
         )
 
         self.default_model = default_model
@@ -560,6 +519,8 @@ class TaskRouter:
             default=Query(self.default_model, enum=set(self.versions.keys())),
         )
 
+        self.inputs = self.__get_routeur_inputs()
+
         # Define the post routes implemented by fastapi
         # The @router.post() content define the informations
         # displayed in /docs and /openapi.json for the post routes
@@ -575,14 +536,10 @@ class TaskRouter:
 
             # cast BaseModel pydantic models into python type
             parameters_in_body = self.__build_parameters_in_body(kwargs)
+            del kwargs
 
-            kwargs = parameters_in_body
-
-            self.__get_routeur_inputs()
-
-            model = kwargs["model"]
-            # remove it from kwargs to avoid passing it to the predict function
-            del kwargs["model"]
+            model = parameters_in_body["model"]
+            del parameters_in_body["model"]
 
             module_path = f"{self.root_package_path}/{model}/"
             self.module_path = module_path
@@ -594,10 +551,10 @@ class TaskRouter:
 
             # return False if an error occured
             (
-                kwargs,
+                parameters_in_body,
                 success,
                 error_message,
-            ) = await clean_kwargs_based_on_router_inputs(kwargs, self.inputs)
+            ) = await clean_kwargs_based_on_router_inputs(parameters_in_body, self.inputs)
 
             if not success:
                 raise HTTPException(status.HTTP_400_BAD_REQUEST, error_message)
@@ -615,7 +572,7 @@ class TaskRouter:
                     # if the api is running, use it
                     result = call_subprocess_api(
                         api_name=api_name,
-                        kwargs=kwargs,
+                        kwargs=parameters_in_body,
                     )
 
                 else:
@@ -623,27 +580,21 @@ class TaskRouter:
                     result = self.__call_in_subprocess(
                         inputs=self.inputs,
                         model=model,
-                        kwargs=kwargs,
+                        kwargs=parameters_in_body,
                         env_name=env_name,
                     )
 
             else:
                 result = self.__call_in_a_native_way(
-                    model=model, kwargs=kwargs, args=args
+                    model=model, kwargs=parameters_in_body, args=args
                 )
 
             return self.__post_processing(result)
 
     def __get_routeur_inputs(self) -> list:
-        self.routeur = (
-            to_task_name(self.root_package_path)
-            .replace(os.getenv("PATH_TO_GLADIA_SRC", "/app"), "")
-            .replace("/", ".")
-            .strip(".")
-        )
-        self.this_routeur = importlib.import_module(self.routeur.replace("/", "."))
-        self.inputs = self.this_routeur.inputs
-        return self.inputs
+        task_metadata = yaml.safe_load(open(os.path.join(self.root_package_path, "task.yaml")))
+
+        return task_metadata["inputs"]
 
     def __build_parameters_in_body(self, kwargs: dict) -> dict:
         """
@@ -805,14 +756,14 @@ class TaskRouter:
         # convert io Bytes to files
         # input_files to clean
         input_files = list()
-        for input in inputs:
-            if input["type"] in FILE_TYPES:
-                tmp_file = write_tmp_file(kwargs[input["name"]])
-                kwargs[input["name"]] = tmp_file
+        for input_name, input_metadata in inputs.items():
+            if input_metadata["type"] in FILE_TYPES:
+                tmp_file = write_tmp_file(kwargs[input_name])
+                kwargs[input_name] = tmp_file
                 input_files.append(tmp_file)
 
-            elif input["type"] in ["text"]:
-                kwargs[input["name"]] = quote(kwargs[input["name"]])
+            elif input_metadata["type"] in ["text"]:
+                kwargs[input_name] = quote(kwargs[input_name])
 
         output_tmp_result = quote(tempfile.NamedTemporaryFile().name)
 
@@ -901,10 +852,10 @@ async def clean_kwargs_based_on_router_inputs(
     success = True
     error_message = "Empty error message"
 
-    for input in inputs:
-        input_name = input["name"]
+    for input_name, input_metadata in inputs.items():
+        # input_name = input["name"]
 
-        if input["type"] in FILE_TYPES:
+        if input_metadata["type"] in FILE_TYPES:
             # if the input file is in kwargs:
             if isinstance(
                 kwargs.get(input_name, None),
@@ -940,12 +891,12 @@ async def clean_kwargs_based_on_router_inputs(
             # remove the url arg to avoid it to be passed in predict
             if f"{input_name}_url" in kwargs:
                 del kwargs[f"{input_name}_url"]
-        elif input["type"] in LIST_TYPES:
+        elif input_metadata["type"] in LIST_TYPES:
             kwargs[input_name] = str(kwargs[input_name].value)
         else:
             if not kwargs.get(input_name, None):
                 error_message = (
-                    f"Input '{input_name}' of '{input['type']}' type is missing."
+                    f"Input '{input_name}' of '{input_metadata['type']}' type is missing."
                 )
                 success = False
 
