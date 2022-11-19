@@ -858,8 +858,6 @@ async def clean_kwargs_based_on_router_inputs(
     error_message = "Empty error message"
 
     for input_name, input_metadata in inputs.items():
-        # input_name = input["name"]
-
         if input_metadata["type"] in FILE_TYPES:
             # if the input file is in kwargs:
             if isinstance(

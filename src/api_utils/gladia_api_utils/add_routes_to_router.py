@@ -9,7 +9,6 @@ from typing import Any, Dict, List
 
 def __add_router(
     app,
-    module: ModuleType,
     module_path: str,
     active_tasks: Dict[str, Any],
     apis_folder_name: str,
@@ -201,13 +200,10 @@ def add_routes_to_router(
         # also make the path absolute
         module_file_path = os.path.abspath(module_path.replace(".", "/"))
 
-        if not __module_is_subprocess(module_file_path):
-            module = __clean_package_import(module_path)
-
         module_relative_path = module_path.replace("apis", "")[1:]
 
         if "module" in vars() and len(module_path.split(".")) == 4 and "task.yaml" in os.listdir("apis/" + module_relative_path.replace(".", "/")):
-            __add_router(app, module, module_path, active_tasks, apis_folder_name)
+            __add_router(app, module_path, active_tasks, apis_folder_name)
 
         if not recursive or not is_pkg:
             continue
