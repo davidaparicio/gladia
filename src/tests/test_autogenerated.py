@@ -114,7 +114,11 @@ def autogenerate_tests(path_to_api: str, path_to_config: str):
                 input_names = []
 
                 for input_name in list(task_metadata["inputs"].keys()):
-                    if task_metadata["inputs"][input_name]["type"] in ("audio", "video", "image"):
+                    if task_metadata["inputs"][input_name]["type"] in (
+                        "audio",
+                        "video",
+                        "image",
+                    ):
                         input_names.append(input_name + "_url")
                     else:
                         input_names.append(input_name)
