@@ -3,12 +3,14 @@ summary: ''
 inputs:
   image_url:
     type: image
+    placeholder: "Image to use"
     examples:
       - "http://files.gladia.io/examples/image/text/classification/image.png"
       - "http://files.gladia.io/examples/image/text/classification/image.jpg"
       - "http://files.gladia.io/examples/image/text/classification/image.gif"
   top_k:
     type: int
+    placeholder: "Number of possible prediction to return"
     examples:
       - 1
       - 2

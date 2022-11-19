@@ -6,15 +6,14 @@ task_metadata = get_task_metadata(__file__)
 
 router = APIRouter()
 
-inputs = [
-    {
-        "type": task_metadata["inputs"]["input_string"]["type"],
-        "name": "input_string",
-        "example": task_metadata["inputs"]["input_string"]["examples"][0],
-        "examples": task_metadata["inputs"]["input_string"]["examples"],
-        "placeholder": "Insert the text to analyze here",
-    }
-]
+inputs = [{
+    "name": input_name,
+    "type": task_metadata["inputs"][input_name]["type"],
+    "default": task_metadata["inputs"][input_name].get("default", ...),
+    "example": task_metadata["inputs"][input_name]["examples"][0],
+    "examples": task_metadata["inputs"][input_name]["examples"],
+    "placeholder": task_metadata["inputs"][input_name]["placeholder"],
+} for input_name in task_metadata["inputs"]]
 
 output = {"name": "analyzed_text", "type": "string", "example": "analyzed_text"}
 

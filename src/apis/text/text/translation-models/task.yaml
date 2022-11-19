@@ -3,15 +3,18 @@ summary: ''
 inputs:
   input_string:
     type: str
+    placeholder: "input text"
     examples:
       - "Text to translate"
 
   source_language:
     type: str
+    placeholder: "ISO 639-2 Source language (3 letters)"
     examples:
       - "eng"
 
   target_language:
     type: str
+    placeholder: "ISO 639-2 Source language (3 letters)"
     examples:
       - "fra"

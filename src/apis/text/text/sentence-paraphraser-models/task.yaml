@@ -4,5 +4,6 @@ summary: ''
 inputs:
   context:
     type: str
+    placeholder: "input text"
     examples:
       - "Once, a group of frogs was roaming around the forest in search of water."

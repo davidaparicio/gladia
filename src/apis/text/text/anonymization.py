@@ -6,29 +6,14 @@ task_metadata = get_task_metadata(__file__)
 
 router = APIRouter()
 
-inputs = [
-    {
-        "type": task_metadata["inputs"]["text"]["type"],
-        "name": "text",
-        "example": task_metadata["inputs"]["text"]["examples"][0],
-        "examples": task_metadata["inputs"]["text"]["examples"],
-        "placeholder": "Insert the text to anonymize",
-    },
-    {
-        "type": task_metadata["inputs"]["language"]["type"],
-        "name": "language",
-        "example": task_metadata["inputs"]["language"]["examples"][0],
-        "examples": task_metadata["inputs"]["language"]["examples"],
-        "placeholder": "Insert the language of the text to anonymize",
-    },
-    {
-        "type": task_metadata["inputs"]["entities"]["type"],
-        "name": "entities",
-        "example": task_metadata["inputs"]["entities"]["examples"][0],
-        "examples": task_metadata["inputs"]["entities"]["examples"],
-        "placeholder": "Entities to anonymize (default: None=all)",
-    },
-]
+inputs = [{
+    "name": input_name,
+    "type": task_metadata["inputs"][input_name]["type"],
+    "default": task_metadata["inputs"][input_name].get("default", ...),
+    "example": task_metadata["inputs"][input_name]["examples"][0],
+    "examples": task_metadata["inputs"][input_name]["examples"],
+    "placeholder": task_metadata["inputs"][input_name]["placeholder"],
+} for input_name in task_metadata["inputs"]]
 
 output = {"name": "anonymized_text", "type": "string", "example": "anonymized_text"}
 

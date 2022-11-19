@@ -4,5 +4,6 @@ summary: ''
 inputs:
   image_url:
     type: image
+    placeholder: "Image to use"
     examples:
       - "http://files.gladia.io/test/test.png"

@@ -4,12 +4,14 @@ summary: ''
 inputs:
   audio_url:
     type: audio
+    placeholder: "Audio to use"
     examples:
       - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.mp3"
       - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.m4a"
       - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.wav"
 
   language:
+    placeholder: "Language of the input audio"
     type: str
     examples:
       - "en"

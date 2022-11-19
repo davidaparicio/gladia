@@ -3,12 +3,14 @@ summary: ''
 inputs:
   image_url:
     type: image
+    placeholder: "Image to use"
     examples:
       - "http://files.gladia.io/examples/image/text/ocr/testocr.png"
       - "http://files.gladia.io/examples/image/text/ocr/testocr.jpg"
       - "http://files.gladia.io/examples/image/text/ocr/testocr.gif"
   source_language:
     type: str
+    placeholder: "Language present in the image"
     examples:
       - "eng"
       - "fra"

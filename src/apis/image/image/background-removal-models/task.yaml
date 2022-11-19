@@ -4,6 +4,7 @@ summary: ''
 inputs:
   image_url:
     type: image
+    placeholder: "Image to remove the background from"
     examples:
       - "http://files.gladia.io/examples/image/image/background-removal/owl2.png"
       - "http://files.gladia.io/examples/image/image/background-removal/owl2.jpg"

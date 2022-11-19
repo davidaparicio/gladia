@@ -4,5 +4,6 @@ summary: ''
 inputs:
   text:
     type: str
+    placeholder: "input text"
     examples:
       - "def is_palendrome(s):"

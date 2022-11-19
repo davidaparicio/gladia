@@ -4,15 +4,18 @@ summary: 'Replace the background of an image'
 inputs:
   original_image_url:
     type: image
+    placeholder: "Original image to remove the background from"
     examples:
       - "http://files.gladia.io/examples/image/image/background-removal/owl2.png"
       - "http://files.gladia.io/examples/image/image/background-removal/owl2.jpg"
       - "https://15pictures.com/wp-content/gallery/15-pictures-lions/lions-4.jpg"
   background_image_url:
+    placeholder: "Background image to apply"
     type: image
     examples:
       - "http://files.gladia.io/examples/image/image/bck-grd/green-forest.png"
   alignment:
+    placeholder: "Alignment to use"
     type: list
     examples:
       - "center"

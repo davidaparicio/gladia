@@ -3,6 +3,7 @@ summary: ''
 inputs:
   text:
     type: str
+    placeholder: "input text"
     examples:
       - "Hannah: Hey, do you have Betty's number?
 Amanda: Lemme check

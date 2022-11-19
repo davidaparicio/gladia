@@ -4,10 +4,12 @@ summary: ''
 inputs:
   sentence_1:
     type: str
+    placeholder: "input text"
     examples:
       - "I like banana"
 
   sentence_2:
     type: str
+    placeholder: "input text"
     examples:
       - "I hate banana"

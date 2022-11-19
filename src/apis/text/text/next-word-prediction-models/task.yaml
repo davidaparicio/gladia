@@ -3,11 +3,13 @@ summary: ''
 inputs:
   sentence:
     type: str
+    placeholder: "input text"
     examples:
       - "I think therefore I"
 
   top_k:
     type: int
+    placeholder: "number of prediction to return"
     examples:
       - 1
       - 3

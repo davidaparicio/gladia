@@ -4,6 +4,7 @@ summary: ''
 inputs:
   image_url:
     type: image
+    placeholder: "Image to deblure"
     examples:
       - "http://files.gladia.io/image/image/deblurring/deblurring.png"
       - "http://files.gladia.io/image/image/deblurring/deblurring.jpg"

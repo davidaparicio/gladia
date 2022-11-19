@@ -4,6 +4,7 @@ summary: ''
 inputs:
   text:
     type: str
+    placeholder: "input text"
     examples:
       - |
         Very early yesterday morning, the United States President Donald Trump reported he and his wife First Lady Melania Trump tested positive for COVID-19. Officials said the Trumps' 14-year-old son Barron tested negative as did First Family and Senior Advisors Jared Kushner and Ivanka Trump.
@@ -14,6 +15,7 @@ inputs:
 
   max_length:
     type: int
+    placeholder: "maximum lenght for the headline to generate"
     examples:
       - 16
       - 100

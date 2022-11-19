@@ -4,10 +4,12 @@ summary: ''
 inputs:
   text:
     type: str
+    placeholder: "input text"
     examples:
       - "Лорем ипсум долор сит амет"
 
   language:
     type: str
+    placeholder: "language"
     examples:
       - "ru"

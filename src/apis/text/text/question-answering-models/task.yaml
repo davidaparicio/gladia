@@ -4,16 +4,20 @@ summary: ''
 inputs:
   context:
     type: str
+    placeholder: "context to use"
     examples:
       - "My name is Clara and I live in Berkeley."
 
   question:
     type: str
+    placeholder: "question to ask"
     examples:
       - "What's my name?"
 
   top_k:
     type: int
+    placeholder: "number of prediction to return"
+    default: 1
     examples:
       - 1
       - 10

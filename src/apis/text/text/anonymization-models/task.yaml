@@ -2,18 +2,24 @@ summary: 'Anonymization text by removing PII entities'
 
 
 inputs:
+
   language:
     type: str
+    placeholder: "input language"
     examples:
       - 'en'
       - 'es'
       - 'fr'
+
   entities:
     type: str
+    placeholder: "entities"
     examples:
       - 'PERSON, LOCATION, ORGANIZATION, CREDIT_CARD, CRYPTO, DATE_TIME, DOMAIN_NAME, EMAIL_ADDRESS, IBAN_CODE, IP_ADDRESS, NRP, PASSPORT, PHONE_NUMBER, US_BANK_NUMBER, US_DRIVER_LICENSE, US_ITIN, US_PASSPORT, US_SSN, US_VEHICLE, US_ZIP_CODE'
+
   text:
     type: str
+    placeholder: "input text"
     examples:
       - "Here are a few examples sentences we currently support:
 

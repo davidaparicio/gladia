@@ -6,26 +6,14 @@ task_metadata = get_task_metadata(__file__)
 
 router = APIRouter()
 
-inputs = [
-    {
-        "type": task_metadata["inputs"]["input_string_language_1"]["type"],
-        "name": "input_string_language_1",
-        "example": task_metadata["inputs"]["input_string_language_1"]["examples"][0],
-        "examples": task_metadata["inputs"]["input_string_language_1"][
-            "examples"
-        ],
-        "placeholder": "Insert the Sentence from first language",
-    },
-    {
-        "type": task_metadata["inputs"]["input_string_language_2"]["type"],
-        "name": "input_string_language_2",
-        "example": task_metadata["inputs"]["input_string_language_2"]["examples"][0],
-        "examples": task_metadata["inputs"]["input_string_language_2"][
-            "examples"
-        ],
-        "placeholder": "Insert the Sentence from second language",
-    },
-]
+inputs = [{
+    "name": input_name,
+    "type": task_metadata["inputs"][input_name]["type"],
+    "default": task_metadata["inputs"][input_name].get("default", ...),
+    "example": task_metadata["inputs"][input_name]["examples"][0],
+    "examples": task_metadata["inputs"][input_name]["examples"],
+    "placeholder": task_metadata["inputs"][input_name]["placeholder"],
+} for input_name in task_metadata["inputs"]]
 
 output = {
     "name": "word_aligment",

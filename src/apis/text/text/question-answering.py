@@ -6,30 +6,14 @@ task_metadata = get_task_metadata(__file__)
 
 router = APIRouter()
 
-inputs = [
-    {
-        "type": task_metadata["inputs"]["context"]["type"],
-        "name": "context",
-        "example": task_metadata["inputs"]["context"]["examples"][0],
-        "examples": task_metadata["inputs"]["context"]["examples"],
-        "placeholder": "Insert the text to extract answer from",
-    },
-    {
-        "type": task_metadata["inputs"]["question"]["type"],
-        "name": "question",
-        "example": task_metadata["inputs"]["question"]["examples"][0],
-        "examples": task_metadata["inputs"]["question"]["examples"],
-        "placeholder": "Insert the question to be answered",
-    },
-    {
-        "type": task_metadata["inputs"]["top_k"]["type"],
-        "name": "top_k",
-        "default": task_metadata["inputs"]["top_k"]["examples"][0],
-        "example": task_metadata["inputs"]["top_k"]["examples"][0],
-        "examples": task_metadata["inputs"]["top_k"]["examples"],
-        "placeholder": "Top K",
-    },
-]
+inputs = [{
+    "name": input_name,
+    "type": task_metadata["inputs"][input_name]["type"],
+    "default": task_metadata["inputs"][input_name].get("default", ...),
+    "example": task_metadata["inputs"][input_name]["examples"][0],
+    "examples": task_metadata["inputs"][input_name]["examples"],
+    "placeholder": task_metadata["inputs"][input_name]["placeholder"],
+} for input_name in task_metadata["inputs"]]
 
 output = {"name": "answer", "type": "string", "example": "answer"}
 

@@ -4,6 +4,7 @@ summary: ''
 inputs:
   image_url:
     type: image
+    placeholder: "Image to enhance"
     examples:
       - "http://files.gladia.io/image/image/enhancement/enhancement_retouching.png"
       - "http://files.gladia.io/image/image/enhancement/enhancement_retouching.jpg"

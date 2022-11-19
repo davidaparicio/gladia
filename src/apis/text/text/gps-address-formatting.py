@@ -6,22 +6,14 @@ task_metadata = get_task_metadata(__file__)
 
 router = APIRouter()
 
-inputs = [
-    {
-        "type": task_metadata["inputs"]["latitude"]["type"],
-        "name": "latitude",
-        "example": task_metadata["inputs"]["latitude"]["examples"][0],
-        "examples": task_metadata["inputs"]["latitude"]["examples"],
-        "placeholder": "Insert the latitude of the address to fetch",
-    },
-    {
-        "type": task_metadata["inputs"]["longitude"]["type"],
-        "name": "longitude",
-        "example": task_metadata["inputs"]["longitude"]["examples"][0],
-        "examples": task_metadata["inputs"]["longitude"]["examples"],
-        "placeholder": "Insert the longitude of the address to fetch",
-    },
-]
+inputs = [{
+    "name": input_name,
+    "type": task_metadata["inputs"][input_name]["type"],
+    "default": task_metadata["inputs"][input_name].get("default", ...),
+    "example": task_metadata["inputs"][input_name]["examples"][0],
+    "examples": task_metadata["inputs"][input_name]["examples"],
+    "placeholder": task_metadata["inputs"][input_name]["placeholder"],
+} for input_name in task_metadata["inputs"]]
 
 output = {"name": "formated_address", "type": "string", "example": "formated_address"}
 

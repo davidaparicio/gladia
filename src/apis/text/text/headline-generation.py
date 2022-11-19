@@ -6,22 +6,14 @@ task_metadata = get_task_metadata(__file__)
 
 router = APIRouter()
 
-inputs = [
-    {
-        "type": task_metadata["inputs"]["text"]["type"],
-        "name": "text",
-        "example": task_metadata["inputs"]["text"]["examples"][0],
-        "examples": task_metadata["inputs"]["text"]["examples"],
-        "placeholder": "Insert text here to generate the headline from",
-    },
-    {
-        "type": task_metadata["inputs"]["max_length"]["type"],
-        "name": "max_length",
-        "example": task_metadata["inputs"]["max_length"]["examples"][0],
-        "examples": task_metadata["inputs"]["max_length"]["examples"],
-        "placeholder": "Maximum length for the headline",
-    },
-]
+inputs = [{
+    "name": input_name,
+    "type": task_metadata["inputs"][input_name]["type"],
+    "default": task_metadata["inputs"][input_name].get("default", ...),
+    "example": task_metadata["inputs"][input_name]["examples"][0],
+    "examples": task_metadata["inputs"][input_name]["examples"],
+    "placeholder": task_metadata["inputs"][input_name]["placeholder"],
+} for input_name in task_metadata["inputs"]]
 
 output = {
     "name": "generated_headline",
