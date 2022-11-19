@@ -48,8 +48,8 @@ if "PATH_TO_GLADIA_SRC" in os.environ and "API_UTILS_LOGGING_PATH" not in os.env
 
 rotating_file_handler = RotatingFileHandler(
     log_path,
-    maxBytes=2000,
-    backupCount=10,
+    maxBytes=4096,
+    backupCount=1,
 )
 
 rotating_file_handler.setFormatter(logging.Formatter(logging_format))
