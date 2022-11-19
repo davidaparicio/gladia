@@ -227,7 +227,7 @@ def get_task_metadata(endpoint) -> dict:
         dict: metadata of the task
     """
     path = f"apis{endpoint}"
-    file_name = ".task_metadata.yaml"
+    file_name = "task.yaml"
     fallback_file_name = ".metadata_task_template.yaml"
 
     return get_metadata(path, file_name, fallback_file_name)
