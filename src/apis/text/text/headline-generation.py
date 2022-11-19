@@ -8,14 +8,14 @@ router = APIRouter()
 
 inputs = [
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["text"]["type"],
         "name": "text",
         "example": task_metadata["inputs"]["text"]["examples"][0],
         "examples": task_metadata["inputs"]["text"]["examples"],
         "placeholder": "Insert text here to generate the headline from",
     },
     {
-        "type": "integer",
+        "type": task_metadata["inputs"]["max_length"]["type"],
         "name": "max_length",
         "example": task_metadata["inputs"]["max_length"]["examples"][0],
         "examples": task_metadata["inputs"]["max_length"]["examples"],

@@ -8,14 +8,14 @@ router = APIRouter()
 
 inputs = [
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["text"]["type"],
         "name": "text",
         "example": task_metadata["inputs"]["text"]["examples"][0],
         "examples": task_metadata["inputs"]["text"]["examples"],
         "placeholder": "Insert the text to transliterate here",
     },
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["language"]["type"],
         "name": "language",
         "example": task_metadata["inputs"]["language"]["examples"][0],
         "examples": task_metadata["inputs"]["language"]["examples"],

@@ -3,11 +3,11 @@ summary: ''
 
 inputs:
   sentence_1:
-    
+    type: str
     examples:
       - "I like banana"
 
   sentence_2:
-    
+    type: str
     examples:
       - "I hate banana"

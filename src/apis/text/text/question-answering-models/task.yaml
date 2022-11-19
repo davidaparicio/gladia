@@ -3,14 +3,17 @@ summary: ''
 
 inputs:
   context:
+    type: str
     examples:
       - "My name is Clara and I live in Berkeley."
 
   question:
+    type: str
     examples:
       - "What's my name?"
 
   top_k:
+    type: int
     examples:
       - 1
       - 10

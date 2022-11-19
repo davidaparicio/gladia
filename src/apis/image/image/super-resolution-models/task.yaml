@@ -3,5 +3,6 @@ summary: ''
 
 inputs:
   image_url:
+    type: image
     examples:
       - "http://files.gladia.io/test/test.png"

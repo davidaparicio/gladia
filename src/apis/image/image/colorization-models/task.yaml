@@ -3,6 +3,7 @@ summary: ''
 
 inputs:
   image_url:
+    type: image
     examples:
       - "http://files.gladia.io/examples/image/image/colorization/rsz_paris.jpg"
       - "http://files.gladia.io/examples/image/image/colorization/rsz_paris.png"

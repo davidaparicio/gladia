@@ -2,6 +2,6 @@ summary: ''
 
 inputs:
   text:
-    
+    type: str
     examples:
       - "I'm currently driving while eating a"

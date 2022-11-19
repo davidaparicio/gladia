@@ -3,7 +3,7 @@ summary: 'Repaire the input sentence punctuation'
 
 inputs:
   sentence:
-    
+    type: str
     examples:
       - "My name is Clara and I live in Berkeley California"
       - "My name is Sarah and I live in London"

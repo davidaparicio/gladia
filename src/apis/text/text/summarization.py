@@ -8,21 +8,21 @@ router = APIRouter()
 
 inputs = [
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["text"]["type"],
         "name": "text",
         "example": task_metadata["inputs"]["text"]["examples"][0],
         "examples": task_metadata["inputs"]["text"]["examples"],
         "placeholder": "Insert the text to summarize here",
     },
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["source_language"]["type"],
         "name": "source_language",
         "example": task_metadata["inputs"]["source_language"]["examples"][0],
         "examples": task_metadata["inputs"]["source_language"]["examples"],
         "placeholder": "Use the ISO 3 letters representation for source language",
     },
     {
-        "type": "integer",
+        "type": task_metadata["inputs"]["min_length"]["type"],
         "name": "min_length",
         "default": task_metadata["inputs"]["min_length"]["examples"][0],
         "example": task_metadata["inputs"]["min_length"]["examples"][0],
@@ -30,7 +30,7 @@ inputs = [
         "placeholder": "Minimum lenght of the summary",
     },
     {
-        "type": "integer",
+        "type": task_metadata["inputs"]["max_length"]["type"],
         "name": "max_length",
         "default": task_metadata["inputs"]["max_length"]["examples"][0],
         "example": task_metadata["inputs"]["max_length"]["examples"][0],

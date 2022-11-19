@@ -8,21 +8,21 @@ router = APIRouter()
 
 inputs = [
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["text"]["type"],
         "name": "text",
         "example": task_metadata["inputs"]["text"]["examples"][0],
         "examples": task_metadata["inputs"]["text"]["examples"],
         "placeholder": "Insert the text to anonymize",
     },
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["language"]["type"],
         "name": "language",
         "example": task_metadata["inputs"]["language"]["examples"][0],
         "examples": task_metadata["inputs"]["language"]["examples"],
         "placeholder": "Insert the language of the text to anonymize",
     },
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["entities"]["type"],
         "name": "entities",
         "example": task_metadata["inputs"]["entities"]["examples"][0],
         "examples": task_metadata["inputs"]["entities"]["examples"],

@@ -8,14 +8,14 @@ router = APIRouter()
 
 inputs = [
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["sentence"]["type"],
         "name": "sentence",
         "example": task_metadata["inputs"]["sentence"]["examples"][0],
         "examples": task_metadata["inputs"]["sentence"]["examples"],
         "placeholder": "Insert the text to find the next word from.",
     },
     {
-        "type": "integer",
+        "type": task_metadata["inputs"]["top_k"]["type"],
         "name": "top_k",
         "default": task_metadata["inputs"]["top_k"]["examples"][0],
         "example": task_metadata["inputs"]["top_k"]["examples"][0],

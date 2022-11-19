@@ -2,10 +2,12 @@ summary: ''
 
 inputs:
   text:
+    type: str
     examples:
       - "The Crown is a historical drama streaming television series about the reign of Queen Elizabeth II, created and principally written by Peter Morgan, and produced by Left Bank Pictures and Sony Pictures Television for Netflix."
 
   top_k:
+    type: int
     examples:
       - 1
       - 10

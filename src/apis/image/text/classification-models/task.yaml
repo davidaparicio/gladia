@@ -2,11 +2,13 @@ summary: ''
 
 inputs:
   image_url:
+    type: image
     examples:
       - "http://files.gladia.io/examples/image/text/classification/image.png"
       - "http://files.gladia.io/examples/image/text/classification/image.jpg"
       - "http://files.gladia.io/examples/image/text/classification/image.gif"
   top_k:
+    type: int
     examples:
       - 1
       - 2

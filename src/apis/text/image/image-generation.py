@@ -6,14 +6,14 @@ task_metadata = get_task_metadata(__file__)
 
 inputs = [
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["prompt"]["type"],
         "name": "prompt",
         "example": task_metadata["inputs"]["prompt"]["examples"][0],
         "examples": task_metadata["inputs"]["prompt"]["examples"],
         "placeholder": "Prompt to generate image from",
     },
     {
-        "type": "integer",
+        "type": task_metadata["inputs"]["samples"]["type"],
         "name": "samples",
         "default": 1,
         "example": task_metadata["inputs"]["samples"]["examples"][0],
@@ -21,7 +21,7 @@ inputs = [
         "placeholder": "Number of predictions",
     },
     {
-        "type": "integer",
+        "type": task_metadata["inputs"]["steps"]["type"],
         "name": "steps",
         "default": 40,
         "example": task_metadata["inputs"]["steps"]["examples"][0],
@@ -29,7 +29,7 @@ inputs = [
         "placeholder": "Number of steps",
     },
     {
-        "type": "integer",
+        "type": task_metadata["inputs"]["seed"]["type"],
         "name": "seed",
         "default": 396916372,
         "example": task_metadata["inputs"]["seed"]["examples"][0],

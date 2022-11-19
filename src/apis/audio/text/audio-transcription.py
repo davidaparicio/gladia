@@ -6,14 +6,14 @@ task_metadata = get_task_metadata(__file__)
 
 inputs = [
     {
-        "type": "audio",
+        "type": task_metadata["inputs"]["audio_url"]["type"],
         "name": "audio",
         "example": task_metadata["inputs"]["audio_url"]["examples"][0],
         "examples": task_metadata["inputs"]["audio_url"]["examples"],
         "placeholder": "Audio to transcribe",
     },
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["language"]["type"],
         "name": "language",
         "default": task_metadata["inputs"]["language"]["examples"][0],
         "example": task_metadata["inputs"]["language"]["examples"][0],

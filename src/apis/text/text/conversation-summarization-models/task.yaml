@@ -2,6 +2,7 @@ summary: ''
 
 inputs:
   text:
+    type: str
     examples:
       - "Hannah: Hey, do you have Betty's number?
 Amanda: Lemme check

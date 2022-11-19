@@ -3,6 +3,7 @@ summary: ''
 
 inputs:
   image_url:
+    type: image
     examples:
       - "http://files.gladia.io/image/image/deblurring/deblurring.png"
       - "http://files.gladia.io/image/image/deblurring/deblurring.jpg"

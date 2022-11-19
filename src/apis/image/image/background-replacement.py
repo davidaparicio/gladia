@@ -6,21 +6,21 @@ task_metadata = get_task_metadata(__file__)
 
 inputs = [
     {
-        "type": "image",
+        "type": task_metadata["inputs"]["original_image_url"]["type"],
         "name": "original_image",
         "example": task_metadata["inputs"]["original_image_url"]["examples"][0],
         "examples": task_metadata["inputs"]["original_image_url"]["examples"],
         "placeholder": "Image to replace the background from",
     },
     {
-        "type": "image",
+        "type": task_metadata["inputs"]["background_image_url"]["type"],
         "name": "background_image",
         "example": task_metadata["inputs"]["background_image_url"]["examples"][0],
         "examples": task_metadata["inputs"]["background_image_url"]["examples"],
         "placeholder": "Image the background will be replaced with",
     },
     {
-        "type": "list",
+        "type": task_metadata["inputs"]["alignment"]["type"],
         "name": "alignment",
         "example": task_metadata["inputs"]["alignment"]["examples"][0],
         "examples": task_metadata["inputs"]["alignment"]["examples"],

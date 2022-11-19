@@ -6,10 +6,10 @@ task_metadata = get_task_metadata(__file__)
 
 inputs = [
     {
-        "type": "image",
+        "type": task_metadata["inputs"]["image_url"]["type"],
         "name": "image",
         "example": task_metadata["inputs"]["image_url"]["examples"][0],
-        "examples": task_metadata["inputs"]["image_url"]["examples"],
+        "examples": task_metadata["inputs"]["image_url"]["examples"][0],
         "placeholder": "Image to remove the background from",
     }
 ]

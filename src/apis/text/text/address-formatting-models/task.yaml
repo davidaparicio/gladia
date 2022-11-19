@@ -3,5 +3,6 @@ summary: 'Format the input string as an clean adress using geopy'
 
 inputs:
   address:
+    type: str
     examples:
       - "Taj Mahal, Agra, Uttar Pradesh 282001"

@@ -3,5 +3,6 @@ summary: ''
 
 inputs:
   video_url:
+    type: video
     examples:
       - "http://files.gladia.io/test/test.mp4"

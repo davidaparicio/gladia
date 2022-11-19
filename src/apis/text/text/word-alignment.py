@@ -8,7 +8,7 @@ router = APIRouter()
 
 inputs = [
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["input_string_language_1"]["type"],
         "name": "input_string_language_1",
         "example": task_metadata["inputs"]["input_string_language_1"]["examples"][0],
         "examples": task_metadata["inputs"]["input_string_language_1"][
@@ -17,7 +17,7 @@ inputs = [
         "placeholder": "Insert the Sentence from first language",
     },
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["input_string_language_2"]["type"],
         "name": "input_string_language_2",
         "example": task_metadata["inputs"]["input_string_language_2"]["examples"][0],
         "examples": task_metadata["inputs"]["input_string_language_2"][

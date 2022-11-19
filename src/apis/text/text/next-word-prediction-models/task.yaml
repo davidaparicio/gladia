@@ -2,10 +2,12 @@ summary: ''
 
 inputs:
   sentence:
+    type: str
     examples:
       - "I think therefore I"
 
   top_k:
+    type: int
     examples:
       - 1
       - 3

@@ -8,14 +8,14 @@ router = APIRouter()
 
 inputs = [
     {
-        "type": "float",
+        "type": task_metadata["inputs"]["latitude"]["type"],
         "name": "latitude",
         "example": task_metadata["inputs"]["latitude"]["examples"][0],
         "examples": task_metadata["inputs"]["latitude"]["examples"],
         "placeholder": "Insert the latitude of the address to fetch",
     },
     {
-        "type": "float",
+        "type": task_metadata["inputs"]["longitude"]["type"],
         "name": "longitude",
         "example": task_metadata["inputs"]["longitude"]["examples"][0],
         "examples": task_metadata["inputs"]["longitude"]["examples"],

@@ -3,6 +3,6 @@ summary: ''
 
 inputs:
   sentence:
-    
+    type: str
     examples:
       - "Text to corrcte"

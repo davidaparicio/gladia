@@ -3,6 +3,7 @@ summary: ''
 
 inputs:
   text:
+    type: str
     examples:
       - |
         Very early yesterday morning, the United States President Donald Trump reported he and his wife First Lady Melania Trump tested positive for COVID-19. Officials said the Trumps' 14-year-old son Barron tested negative as did First Family and Senior Advisors Jared Kushner and Ivanka Trump.
@@ -12,6 +13,7 @@ inputs:
         According to official statements, Trump, now operating from the WRNMMC, is to continue performing his duties as president during a 14-day quarantine. In the event of Trump becoming incapacitated, Vice President Mike Pence could take over the duties of president via the 25th Amendment of the US Constitution. The Pence family all tested negative as of yesterday and there were no changes regarding Pence's campaign events.
 
   max_length:
+    type: int
     examples:
       - 16
       - 100

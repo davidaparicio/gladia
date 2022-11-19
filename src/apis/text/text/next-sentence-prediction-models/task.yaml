@@ -2,9 +2,11 @@ summary: ''
 
 inputs:
   sentence_1:
+    type: str
     examples:
       - "I like you."
 
   sentence_2:
+    type: str
     examples:
       - "But it's not about you."

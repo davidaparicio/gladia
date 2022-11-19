@@ -3,6 +3,6 @@ summary: ''
 
 inputs:
   text:
-    
+    type: str
     examples:
       - "I hate you piece of shit"

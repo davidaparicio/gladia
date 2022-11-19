@@ -6,7 +6,7 @@ task_metadata = get_task_metadata(__file__)
 
 inputs = [
     {
-        "type": "video",
+        "type": task_metadata["inputs"]["video_url"]["type"],
         "name": "video",
         "example": task_metadata["inputs"]["video_url"]["examples"][0],
         "examples": task_metadata["inputs"]["video_url"]["examples"],

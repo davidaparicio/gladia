@@ -3,5 +3,6 @@ summary: ''
 
 inputs:
   sentence:
+    type: str
     examples:
       - "Once, a group of frogs was roaming around the forest in search of water."

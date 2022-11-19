@@ -3,6 +3,7 @@ summary: 'Perform speaker diarization (audio segment detect per speaker) on audi
 
 inputs:
   audio_url:
+    type: audio
     examples:
       - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.mp3"
       - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.m4a"

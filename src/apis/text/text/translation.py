@@ -8,21 +8,21 @@ router = APIRouter()
 
 inputs = [
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["input_string"]["type"],
         "name": "input_string",
         "example": task_metadata["inputs"]["input_string"]["examples"][0],
         "examples": task_metadata["inputs"]["input_string"]["examples"],
         "placeholder": "Insert the text to translate here",
     },
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["source_language"]["type"],
         "name": "source_language",
         "example": task_metadata["inputs"]["source_language"]["examples"][0],
         "examples": task_metadata["inputs"]["source_language"]["examples"],
         "placeholder": "Use the ISO 3 letters (ISO 639-3) representation for source language",
     },
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["target_language"]["type"],
         "name": "target_language",
         "example": task_metadata["inputs"]["target_language"]["examples"][0],
         "examples": task_metadata["inputs"]["target_language"]["examples"],

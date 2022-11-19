@@ -3,11 +3,14 @@ summary: ''
 
 inputs:
   original_image_url:
+    type: image
     examples:
       - "https://raw.githubusercontent.com/CompVis/latent-diffusion/main/data/inpainting_examples/overture-creations-5sI6fQgYIuo.png"
   mask_image_url:
+    type: image
     examples:
       - "https://raw.githubusercontent.com/CompVis/latent-diffusion/main/data/inpainting_examples/overture-creations-5sI6fQgYIuo_mask.png"
   prompt:
+    type: str
     examples:
       - "a cat sitting on a bench"

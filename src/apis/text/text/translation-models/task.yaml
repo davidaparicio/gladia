@@ -2,16 +2,16 @@ summary: ''
 
 inputs:
   input_string:
-    
+    type: str
     examples:
       - "Text to translate"
 
   source_language:
-    
+    type: str
     examples:
       - "eng"
 
   target_language:
-    
+    type: str
     examples:
       - "fra"

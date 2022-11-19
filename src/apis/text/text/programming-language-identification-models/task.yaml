@@ -3,6 +3,6 @@ summary: ''
 
 inputs:
   text:
-    
+    type: str
     examples:
       - "def is_palendrome(s):"

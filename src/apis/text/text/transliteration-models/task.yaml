@@ -3,11 +3,11 @@ summary: ''
 
 inputs:
   text:
-    
+    type: str
     examples:
       - "Лорем ипсум долор сит амет"
 
   language:
-    
+    type: str
     examples:
       - "ru"

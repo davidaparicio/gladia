@@ -3,5 +3,6 @@ summary: ''
 
 inputs:
   input_string:
+    type: str
     examples:
       - "Text to analyze."

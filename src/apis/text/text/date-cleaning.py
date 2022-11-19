@@ -8,7 +8,7 @@ router = APIRouter()
 
 inputs = [
     {
-        "type": "string",
+        "type": task_metadata["inputs"]["date"]["type"],
         "name": "date",
         "example": task_metadata["inputs"]["date"]["examples"][0],
         "examples": task_metadata["inputs"]["date"]["examples"],

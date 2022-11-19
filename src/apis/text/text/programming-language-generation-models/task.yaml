@@ -2,6 +2,6 @@ summary: ''
 
 inputs:
   code_snippet:
-    
+    type: str
     examples:
       - "def is_palendrome(s):"
