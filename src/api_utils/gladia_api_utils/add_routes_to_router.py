@@ -32,9 +32,7 @@ def __add_router(
 
     module_config = active_tasks[module_input][module_output]
 
-    active_task_list = set(
-        map(lambda each: each.split("?")[0], module_config)
-    )
+    active_task_list = set(map(lambda each: each.split("?")[0], module_config))
 
     if (
         ("NONE" not in active_task_list and "NONE" not in module_config)
@@ -77,7 +75,11 @@ def __add_router(
             rel_path=module_path.replace(".", "/"),
         )
 
-        module_prefix = module_path.replace(".", "/").replace(apis_folder_name, "").replace("-models", "")
+        module_prefix = (
+            module_path.replace(".", "/")
+            .replace(apis_folder_name, "")
+            .replace("-models", "")
+        )
 
         app.include_router(router, prefix=module_prefix)  #
 
@@ -152,6 +154,7 @@ def __module_is_a_task(split_module_path: List[str], module_config: dict) -> boo
         or len(module_config) == 0
     )
 
+
 def __module_is_subprocess(module_path: str) -> bool:
     """
     Check if the module is a subprocess looking for env.yaml file within
@@ -206,7 +209,12 @@ def add_routes_to_router(
 
         module_relative_path = module_path.replace("apis", "")[1:]
 
-        if "module" in vars() and len(module_path.split(".")) == 4 and "task.yaml" in os.listdir("apis/" + module_relative_path.replace(".", "/")):
+        if (
+            "module" in vars()
+            and len(module_path.split(".")) == 4
+            and "task.yaml"
+            in os.listdir("apis/" + module_relative_path.replace(".", "/"))
+        ):
             __add_router(app, module, module_path, active_tasks, apis_folder_name)
 
         if not recursive or not is_pkg:

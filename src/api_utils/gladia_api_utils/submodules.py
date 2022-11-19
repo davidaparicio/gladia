@@ -456,9 +456,7 @@ class TaskRouter:
 
         self.task_name, self.plugin, self.tags = get_module_infos(root_path=rel_path)
         self.versions, self.root_package_path = get_model_versions(full_path)
-        self.endpoint = (
-            f"/{rel_path.split('/')[1]}/{rel_path.split('/')[2]}/{self.task_name.replace('-models', '')}/"
-        )
+        self.endpoint = f"/{rel_path.split('/')[1]}/{rel_path.split('/')[2]}/{self.task_name.replace('-models', '')}/"
 
         self.default_model = default_model
 
@@ -559,7 +557,9 @@ class TaskRouter:
                 parameters_in_body,
                 success,
                 error_message,
-            ) = await clean_kwargs_based_on_router_inputs(parameters_in_body, self.inputs)
+            ) = await clean_kwargs_based_on_router_inputs(
+                parameters_in_body, self.inputs
+            )
 
             if not success:
                 raise HTTPException(status.HTTP_400_BAD_REQUEST, error_message)
@@ -597,7 +597,9 @@ class TaskRouter:
             return self.__post_processing(result)
 
     def __get_routeur_inputs(self) -> list:
-        task_metadata = yaml.safe_load(open(os.path.join(self.root_package_path, "task.yaml")))
+        task_metadata = yaml.safe_load(
+            open(os.path.join(self.root_package_path, "task.yaml"))
+        )
 
         return task_metadata["inputs"]
 
@@ -898,9 +900,7 @@ async def clean_kwargs_based_on_router_inputs(
             kwargs[input_name] = str(kwargs[input_name].value)
         else:
             if not kwargs.get(input_name, None):
-                error_message = (
-                    f"Input '{input_name}' of '{input_metadata['type']}' type is missing."
-                )
+                error_message = f"Input '{input_name}' of '{input_metadata['type']}' type is missing."
                 success = False
 
     return kwargs, success, error_message
