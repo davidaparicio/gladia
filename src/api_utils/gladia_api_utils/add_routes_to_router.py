@@ -1,10 +1,14 @@
-import importlib
-import logging
 import os
-import pkgutil
 import sys
+import logging
+import pkgutil
+import importlib
+
 from types import ModuleType
+from fastapi import APIRouter
 from typing import Any, Dict, List
+from gladia_api_utils.submodules import TaskRouter
+from gladia_api_utils.task_management import get_task_metadata
 
 
 def __add_router(
@@ -39,12 +43,6 @@ def __add_router(
         and (module_task in active_task_list or "*" in module_config)
         and (module_path[:4] == "apis")
     ):
-
-        # remove the "apis" part of the path
-        from fastapi import APIRouter
-        from gladia_api_utils.submodules import TaskRouter
-        from gladia_api_utils.task_management import get_task_metadata
-
         task_metadata = get_task_metadata(module_path.replace(".", "/"))
 
         inputs = [
