@@ -2,7 +2,7 @@ summary: 'Perform speaker diarization (audio segment detect per speaker) on audi
 
 
 inputs:
-  audio_url:
+  audio:
     type: audio
     placeholder: "Audio to use"
     examples:

@@ -2,7 +2,8 @@ summary: ''
 
 
 inputs:
-  video_url:
+  video:
     type: video
+    placeholder: "input video"
     examples:
       - "http://files.gladia.io/test/test.mp4"

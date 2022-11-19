@@ -2,7 +2,7 @@ summary: 'Classify the gender of a speaker from a speech sample'
 
 
 inputs:
-  audio_url:
+  audio:
     type: audio
     placeholder: "Audio to use"
     examples:

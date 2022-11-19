@@ -2,7 +2,7 @@ summary: ''
 
 
 inputs:
-  image_url:
+  image:
     type: image
     placeholder: "Image to remove the background from"
     examples:

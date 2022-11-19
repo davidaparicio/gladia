@@ -111,8 +111,16 @@ def autogenerate_tests(path_to_api: str, path_to_config: str):
                     path_to_initializer_file=path_to_initializer_file
                 )
 
+                input_names = []
+
+                for input_name in list(task_metadata["inputs"].keys()):
+                    if task_metadata["inputs"][input_name]["type"] in ("audio", "video", "image"):
+                        input_names.append(input_name + "_url")
+                    else:
+                        input_names.append(input_name)
+
                 inputs_to_test = get_inputs_to_test(
-                    input_names=list(task_metadata["inputs"].keys()),
+                    input_names=input_names,
                     path_to_task=join_path(
                         path_to_api, input_modality, output_modality, task
                     ),

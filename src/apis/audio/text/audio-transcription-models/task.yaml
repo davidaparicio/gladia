@@ -2,7 +2,7 @@ summary: ''
 
 
 inputs:
-  audio_url:
+  audio:
     type: audio
     placeholder: "Audio to use"
     examples:

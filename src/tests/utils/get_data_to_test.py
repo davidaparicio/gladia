@@ -93,13 +93,13 @@ def get_inputs_to_test(
     if PYTEST_CONFIG.getoption("--default-inputs-only"):
         return [
             {
-                input_name: task_metadata["inputs"][input_name]["examples"][0]
+                input_name: task_metadata["inputs"][input_name.replace("_url", "")]["examples"][0]
                 for input_name in input_names
             }
         ]
 
     possible_values_for_each_input = {
-        input_name: task_metadata["inputs"][input_name]["examples"]
+        input_name: task_metadata["inputs"][input_name.replace("_url", "")]["examples"]
         for input_name in input_names
     }
 

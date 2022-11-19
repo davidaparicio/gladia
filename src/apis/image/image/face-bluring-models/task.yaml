@@ -2,7 +2,7 @@ summary: ''
 
 
 inputs:
-  image_url:
+  image:
     type: image
     placeholder: "Image to whith faces to blure"
     examples:
