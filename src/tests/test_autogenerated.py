@@ -96,7 +96,6 @@ def autogenerate_tests(path_to_api: str, path_to_config: str):
                 ):
                     continue
 
-
                 path_to_initializer_file = join_path(
                     path_to_api,
                     input_modality,
@@ -104,7 +103,10 @@ def autogenerate_tests(path_to_api: str, path_to_config: str):
                     task,
                 )
 
-                if os.path.exists(join_path(path_to_initializer_file, "task.yaml")) is False:
+                if (
+                    os.path.exists(join_path(path_to_initializer_file, "task.yaml"))
+                    is False
+                ):
                     continue
 
                 task_metadata = get_task_metadata(
