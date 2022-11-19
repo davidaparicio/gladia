@@ -39,9 +39,11 @@ def __add_router(
         map(lambda each: to_task_name(each.split("?")[0]), module_config)
     )
 
-    if ("NONE" not in active_task_list and "NONE" not in module_config) and (
-        module_task in active_task_list or "*" in module_config
-    ) and (module_path[:4] == "apis"):
+    if (
+        ("NONE" not in active_task_list and "NONE" not in module_config)
+        and (module_task in active_task_list or "*" in module_config)
+        and (module_path[:4] == "apis")
+    ):
 
         # remove the "apis" part of the path
         from fastapi import APIRouter
@@ -53,14 +55,17 @@ def __add_router(
         # assert False, module_path
         task_metadata = get_task_metadata(module_path.replace(".", "/") + "-models")
 
-        inputs = [{
-            "name": input_name,
-            "type": task_metadata["inputs"][input_name]["type"],
-            "default": task_metadata["inputs"][input_name].get("default", ...),
-            "example": task_metadata["inputs"][input_name]["examples"][0],
-            "examples": task_metadata["inputs"][input_name]["examples"],
-            "placeholder": task_metadata["inputs"][input_name]["placeholder"],
-        } for input_name in task_metadata["inputs"]]
+        inputs = [
+            {
+                "name": input_name,
+                "type": task_metadata["inputs"][input_name]["type"],
+                "default": task_metadata["inputs"][input_name].get("default", ...),
+                "example": task_metadata["inputs"][input_name]["examples"][0],
+                "examples": task_metadata["inputs"][input_name]["examples"],
+                "placeholder": task_metadata["inputs"][input_name]["placeholder"],
+            }
+            for input_name in task_metadata["inputs"]
+        ]
 
         output = {
             "name": task_metadata["output"]["name"],
@@ -75,12 +80,12 @@ def __add_router(
             input=inputs,
             output=output,
             default_model=task_metadata["default-model"],
-            rel_path=module_path.replace(".", "/")
+            rel_path=module_path.replace(".", "/"),
         )
 
         module_prefix = module_path.replace(".", "/").replace(apis_folder_name, "")
 
-        app.include_router(router, prefix=module_prefix)#
+        app.include_router(router, prefix=module_prefix)  #
 
 
 def __clean_package_import(module_path: str) -> ModuleType:

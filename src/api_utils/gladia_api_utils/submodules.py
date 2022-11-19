@@ -459,7 +459,12 @@ class TaskRouter:
     """
 
     def __init__(
-        self, router: APIRouter, input: List[dict], output, default_model: str, rel_path=None,
+        self,
+        router: APIRouter,
+        input: List[dict],
+        output,
+        default_model: str,
+        rel_path=None,
     ):
         """
         Initialize the TaskRouter class
