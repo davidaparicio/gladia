@@ -4,7 +4,6 @@ from logging import getLogger
 from os.path import join as join_path
 
 import pytest
-import requests
 from gladia_api_utils.task_management import get_task_metadata
 
 from main import app
@@ -101,18 +100,33 @@ def autogenerate_tests(path_to_api: str, path_to_config: str):
                     path_to_api,
                     input_modality,
                     output_modality,
-                    f"{task[:-len('-models')]}.py",
+                    task,
                 )
 
-                if os.path.exists(path_to_initializer_file) is False:
+                if (
+                    os.path.exists(join_path(path_to_initializer_file, "task.yaml"))
+                    is False
+                ):
                     continue
 
                 task_metadata = get_task_metadata(
                     path_to_initializer_file=path_to_initializer_file
                 )
 
+                input_names = []
+
+                for input_name in list(task_metadata["inputs"].keys()):
+                    if task_metadata["inputs"][input_name]["type"] in (
+                        "audio",
+                        "video",
+                        "image",
+                    ):
+                        input_names.append(input_name + "_url")
+                    else:
+                        input_names.append(input_name)
+
                 inputs_to_test = get_inputs_to_test(
-                    input_names=list(task_metadata["inputs_example"].keys()),
+                    input_names=input_names,
                     path_to_task=join_path(
                         path_to_api, input_modality, output_modality, task
                     ),

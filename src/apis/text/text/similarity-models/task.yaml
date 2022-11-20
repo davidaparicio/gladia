@@ -1,0 +1,21 @@
+summary: ''
+
+default-model: "all-MiniLM-L6-v2"
+
+inputs:
+  sentence_1:
+    type: str
+    placeholder: "input text"
+    examples:
+      - "I like banana"
+
+  sentence_2:
+    type: str
+    placeholder: "input text"
+    examples:
+      - "I hate banana"
+
+output:
+  name: text
+  type: text
+  example: ""

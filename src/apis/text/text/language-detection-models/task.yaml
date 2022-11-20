@@ -1,0 +1,15 @@
+summary: ''
+
+default-model: "toftrup-etal-2021"
+
+inputs:
+  text:
+    type: str
+    placeholder: "input text"
+    examples:
+      - "Input text to perform language detection on"
+
+output:
+  name: text
+  type: text
+  example: ""

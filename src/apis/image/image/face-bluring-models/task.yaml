@@ -1,0 +1,17 @@
+summary: ''
+
+default-model: "ageitgey"
+
+inputs:
+  image:
+    type: image
+    placeholder: "Image to whith faces to blure"
+    examples:
+      - "http://files.gladia.io/examples/image/image/face-bluring/face-bluring.jpg"
+      - "http://files.gladia.io/examples/image/image/face-bluring/face-bluring.png"
+      - "http://files.gladia.io/examples/image/image/face-bluring/face-bluring.gif"
+
+output:
+  name: image
+  type: image
+  example: ""

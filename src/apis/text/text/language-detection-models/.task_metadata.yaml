@@ -1,7 +1,0 @@
-summary: ''
-
-inputs_example:
-  text:
-    default_example: "Input text to perform language detection on"
-    examples:
-      - "Input text to perform language detection on"

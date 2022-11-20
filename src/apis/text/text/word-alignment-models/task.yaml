@@ -1,0 +1,21 @@
+summary: ''
+
+default-model: "bert-base-multilingual-cased"
+
+inputs:
+  input_string_language_1:
+    type: str
+    placeholder: "input text"
+    examples:
+      - "Sentence from first language"
+
+  input_string_language_2:
+    type: str
+    placeholder: "input text"
+    examples:
+      - "来自 第一 语言的 句子"
+
+output:
+  name: text
+  type: text
+  example: ""

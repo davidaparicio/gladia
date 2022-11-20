@@ -1,0 +1,15 @@
+summary: ''
+
+default-model: "mrm8488-t5-base-finetuned-emotion"
+
+inputs:
+  text:
+    type: str
+    placeholder: "input text"
+    examples:
+      - "I love you."
+
+output:
+  name: text
+  type: text
+  example: ""

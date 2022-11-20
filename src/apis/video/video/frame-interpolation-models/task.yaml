@@ -1,0 +1,15 @@
+summary: ''
+
+default-model: "deep-animation-video-interpolation-in-the-wild"
+
+inputs:
+  video:
+    type: video
+    placeholder: "input video"
+    examples:
+      - "http://files.gladia.io/test/test.mp4"
+
+output:
+  name: video
+  type: video
+  example: ""

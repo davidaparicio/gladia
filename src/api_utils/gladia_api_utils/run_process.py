@@ -20,7 +20,7 @@ python <PATH_TO_FILE>/run_process.py <module_path> <model> <output_tmp_result> <
 if __name__ == "__main__":
 
     if len(sys.argv) < 5:
-        print("Not enough arguments. Please read usage below.", HELP_STRING)
+        logger.fatal("Not enough arguments. Please read usage below.", HELP_STRING)
 
         sys.exit(1)
 

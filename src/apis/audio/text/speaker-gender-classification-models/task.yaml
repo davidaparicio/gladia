@@ -1,0 +1,17 @@
+summary: 'Classify the gender of a speaker from a speech sample'
+
+default-model: "inafoss-inaSpeechSegmenter"
+
+inputs:
+  audio:
+    type: audio
+    placeholder: "Audio to use"
+    examples:
+      - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.mp3"
+      - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.m4a"
+      - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.wav"
+
+output:
+  name: gender
+  type: str
+  example: "male"

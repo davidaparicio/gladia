@@ -1,0 +1,23 @@
+summary: ''
+
+default-model: "distilbert-base-uncased"
+
+inputs:
+  sentence:
+    type: str
+    placeholder: "input text"
+    examples:
+      - "I think therefore I"
+
+  top_k:
+    type: int
+    placeholder: "number of prediction to return"
+    examples:
+      - 1
+      - 3
+      - 10
+
+output:
+  name: text
+  type: text
+  example: ""

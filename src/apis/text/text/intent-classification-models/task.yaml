@@ -1,0 +1,15 @@
+summary: ''
+
+default-model: "jointBERT-bert-atis"
+
+inputs:
+  text:
+    type: str
+    placeholder: "input text"
+    examples:
+      - "I would like to find a flight from charlotte to las vegas that makes a stop in st. louis."
+
+output:
+  name: text
+  type: text
+  example: ""

@@ -1,0 +1,17 @@
+summary: ''
+
+default-model: "mlhubber_colorize"
+
+inputs:
+  image:
+    type: image
+    placeholder: "Image to classify"
+    examples:
+      - "http://files.gladia.io/examples/image/image/colorization/rsz_paris.jpg"
+      - "http://files.gladia.io/examples/image/image/colorization/rsz_paris.png"
+      - "http://files.gladia.io/examples/image/image/colorization/rsz_paris.gif"
+
+output:
+  name: colorized_image
+  type: image
+  example: ""

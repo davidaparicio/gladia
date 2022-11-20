@@ -1,7 +1,0 @@
-summary: ''
-
-inputs_example:
-  text:
-    default_example: "I'm currently driving while eating a"
-    examples:
-      - "I'm currently driving while eating a"

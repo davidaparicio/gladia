@@ -1,0 +1,20 @@
+summary: 'Format the input string as an clean adress using geopy'
+
+default-model: "geopy-formatter"
+
+inputs:
+  latitude:
+    type: float
+    placeholder: "latitude"
+    examples:
+      - 43.2965
+  longitude:
+    placeholder: "longitude"
+    type: float
+    examples:
+      - 5.36978
+
+output:
+  name: text
+  type: text
+  example: ""

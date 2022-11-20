@@ -1,0 +1,15 @@
+summary: ''
+
+default-model: "latent-sr"
+
+inputs:
+  image:
+    type: image
+    placeholder: "Image to use"
+    examples:
+      - "http://files.gladia.io/test/test.png"
+
+output:
+  name: image
+  type: image
+  example: ""

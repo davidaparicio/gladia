@@ -1,9 +1,0 @@
-summary: ''
-
-
-inputs_example:
-  image_url:
-    default_example: "http://files.gladia.io/image/image/deblurring/deblurring.png"
-    examples:
-      - "http://files.gladia.io/image/image/deblurring/deblurring.png"
-      - "http://files.gladia.io/image/image/deblurring/deblurring.jpg"

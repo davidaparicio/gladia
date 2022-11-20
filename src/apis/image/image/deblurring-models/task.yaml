@@ -1,0 +1,16 @@
+summary: ''
+
+default-model: "CMFNet"
+
+inputs:
+  image:
+    type: image
+    placeholder: "Image to deblure"
+    examples:
+      - "http://files.gladia.io/image/image/deblurring/deblurring.png"
+      - "http://files.gladia.io/image/image/deblurring/deblurring.jpg"
+
+output:
+  name: deblurded_image
+  type: image
+  example: ""

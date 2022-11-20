@@ -1,0 +1,21 @@
+summary: ''
+
+default-model: "bert-base-uncased"
+
+inputs:
+  sentence_1:
+    type: str
+    placeholder: "input text"
+    examples:
+      - "I like you."
+
+  sentence_2:
+    type: str
+    placeholder: "input text"
+    examples:
+      - "But it's not about you."
+
+output:
+  name: text
+  type: text
+  example: ""

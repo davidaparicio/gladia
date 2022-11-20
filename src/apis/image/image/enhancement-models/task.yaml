@@ -1,0 +1,18 @@
+summary: ''
+
+default-model: "FiveK"
+
+inputs:
+  image:
+    type: image
+    placeholder: "Image to enhance"
+    examples:
+      - "http://files.gladia.io/image/image/enhancement/enhancement_retouching.png"
+      - "http://files.gladia.io/image/image/enhancement/enhancement_retouching.jpg"
+      - "http://files.gladia.io/image/image/enhancement/enhancement_low-light.png"
+      - "http://files.gladia.io/image/image/enhancement/enhancement_low-light.jpg"
+
+output:
+  name: image
+  type: image
+  example: ""

@@ -1,0 +1,24 @@
+summary: ''
+
+default-model: "keybert-paraphrase-multilingual-MiniLM-L12-v2"
+
+inputs:
+  text:
+    type: str
+    placeholder: "input text"
+    examples:
+      - "The Crown is a historical drama streaming television series about the reign of Queen Elizabeth II, created and principally written by Peter Morgan, and produced by Left Bank Pictures and Sony Pictures Television for Netflix."
+
+  top_k:
+    type: int
+    placeholder: "number of of keywords to extract"
+    default: 3
+    examples:
+      - 1
+      - 10
+      - 100
+
+output:
+  name: text
+  type: text
+  example: ""

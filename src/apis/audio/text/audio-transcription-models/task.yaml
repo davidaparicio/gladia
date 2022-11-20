@@ -1,0 +1,23 @@
+summary: ''
+
+default-model: "openai-whisper-tiny"
+
+inputs:
+  audio:
+    type: audio
+    placeholder: "Audio to use"
+    examples:
+      - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.mp3"
+      - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.m4a"
+      - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.wav"
+
+  language:
+    placeholder: "Language of the input audio"
+    type: str
+    examples:
+      - "en"
+
+output:
+  name: transcription
+  type: str
+  example: "I'm telling you that this is the tools i've seen so far."

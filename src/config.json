@@ -78,6 +78,5 @@
     },
 
     "subprocess_to_apify": [
-        "/image/text/ocr-models/textract-extractor/"
     ]
 }
