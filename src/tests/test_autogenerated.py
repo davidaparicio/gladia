@@ -80,6 +80,9 @@ def autogenerate_tests(path_to_api: str, path_to_config: str):
                 join_path(path_to_api, input_modality, output_modality)
             ):
 
+                if not os.path.isdir(join_path(path_to_api, input_modality, output_modality, task)):
+                    continue
+
                 if (
                     task_is_activated(
                         activated_tasks,
