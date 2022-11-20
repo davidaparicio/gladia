@@ -23,8 +23,8 @@ def __create_subprocess_api_config(api_name_to_build: str) -> Tuple[str, str, st
 
     Args:
         api_name_to_build (str): The name of the api to build
-        (should look like /input/output/task-models/model-name/)
-        (example "/text/text/language-detection-models/toftrup-etal-2021/")
+        (should look like /input/output/task/model-name/)
+        (example "/text/text/language-detection/toftrup-etal-2021/")
         (should be the same as the api name in the config.json file)
 
     Returns:
@@ -41,7 +41,7 @@ def __create_subprocess_api_config(api_name_to_build: str) -> Tuple[str, str, st
     # built previously and name as follows:
     # task-models-model-name
     # example: image-generation-models-dream-studio
-    # where the api name is /input/output/image-generation-models/dream-studio/
+    # where the api name is /input/output/image-generation/dream-studio/
     # (see create_custom_envs.py)
 
     # 3.1. get the name of the micromamba env
@@ -169,7 +169,7 @@ def __get_api_port(api_name: str) -> Union[int, bool]:
 
     Args:
         api_name (str): Name of the subprocess api to get the port of
-        (should look like "/text/text/language-detection-models/toftrup-etal-2021/")
+        (should look like "/text/text/language-detection/toftrup-etal-2021/")
 
     Returns:
         Union[int, bool]: Port of the subprocess api if it exists, False otherwise
@@ -208,7 +208,7 @@ def __set_api_port(api_name: str) -> int:
 
     Args:
         api_name (str): Name of the api to set the port for
-        (should look like /input/output/task-models/model-name/)
+        (should look like /input/output/task/model-name/)
 
     Returns:
         int: Port of the api
@@ -262,7 +262,7 @@ def call_subprocess_api(api_name: str, kwargs: dict()) -> Any:
 
     Args:
         api_name (str): Name of the subprocess api to call
-        (should look like "/text/text/language-detection-models/toftrup-etal-2021/")
+        (should look like "/text/text/language-detection/toftrup-etal-2021/")
         kwargs (dict): Dict of kwargs to pass to the subprocess api
 
     Returns:
@@ -316,7 +316,7 @@ def is_subprocess_api_running(api_name_to_check: str) -> bool:
 
     Args:
         api_name_to_check (str): The name of the api to check
-        (should look like "/text/text/language-detection-models/toftrup-etal-2021/")
+        (should look like "/text/text/language-detection/toftrup-etal-2021/")
 
     Returns:
         bool: True if the api is running, False otherwise

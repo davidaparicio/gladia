@@ -85,7 +85,7 @@ if __name__ == "__main__":
     port = int(sys.argv[1])
 
     # model path should look like the fullpath to the model file
-    # /app/src/apis/image/image/blabla-models/MyModel/MyModel.py
+    # /app/src/apis/image/image/blabla/MyModel/MyModel.py
     module_path = sys.argv[2]
 
     # fix the dependency issue with the imported model

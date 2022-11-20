@@ -107,7 +107,7 @@ def get_module_infos(root_path=None) -> Tuple:
     pwd = str(Path(caller_file).absolute()).split("/")
 
     plugin = pwd[len(pwd) - 3 : len(pwd)]
-    tags = ".".join(plugin)[:-7]
+    tags = ".".join(plugin)
     task = plugin[-1][:-3]
 
     return task, plugin, tags
@@ -456,7 +456,7 @@ class TaskRouter:
 
         self.task_name, self.plugin, self.tags = get_module_infos(root_path=rel_path)
         self.versions, self.root_package_path = get_model_versions(full_path)
-        self.endpoint = f"/{rel_path.split('/')[1]}/{rel_path.split('/')[2]}/{self.task_name.replace('-models', '')}/"
+        self.endpoint = f"/{rel_path.split('/')[1]}/{rel_path.split('/')[2]}/{self.task_name}/"
 
         self.default_model = default_model
 
