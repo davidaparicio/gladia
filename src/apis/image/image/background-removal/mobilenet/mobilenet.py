@@ -1,7 +1,7 @@
 from gladia_api_utils.model_management import download_model
 from PIL import Image
 
-from apis.image.image.background_removal_models.OnnxBackgroundRemoval import (
+from apis.image.image.background_removal.OnnxBackgroundRemoval import (
     OnnxBackgroundRemoval,
 )
 
