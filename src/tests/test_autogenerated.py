@@ -49,8 +49,7 @@ def task_is_activated(
 
     if (
         "*" in activated_tasks[input_modality][output_modality]
-        or task_dir
-        in activated_tasks[input_modality][output_modality]
+        or task_dir in activated_tasks[input_modality][output_modality]
     ) and __a_model_exists_for_this_task(
         path_to_api, input_modality, output_modality, task_dir
     ):
@@ -80,7 +79,9 @@ def autogenerate_tests(path_to_api: str, path_to_config: str):
                 join_path(path_to_api, input_modality, output_modality)
             ):
 
-                if not os.path.isdir(join_path(path_to_api, input_modality, output_modality, task)):
+                if not os.path.isdir(
+                    join_path(path_to_api, input_modality, output_modality, task)
+                ):
                     continue
 
                 if (

@@ -73,10 +73,7 @@ def __add_router(
             rel_path=module_path.replace(".", "/"),
         )
 
-        module_prefix = (
-            module_path.replace(".", "/")
-            .replace(apis_folder_name, "")
-        )
+        module_prefix = module_path.replace(".", "/").replace(apis_folder_name, "")
 
         app.include_router(router, prefix=module_prefix)  #
 
