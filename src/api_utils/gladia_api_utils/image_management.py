@@ -2,7 +2,6 @@ import base64
 import os
 from io import BytesIO
 
-import cv2
 import numpy as np
 from PIL import Image
 from skimage.filters import gaussian

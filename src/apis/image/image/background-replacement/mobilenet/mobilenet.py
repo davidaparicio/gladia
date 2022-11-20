@@ -1,7 +1,7 @@
 from gladia_api_utils.io import _open
 from PIL import Image
 
-from apis.image.image.background_removal_models.mobilenet.mobilenet import (
+from apis.image.image.background_removal.mobilenet.mobilenet import (
     predict as background_removal_predict,
 )
 

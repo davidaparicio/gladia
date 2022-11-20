@@ -13,7 +13,7 @@ from torch.nn import Module
 from torch.nn.functional import pad
 from torchvision.transforms.functional import to_tensor
 
-from apis.image.image.deblurring_models.CMFNet.model.CMFNet import CMFNet
+from apis.image.image.deblurring.CMFNet.model.CMFNet import CMFNet
 
 MODEL_PATH = download_model(
     url="https://github.com/FanChiMao/CMFNet/releases/download/v0.0/deblur_GoPro_CMFNet.pth",
