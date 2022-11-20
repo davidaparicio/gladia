@@ -107,7 +107,7 @@ def get_module_infos(root_path=None) -> Tuple:
     pwd = str(Path(caller_file).absolute()).split("/")
 
     plugin = pwd[len(pwd) - 3 : len(pwd)]
-    tags = ".".join(plugin)[:-3]
+    tags = ".".join(plugin)[:-7]
     task = plugin[-1][:-3]
 
     return task, plugin, tags
