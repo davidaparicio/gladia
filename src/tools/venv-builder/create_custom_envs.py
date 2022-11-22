@@ -107,6 +107,9 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
 
     custom_env = yaml.safe_load(open(path_to_env_file, "r"))
 
+    if "name" in custom_env:
+        env_name = custom_env["name"]
+
     if custom_env is None:
         error_message = "Provided config env is empty, you must either specify `inherit` or `dependencies`."
 
