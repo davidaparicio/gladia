@@ -107,10 +107,22 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
 
     custom_env = yaml.safe_load(open(path_to_env_file, "r"))
 
-    if custom_env is None:
+    if "name" in custom_env:
+        logger.info(
+            f"overwriting default custom env's name {env_name} to {custom_env['name']}"
+        )
+
+        env_name = custom_env["name"]
+
+    if os.path.isdir(os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)):
+        logger.info(f"{env_name} already exists, skipping build")
+
+        return
+
+    if "inherit" not in custom_env and "dependencies" not in custom_env:
         error_message = "Provided config env is empty, you must either specify `inherit` or `dependencies`."
 
-        logger.error(error_message)
+        logger.critical(error_message)
 
         raise RuntimeError(error_message)
 
