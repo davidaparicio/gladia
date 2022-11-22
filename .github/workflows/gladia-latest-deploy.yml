@@ -96,7 +96,6 @@ jobs:
             -e TRITON_MODELS_PATH=/tmp/gladia/triton \
             -e HUGGINGFACE_ACCESS_TOKEN=${HUGGINGFACE_ACCESS_TOKEN} \
             -e STABILITY_KEY=${STABILITY_KEY} \
-            -e MODE=server \
             ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }}
 
       - name: Gladia AIPI-1 readiness
@@ -130,7 +129,6 @@ jobs:
             -e TRITON_MODELS_PATH=/tmp/gladia/triton \
             -e HUGGINGFACE_ACCESS_TOKEN=${HUGGINGFACE_ACCESS_TOKEN} \
             -e STABILITY_KEY=${STABILITY_KEY} \
-            -e MODE=server \
             ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }}
 
       - name: Gladia AIPI-2 readiness
