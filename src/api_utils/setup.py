@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name="gladia-api-utils",
-    version="0.1.13",
+    version="0.1.14",
     description="Utils for Gladia APIs Framework",
     long_description=readme(),
     long_description_content_type="text/markdown",
@@ -22,7 +22,12 @@ setup(
     author_email="jlqueguiner@gladia.io",
     keywords="ai api fastapi artificial_intelligence gladia",
     license="MIT",
-    packages=["gladia_api_utils", "gladia_api_utils.triton_helper"],
+    packages=[
+        "gladia_api_utils",
+        "gladia_api_utils.triton_helper",
+        "model_architectures",
+        "inpainting_helper",
+    ],
     install_requires=[
         "PyYAML",
         "requests",
