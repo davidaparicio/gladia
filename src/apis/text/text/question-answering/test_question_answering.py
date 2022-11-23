@@ -3,7 +3,6 @@ import os
 import pytest
 import requests
 
-from main import app
 from tests import create_default_tests
 from tests.utils import get_inputs_to_test, get_models_to_test
 
