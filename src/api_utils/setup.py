@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name="gladia-api-utils",
-    version="0.1.12",
+    version="0.1.13",
     description="Utils for Gladia APIs Framework",
     long_description=readme(),
     long_description_content_type="text/markdown",
