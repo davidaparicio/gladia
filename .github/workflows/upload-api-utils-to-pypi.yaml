@@ -18,15 +18,16 @@ jobs:
           fetch-depth: 0
 
       - name: Get changed files in the api_utils folder
-        id: changed-default
+        id: changed-api-utils
         uses: tj-actions/changed-files@v34
         with:
           files: |
             src/api_utils/**
 
   upload:
+    name: Build and Upload package
+    needs: check_if_need_to_rebuild
     if: ${{ (needs.check_if_need_to_rebuild.outputs.update_api_utils  == 'true') }}
-
     runs-on: ubuntu-latest
 
     steps:
