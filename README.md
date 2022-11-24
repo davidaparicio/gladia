@@ -5,6 +5,7 @@
   <em>Gladia the fastest way to develop and deploy AI APIs.</em>
   <br/>
   <em>The fastest way to implement and compare AI research models for a given task.</em>
+  <em>No more Docker / Kubernetes complexity, no more Driver headaches, no more package collisions, and dependency hell.</em>
 </p>
 
 ---
