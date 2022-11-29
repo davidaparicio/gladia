@@ -4,31 +4,55 @@ on:
     types: [completed]
 
 jobs:
+  get-info:
+    name: "Get information about the source run"
+    runs-on: ubuntu-latest
+    outputs:
+      prNumber: ${{ steps.PR.outputs.number }}
+      prLabel: ${{ steps.PR.outputs.pr_labels }}
+      prTitle: ${{ steps.PR.outputs.pr_title }}
+      prOutcome: ${{ steps.PR.outputs.outcome  }}
+
+    steps:
+      - uses: 8BitJonny/gh-get-current-pr@2.1.3
+        id: PR
+        with:
+          sha: ${{ github.event.workflow_run.head_sha }}
+
   on-success:
     runs-on: ubuntu-latest
+    needs: get-info
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Notify Slack - Successful deploy
         uses: rtCamp/action-slack-notify@v2.2.0
         env: 
           SLACK_CHANNEL: #releases
-          SLACK_COLOR: ${{ job.status }}
+          SLACK_COLOR: ${{ needs.get-info.outpus.prOutcome }}
           SLACK_USERNAME: gladia-ai-ci
           SLACK_TITLE: 'New Docker Hub Release :rocket:'
-          SLACK_MESSAGE: ${{ github.event.pull_request.title }} by ${{ github.event.pull_request.user.login }}
+          SLACK_MESSAGE: ${{ needs.get-info.outpus.prtitle }} 
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_ICON_EMOJI: ':rocket:'
-  on-failure:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
-    steps:
-      - name: Notify Slack - Failed deploy
-        uses: rtCamp/action-slack-notify@v2.2.0
-        env: 
-          SLACK_CHANNEL: #releases
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_USERNAME: gladia-ai-ci
-          SLACK_TITLE: 'New Docker Hub Release :rocket:'
-          SLACK_MESSAGE: ${{ github.event.pull_request.title }} by ${{ github.event.pull_request.user.login }}
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_ICON_EMOJI: ':rocket:'
+
+      - name: Trigger CD
+        run: |
+          curl -H "Authorization: token ${{ secrets.CD_SECRET }}" \                                                                                                                                                                         1 ✘ │ vincent@lusankya │ 14:10:26  
+              -H 'Accept: application/vnd.github.everest-preview+json' \
+              "https://api.github.com/repos/${{ secrets.CD_REPO }}/dispatches" \
+              -d '{"event_type": "rollout", "client_payload": {"rollout": "public"}}'
+
+  # on-failure:
+  #   runs-on: ubuntu-latest
+  #   if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+  #   steps:
+  #     - name: Notify Slack - Failed deploy
+  #       uses: rtCamp/action-slack-notify@v2.2.0
+  #       env: 
+  #         SLACK_CHANNEL: #releases
+  #         SLACK_COLOR: ${{ job.status }}
+  #         SLACK_USERNAME: gladia-ai-ci
+  #         SLACK_TITLE: 'New Docker Hub Release :rocket:'
+  #         SLACK_MESSAGE: ${{ github.event.pull_request.title }} by ${{ github.event.pull_request.user.login }}
+  #         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+  #         SLACK_ICON_EMOJI: ':rocket:'
