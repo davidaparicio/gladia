@@ -32,7 +32,7 @@ Provided that you cloned the repo, build your own Docker image. We are giving it
 ```bash
 > git clone https://github.com/gladiaio/gladia.git
 > cd gladia/src
-> docker build -t oboulant/mamba -f gpu.Dockerfile .
+> docker build -t gladia -f docker/gpu.Dockerfile .
 ```
 
 The `docker build` command may take some time to run since it is building the complete image. Once the it returns, you can check that the image is properly built

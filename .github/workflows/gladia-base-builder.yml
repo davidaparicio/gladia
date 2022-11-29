@@ -29,7 +29,7 @@ jobs:
         run: >-
           docker build --pull	
           ${{env.DOCKER_BUILD_OPT}}
-          -t ${DOCKER_GLADIA_FQDN}/${{env.DOCKER_BUILD_IMAGE_NAME}}:${{env.DOCKER_BUILD_IMAGE_TAG}} -f base.Dockerfile .
+          -t ${DOCKER_GLADIA_FQDN}/${{env.DOCKER_BUILD_IMAGE_NAME}}:${{env.DOCKER_BUILD_IMAGE_TAG}} -f docker/base.Dockerfile .
 
       - name: Push new base latest to Gladia registry
         run: docker push ${DOCKER_GLADIA_FQDN}/${{env.DOCKER_BUILD_IMAGE_NAME}}:${{env.DOCKER_BUILD_IMAGE_TAG}}

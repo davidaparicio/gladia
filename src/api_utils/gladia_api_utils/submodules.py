@@ -290,6 +290,11 @@ def get_module_env_name(module_path: str) -> Union[str, None]:
     """
 
     if os.path.isfile(os.path.join(module_path, ENV_YAML)):
+        task_custom_env = yaml.safe_load(open(os.path.join(module_path, ENV_YAML)))
+
+        if "name" in task_custom_env:
+            return task_custom_env["name"]
+
         path = os.path.join(module_path, ENV_YAML).split("/")
 
         task = path[-3]
@@ -298,6 +303,14 @@ def get_module_env_name(module_path: str) -> Union[str, None]:
         return f"{task}-{model}"
 
     elif os.path.isfile(os.path.join(module_path, "../", ENV_YAML)):
+
+        model_custom_env = yaml.safe_load(
+            open(os.path.join(module_path, "../", ENV_YAML))
+        )
+
+        if "name" in model_custom_env:
+            return model_custom_env["name"]
+
         return os.path.split(os.path.split(os.path.split(module_path)[0])[0])[1]
 
     else:
@@ -443,6 +456,8 @@ class TaskRouter:
         self.output = output
         self.default_model = default_model
 
+        self.models_env = {}
+
         if not rel_path:
             namespace = sys._getframe(1).f_globals
 
@@ -566,7 +581,11 @@ class TaskRouter:
             if not success:
                 raise HTTPException(status.HTTP_400_BAD_REQUEST, error_message)
 
-            env_name = get_module_env_name(module_path)
+            if module_path not in self.models_env:
+                self.models_env[module_path] = get_module_env_name(module_path)
+
+            env_name = self.models_env[module_path]
+
             # if its a subprocess
             if env_name is not None:
 
