@@ -192,7 +192,7 @@ jobs:
       - name: Gladia container readiness
         uses: nick-fields/retry@v2
         with:
-          timeout_seconds: 120
+          timeout_seconds: 1200
           max_attempts: 120
           retry_on: error
           command: curl http://aipi-test-${{env.DOCKER_BUILD_TAG}}.$KNS:8000/v2/health/ready --connect-timeout 5

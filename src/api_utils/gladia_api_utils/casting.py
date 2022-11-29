@@ -9,8 +9,7 @@ from typing import Union
 import numpy as np
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from PIL import ExifTags, Image
-from PIL.PngImagePlugin import PngInfo
+from PIL import Image
 from starlette.responses import StreamingResponse
 
 from .file_management import get_file_type
