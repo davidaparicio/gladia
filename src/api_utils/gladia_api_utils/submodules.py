@@ -702,7 +702,6 @@ class TaskRouter:
             if hasattr(module, "warm_up"):
                 module.warm_up()
         else:
-            print(f"warm_up {env_name}")
             _warm_up_in_subprocess(
                 env_name=env_name,
                 module_path=module_path,
