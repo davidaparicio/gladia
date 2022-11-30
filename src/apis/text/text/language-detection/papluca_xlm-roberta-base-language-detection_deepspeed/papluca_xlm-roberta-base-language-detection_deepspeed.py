@@ -4,7 +4,6 @@ from typing import Dict, Union
 import mii
 from gladia_api_utils.deepspeed_helper import warm_up as warm_up_deepspeed
 
-
 MODEL_NAME = "jb2k/bert-base-multilingual-cased-language-detection"
 DEPLOYMENT_NAME = MODEL_NAME + "-LanguageDetection-deployment"
 
@@ -87,10 +86,9 @@ def predict(text: str) -> Dict[str, Union[str, Dict[str, float]]]:
 
     for result in results:
         language = LABELS[result["label"]]
-        prediction_raw[language]= result["score"]
+        prediction_raw[language] = result["score"]
         if result["score"] > max_score:
             max_language = language
             max_score = result["score"]
-
 
     return {"prediction": max_language, "prediction_raw": prediction_raw}

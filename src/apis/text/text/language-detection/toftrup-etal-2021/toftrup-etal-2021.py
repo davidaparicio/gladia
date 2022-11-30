@@ -1,8 +1,7 @@
 from typing import Dict, Union
 
-from LanguageIdentifier import rank
-
 from langcodes import Language
+from LanguageIdentifier import rank
 
 
 def predict(text: str) -> Dict[str, Union[str, Dict[str, float]]]:
@@ -21,6 +20,8 @@ def predict(text: str) -> Dict[str, Union[str, Dict[str, float]]]:
     for lang, score in rank(text):
         prediction_raw[Language.get(lang).to_alpha3()] = score
 
-    prediction = Language.get(max(zip(prediction_raw.values(), prediction_raw.keys()))[1]).to_alpha3()
+    prediction = Language.get(
+        max(zip(prediction_raw.values(), prediction_raw.keys()))[1]
+    ).to_alpha3()
 
     return {"prediction": prediction, "prediction_raw": prediction_raw}
