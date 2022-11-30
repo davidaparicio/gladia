@@ -510,6 +510,8 @@ class TaskRouter:
 
         self.models_env = {}
 
+        self.warmed_up = False
+
         if not rel_path:
             namespace = sys._getframe(1).f_globals
 
@@ -605,6 +607,9 @@ class TaskRouter:
         )
         @forge.sign(*[*form_parameters, query_for_model_name])
         async def apply(*args, **kwargs):
+
+            if not self.warmed_up:
+                self.warm_up()
 
             # cast BaseModel pydantic models into python type
             parameters_in_body = self.__build_parameters_in_body(kwargs)
@@ -703,6 +708,8 @@ class TaskRouter:
                 module_path=module_path,
                 model=self.default_model,
             )
+
+        self.warmed_up = True
 
     def __get_routeur_inputs(self) -> list:
         task_metadata = yaml.safe_load(

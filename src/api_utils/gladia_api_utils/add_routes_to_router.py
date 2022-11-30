@@ -6,6 +6,7 @@ import sys
 from logging import getLogger
 from types import ModuleType
 from typing import Any, Dict, List
+from warnings import warn
 
 from fastapi import APIRouter
 from gladia_api_utils.submodules import TaskRouter
@@ -68,13 +69,20 @@ def __add_router(
 
         router = APIRouter()
 
-        TaskRouter(
+        task_router = TaskRouter(
             router=router,
             input=inputs,
             output=output,
             default_model=task_metadata["default-model"],
             rel_path=module_path.replace(".", "/"),
-        ).warm_up()
+        )
+
+        if os.getenv("LAZY_WARM_UP", "true").lower() == "false":
+            task_router.warm_up()
+        else:
+            warn(
+                "LAZY_WARM_UP is set to true, this could result in a long first call to the model in order to init it."
+            )
 
         module_prefix = module_path.replace(".", "/").replace(apis_folder_name, "")
 
