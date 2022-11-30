@@ -8,6 +8,13 @@ API_SERVER_TIMEOUT="${API_SERVER_TIMEOUT:-1200}"
 rm /usr/bin/python3 && \
 ln -s /usr/bin/python3.8 /usr/bin/python3
 
+GLADIA_TMP_PATH="${GLADIA_TMP_PATH:-/tmp/gladia}"
+GLADIA_TMP_MODEL_PATH="${GLADIA_TMP_MODEL_PATH:-$GLADIA_TMP_PATH/model}"
+
+# init mii folders
+mkdir -p "${MII_CACHE_PATH:-$GLADIA_TMP_MODEL_PATH/mii/cache"
+mkdir -p "${MII_MODEL_PATH:-$GLADIA_TMP_MODEL_PATH/mii/models"
+
 service supervisor start
 
 # initialize the nltk database
