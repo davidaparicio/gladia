@@ -4,6 +4,7 @@ from typing import Dict, Union
 import mii
 from gladia_api_utils.deepspeed_helper import warm_up as warm_up_deepspeed
 
+
 MODEL_NAME = "jb2k/bert-base-multilingual-cased-language-detection"
 DEPLOYMENT_NAME = MODEL_NAME + "-LanguageDetection-deployment"
 
@@ -23,51 +24,51 @@ def warm_up(*_, **__) -> None:
 def predict(text: str) -> Dict[str, Union[str, Dict[str, float]]]:
 
     LABELS = {
-        "LABEL_0": "Arabic",
-        "LABEL_1": "Basque",
-        "LABEL_2": "Breton",
-        "LABEL_3": "Catalan",
-        "LABEL_4": "Chinese_China",
-        "LABEL_5": "Chinese_Hongkong",
-        "LABEL_6": "Chinese_Taiwan",
-        "LABEL_7": "Chuvash",
-        "LABEL_8": "Czech",
-        "LABEL_9": "Dhivehi",
-        "LABEL_10": "Dutch",
-        "LABEL_11": "English",
-        "LABEL_12": "Esperanto",
-        "LABEL_13": "Estonian",
-        "LABEL_14": "French",
-        "LABEL_15": "Frisian",
-        "LABEL_16": "Georgian",
-        "LABEL_17": "German",
-        "LABEL_18": "Greek",
-        "LABEL_19": "Hakha_Chin",
-        "LABEL_20": "Indonesian",
-        "LABEL_21": "Interlingua",
-        "LABEL_22": "Italian",
-        "LABEL_23": "Japanese",
-        "LABEL_24": "Kabyle",
-        "LABEL_25": "Kinyarwanda",
-        "LABEL_26": "Kyrgyz",
-        "LABEL_27": "Latvian",
-        "LABEL_28": "Maltese",
-        "LABEL_29": "Mongolian",
-        "LABEL_30": "Persian",
-        "LABEL_31": "Polish",
-        "LABEL_40": "Portuguese",
-        "LABEL_41": "Romanian",
-        "LABEL_42": "Romansh_Sursilvan",
-        "LABEL_43": "Russian",
-        "LABEL_44": "Sakha",
-        "LABEL_45": "Slovenian",
-        "LABEL_46": "Spanish",
-        "LABEL_47": "Swedish",
-        "LABEL_48": "Tamil",
-        "LABEL_49": "Tatar",
-        "LABEL_50": "Turkish",
-        "LABEL_51": "Ukranian",
-        "LABEL_52": "Welsh",
+        "LABEL_0": "arb",
+        "LABEL_1": "baq",
+        "LABEL_2": "bre",
+        "LABEL_3": "cat",
+        "LABEL_4": "chi",
+        "LABEL_5": "chi",
+        "LABEL_6": "chi",
+        "LABEL_7": "chv",
+        "LABEL_8": "cze",
+        "LABEL_9": "div",
+        "LABEL_10": "dum",
+        "LABEL_11": "eng",
+        "LABEL_12": "epo",
+        "LABEL_13": "est",
+        "LABEL_14": "fre",
+        "LABEL_15": "fry",
+        "LABEL_16": "geo",
+        "LABEL_17": "get",
+        "LABEL_18": "grc",
+        "LABEL_19": "cnh",
+        "LABEL_20": "ind",
+        "LABEL_21": "ina",
+        "LABEL_22": "ita",
+        "LABEL_23": "jpn",
+        "LABEL_24": "kab",
+        "LABEL_25": "kin",
+        "LABEL_26": "kir",
+        "LABEL_27": "lav",
+        "LABEL_28": "mlt",
+        "LABEL_29": "mon",
+        "LABEL_30": "peo",
+        "LABEL_31": "pol",
+        "LABEL_32": "prt",
+        "LABEL_33": "ron",
+        "LABEL_34": "roh",
+        "LABEL_35": "rus",
+        "LABEL_36": "sah",
+        "LABEL_37": "slv",
+        "LABEL_38": "spa",
+        "LABEL_39": "swe",
+        "LABEL_40": "tam",
+        "LABEL_41": "tat",
+        "LABEL_42": "tur",
+        "LABEL_43": "ukr",
+        "LABEL_44": "wel",
     }
 
     generator = mii.mii_query_handle(DEPLOYMENT_NAME)
@@ -78,12 +79,18 @@ def predict(text: str) -> Dict[str, Union[str, Dict[str, float]]]:
         }
     ).response
 
-    language = ""
+    max_language = ""
     max_score = 0.0
 
-    for p in json_loads(result.replace("'", '"'))[0]:
-        if p["score"] > max_score:
-            max_score = p["score"]
-            language = p["label"]
+    results = json_loads(result.replace("'", '"'))[0]
+    prediction_raw = dict()
 
-    return {"prediction": LABELS[language], "prediction_raw": result}
+    for result in results:
+        language = LABELS[result["label"]]
+        prediction_raw[language]= result["score"]
+        if result["score"] > max_score:
+            max_language = language
+            max_score = result["score"]
+
+
+    return {"prediction": max_language, "prediction_raw": prediction_raw}
