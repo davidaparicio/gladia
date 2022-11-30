@@ -3,12 +3,15 @@ import logging
 import os
 import pkgutil
 import sys
+from logging import getLogger
 from types import ModuleType
 from typing import Any, Dict, List
 
 from fastapi import APIRouter
 from gladia_api_utils.submodules import TaskRouter
 from gladia_api_utils.task_management import get_task_metadata
+
+logger = getLogger(name=__name__)
 
 
 def __add_router(
@@ -71,7 +74,7 @@ def __add_router(
             output=output,
             default_model=task_metadata["default-model"],
             rel_path=module_path.replace(".", "/"),
-        )
+        ).warm_up()
 
         module_prefix = module_path.replace(".", "/").replace(apis_folder_name, "")
 

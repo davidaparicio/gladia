@@ -218,6 +218,58 @@ def get_metadata(rel_path, file_name, fallback_file_name) -> dict:
     return metadata
 
 
+def _warm_up_in_subprocess(env_name: str, module_path: str, model: str):
+    """
+    Execute a model in a subprocess.
+    The subprocess is executed in a separate thread.
+
+    Args:
+        env_name (str): name of the environment
+        module_path (str): path to the module
+        model (str): name of the model to execute
+
+    Returns:
+        threading.Thread: thread of the subprocess
+
+    Raises:
+        RuntimeError: if the subprocess fails
+    """
+
+    module_full_path = os.path.abspath(module_path)
+
+    cwd = os.path.abspath(Path(__file__).parent)
+
+    cmd = f"""micromamba run -n {env_name} --cwd {module_full_path} python {os.path.join(cwd, "warm_up_in_custom_env.py")} {module_full_path} {model}"""
+
+    logger.debug(f"Executing command: {cmd}")
+
+    try:
+        proc = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            stdin=subprocess.PIPE,
+            shell=True,
+            executable="/bin/bash",
+        )
+
+        proc.wait()
+
+        if proc.returncode != 0:
+            error_message = f"Subprocess encountered the following error : {proc.stderr.read().decode()}\nCommand executed: {cmd}"
+
+            logger.error(error_message)
+
+            raise RuntimeError(error_message)
+
+    except subprocess.CalledProcessError as error:
+        error_message = f"Could not run in subprocess command {cmd}: {error}"
+
+        logger.error(error_message)
+
+        raise RuntimeError(error_message)
+
+
 def exec_in_subprocess(
     env_name: str, module_path: str, model: str, output_tmp_result: str, **kwargs
 ):
@@ -616,6 +668,41 @@ class TaskRouter:
                 )
 
             return self.__post_processing(result)
+
+    def warm_up(self, default_only: bool = True) -> None:
+        if not self.__check_if_model_exist():
+            return
+
+        if not default_only:
+            logger.warning(
+                "warm_up currently only handle default model. Skipping non-default models."
+            )
+
+        module_path = f"{self.root_package_path}/{self.default_model}/"
+
+        if module_path not in self.models_env:
+            self.models_env[module_path] = get_module_env_name(module_path)
+
+        env_name = self.models_env[module_path]
+
+        if env_name is None:
+            module_path = self.root_package_path.replace(
+                os.getenv("PATH_TO_GLADIA_SRC") + "/", ""
+            )
+            module_path = module_path.replace("/", ".") + ""
+
+            module_path = f"{module_path}.{self.default_model}.{self.default_model}"
+            module = importlib.import_module(module_path)
+
+            if hasattr(module, "warm_up"):
+                module.warm_up()
+        else:
+            print(f"warm_up {env_name}")
+            _warm_up_in_subprocess(
+                env_name=env_name,
+                module_path=module_path,
+                model=self.default_model,
+            )
 
     def __get_routeur_inputs(self) -> list:
         task_metadata = yaml.safe_load(

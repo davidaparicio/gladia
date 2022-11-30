@@ -1,13 +1,11 @@
 # adapted from https://colab.research.google.com/drive/1xqzUi2iXQXDqXBHQGP9Mqt2YrYW6cx-J?usp=sharing#scrollTo=BPnyd-XUKbfE
 import numpy as np
-import torch
-import torchvision
-from einops import rearrange, repeat
 from gladia_api_utils.io import _open
 from gladia_api_utils.model_management import download_model
 from notebook_helpers import load_model_from_config, run
 from omegaconf import OmegaConf
 from PIL import Image
+from torch import clamp as torch_clamp
 
 path_ckpt = download_model(
     url="https://heibox.uni-heidelberg.de/f/578df07c8fc04ffbadf3/?dl=1",
@@ -46,7 +44,7 @@ def predict(image: Image, steps: int = 10) -> Image:
 
     sample = logs["sample"]
     sample = sample.detach().cpu()
-    sample = torch.clamp(sample, -1.0, 1.0)
+    sample = torch_clamp(sample, -1.0, 1.0)
     sample = (sample + 1.0) / 2.0 * 255
     sample = sample.numpy().astype(np.uint8)
     sample = np.transpose(sample, (0, 2, 3, 1))
