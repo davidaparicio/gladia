@@ -1,6 +1,6 @@
 summary: ''
 
-default-model: "dbmdz-bert-large-cased-finetuned-conll03-english"
+default-model: "dbmdz-bert-large-cased-finetuned-conll03-english_deepspeed"
 
 inputs:
   text:
