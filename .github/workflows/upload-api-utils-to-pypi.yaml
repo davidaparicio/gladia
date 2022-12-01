@@ -32,7 +32,7 @@ jobs:
 
     steps:
       - name: build dist
-        run: python setup.py sdist
+        run: cd src/api_utils && python src/api_utils/setup.py sdist
 
       - name: upload dist
-        run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }} dist/*
+        run: cd src/api_utils && twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }} dist/*
