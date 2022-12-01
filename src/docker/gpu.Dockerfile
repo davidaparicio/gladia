@@ -62,7 +62,7 @@ RUN mv $PATH_TO_GLADIA_SRC/tools/docker/_activate_current_env.sh /usr/local/bin/
 WORKDIR $PATH_TO_GLADIA_SRC
 
 RUN micromamba create -f env.yaml && \
-    micromamba run -n server /bin/bash -c "pip install --upgrade \"jax[cuda117_cudnn82]==0.3.25\" -f https://storage.googleapis.com/jax-releases/jax_releases.html" && \
+    micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]==0.3.25\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html" & \
     $PATH_TO_GLADIA_SRC/tools/docker/clean-layer.sh
 
 ENV LD_LIBRARY_PATH=$MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/nvidia/cublas/lib/:$LD_LIBRARY_PATH
