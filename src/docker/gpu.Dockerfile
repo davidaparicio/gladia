@@ -45,8 +45,8 @@ ENV GLADIA_TMP_PATH=$GLADIA_TMP_PATH \
     MAMBA_EXE="/usr/local/bin/micromamba" \
     MAMBA_DOCKERFILE_ACTIVATE=1 \
     MAMBA_ALWAYS_YES=true \
-    PATH=$PATH:/usr/local/bin/:$MAMBA_EXE
-
+    PATH=$PATH:/usr/local/bin/:$MAMBA_EXE \
+    JAX_PLATFORM_NAME=gpu
 
 RUN mkdir -p $GLADIA_TMP_MODEL_PATH \
     mkdir -p $NLTK_DATA
@@ -62,8 +62,9 @@ RUN mv $PATH_TO_GLADIA_SRC/tools/docker/_activate_current_env.sh /usr/local/bin/
 WORKDIR $PATH_TO_GLADIA_SRC
 
 RUN micromamba create -f env.yaml && \
+    micromamba run -n server /bin/bash -c "pip install --upgrade \"jax[cuda117_cudnn82]==0.3.25\" -f https://storage.googleapis.com/jax-releases/jax_releases.html" && \
     $PATH_TO_GLADIA_SRC/tools/docker/clean-layer.sh
-    
+
 ENV LD_LIBRARY_PATH=/opt/conda/envs/server/lib/python3.8/site-packages/nvidia/cublas/lib/:$LD_LIBRARY_PATH
 
 RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then \
