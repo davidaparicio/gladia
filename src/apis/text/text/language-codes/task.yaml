@@ -1,0 +1,15 @@
+summary: ''
+
+default-model: "language-codes"
+
+inputs:
+  text:
+    type: str
+    placeholder: "eng"
+    examples:
+      - "fra"
+
+output:
+  name: text
+  type: text
+  example: ""
