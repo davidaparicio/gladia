@@ -8,21 +8,7 @@ MODEL_NAME = "jb2k/bert-base-multilingual-cased-language-detection"
 DEPLOYMENT_NAME = MODEL_NAME + "-LanguageDetection-deployment"
 
 
-def warm_up(*_, **__) -> None:
-
-    warm_up_deepspeed()
-
-    mii.deploy(
-        task="text-classification",
-        model=MODEL_NAME,
-        deployment_name=DEPLOYMENT_NAME,
-        mii_config={"tensor_parallel": 1, "port_number": 50052},
-    )
-
-
-def predict(text: str) -> Dict[str, Union[str, Dict[str, float]]]:
-
-    LABELS = {
+LABELS = {
         "LABEL_0": "arb",
         "LABEL_1": "baq",
         "LABEL_2": "bre",
@@ -69,6 +55,20 @@ def predict(text: str) -> Dict[str, Union[str, Dict[str, float]]]:
         "LABEL_43": "ukr",
         "LABEL_44": "wel",
     }
+
+def warm_up(*_, **__) -> None:
+
+    warm_up_deepspeed()
+
+    mii.deploy(
+        task="text-classification",
+        model=MODEL_NAME,
+        deployment_name=DEPLOYMENT_NAME,
+        mii_config={"tensor_parallel": 1, "port_number": 50052},
+    )
+
+
+def predict(text: str) -> Dict[str, Union[str, Dict[str, float]]]:
 
     generator = mii.mii_query_handle(DEPLOYMENT_NAME)
 
