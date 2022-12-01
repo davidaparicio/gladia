@@ -210,7 +210,8 @@ def build_specific_envs(paths: List[str]) -> None:
         logger.debug(f"building environemnt {task}-{model}")
 
         create_custom_env(
-            env_name=f"{task}-{model}", path_to_env_file=os.path.join(path, ENV_DEFAULT_FILENAME)
+            env_name=f"{task}-{model}",
+            path_to_env_file=os.path.join(path, ENV_DEFAULT_FILENAME),
         )
 
 
