@@ -10,8 +10,8 @@ try:
     from tester.default_tests import create_default_tests
     from tester.utils import get_inputs_to_test, get_models_to_test
 except ModuleNotFoundError:
-    from default_tests import create_default_tests
-    from utils import get_inputs_to_test, get_models_to_test
+    from .default_tests import create_default_tests
+    from .utils import get_inputs_to_test, get_models_to_test
 
 
 logger = getLogger(__name__)
@@ -63,6 +63,7 @@ def task_is_activated(
 
 
 def autogenerate_tests(path_to_api: str, path_to_config: str):
+    print(f"{path_to_api=} {path_to_config=}")
     import requests
 
     activated_tasks = json.load(open(path_to_config))["active_tasks"]

@@ -2,7 +2,6 @@ import os
 
 import pytest
 import requests
-
 from tester import create_default_tests
 from tester.utils import get_inputs_to_test, get_models_to_test
 
