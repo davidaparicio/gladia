@@ -3,7 +3,6 @@ from typing import Any, Dict
 
 import pytest
 import requests
-
 from tester.constants import HOST_TO_EXAMPLE_STORAGE
 from tester.utils import get_inputs_to_test, get_models_to_test
 

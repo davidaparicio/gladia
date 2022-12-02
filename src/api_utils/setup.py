@@ -24,10 +24,11 @@ setup(
     license="MIT",
     packages=[
         "gladia_api_utils",
-        "gladia_api_utils.deepspeed_helper",
+        "gladia_api_utils.tester",
         "gladia_api_utils.triton_helper",
-        "gladia_api_utils.model_architectures",
+        "gladia_api_utils.deepspeed_helper",
         "gladia_api_utils.inpainting_helper",
+        "gladia_api_utils.model_architectures",
     ],
     install_requires=[
         "PyYAML",
