@@ -10,7 +10,7 @@ def predict(
     From a given text, return a json scoring the probability of the given text to be of a certain language
 
     Args:
-        lang_code (str): The language code to get informations on
+        language_code (str): The language code to get informations on
         displa_output_language (str): The language code used to display information about the languge
 
     Returns:
@@ -19,7 +19,7 @@ def predict(
 
     prediction_raw = dict()
 
-    l_code = Language.get(lang_code)
+    l_code = Language.get(language_code)
     l_code_describe = l_code.describe(display_output_language)
     script = ""
 
