@@ -12,7 +12,7 @@ def predict(
     Args:
         lang_code (str): The language code to get informations on
         displa_output_language (str): The language code used to display information about the languge
-        
+
     Returns:
         Dict[str, Union[str, Dict[str, float]]]: The language of the text and the probability of the text to be of that language in iso639-3 format
     """
