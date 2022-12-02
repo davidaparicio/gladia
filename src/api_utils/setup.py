@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name="gladia-api-utils",
-    version="0.1.14",
+    version="0.1.15",
     description="Utils for Gladia APIs Framework",
     long_description=readme(),
     long_description_content_type="text/markdown",
@@ -25,6 +25,7 @@ setup(
     packages=[
         "gladia_api_utils",
         "gladia_api_utils.tester",
+        "gladia_api_utils.tester.utils",
         "gladia_api_utils.triton_helper",
         "gladia_api_utils.deepspeed_helper",
         "gladia_api_utils.inpainting_helper",
@@ -32,6 +33,7 @@ setup(
     ],
     install_requires=[
         "PyYAML",
+        "pytest",
         "requests",
         "scikit-image",
         "Pillow",

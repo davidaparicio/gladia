@@ -14,6 +14,9 @@ from tqdm import tqdm
 logger = getLogger(__name__)
 
 
+ENV_DEFAULT_FILENAME = "env.yaml"
+
+
 def retrieve_package_from_env_file(env_file: dict) -> Tuple[List[str], List[str]]:
     """
     retrieve the necessary packages to install from the env file
@@ -47,7 +50,7 @@ def create_temp_env_file(
     env_name: str,
     packages_to_install_from_channel: List[str],
     packages_to_install_from_pip: List[str],
-) -> str:
+) -> tempfile.NamedTemporaryFile:
     """
     create a temporary environment to use at the creation of the mamba env
 
@@ -198,7 +201,7 @@ def build_specific_envs(paths: List[str]) -> None:
                 f"custom env {path} not found, please specify a correct path either leading to a model or model's env file."
             )
 
-        if "env.yaml" in path:
+        if ENV_DEFAULT_FILENAME in path:
             path = os.path.split(path)[0]
 
         task_path, model = os.path.split(path)
@@ -207,7 +210,8 @@ def build_specific_envs(paths: List[str]) -> None:
         logger.debug(f"building environemnt {task}-{model}")
 
         create_custom_env(
-            env_name=f"{task}-{model}", path_to_env_file=os.path.join(path, "env.yaml")
+            env_name=f"{task}-{model}",
+            path_to_env_file=os.path.join(path, ENV_DEFAULT_FILENAME),
         )
 
 
@@ -237,7 +241,7 @@ def build_env_for_activated_tasks(
         logger.debug(f"full_path_mode activated {modality}")
         logger.debug(f"building env for {modality}")
 
-        env_file_path = os.path.join(modality[0], "env.yaml")
+        env_file_path = os.path.join(modality[0], ENV_DEFAULT_FILENAME)
 
         if os.path.exists(env_file_path):
             head, model = os.path.split(modality[0].rstrip("/"))
@@ -249,7 +253,7 @@ def build_env_for_activated_tasks(
 
         else:
             raise FileNotFoundError(
-                f"Couldn't find env.yaml for {modality[0]}, please check your config file."
+                f"Couldn't find {ENV_DEFAULT_FILENAME} for {modality[0]}, please check your config file."
             )
     else:
 
@@ -266,7 +270,7 @@ def build_env_for_activated_tasks(
 
                 continue
 
-            env_file_path = os.path.join(task, "env.yaml")
+            env_file_path = os.path.join(task, ENV_DEFAULT_FILENAME)
             if os.path.exists(env_file_path):
                 create_custom_env(
                     env_name=os.path.split(task)[1],
@@ -283,7 +287,7 @@ def build_env_for_activated_tasks(
             )
 
             for model in models:
-                env_file_path = os.path.join(task, model, "env.yaml")
+                env_file_path = os.path.join(task, model, ENV_DEFAULT_FILENAME)
                 if not os.path.exists(env_file_path):
                     continue
 

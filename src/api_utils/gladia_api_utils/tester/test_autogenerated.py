@@ -7,8 +7,8 @@ import pytest
 from gladia_api_utils.task_management import get_task_metadata
 
 try:
+    from gladia_api_utils.tester.utils import get_inputs_to_test, get_models_to_test
     from tester.default_tests import create_default_tests
-    from tester.utils import get_inputs_to_test, get_models_to_test
 except ModuleNotFoundError:
     from .default_tests import create_default_tests
     from .utils import get_inputs_to_test, get_models_to_test
