@@ -17,7 +17,7 @@ inputs:
 output:
   name: text
   type: text
-  example: "{
+  example: '{
   "prediction": "fra",
   "prediction_raw": {
     "alpha3": "fra",
@@ -31,4 +31,4 @@ output:
     "speaking_population": 272965535,
     "writing_population": 217063693
   }
-}"
+}'
