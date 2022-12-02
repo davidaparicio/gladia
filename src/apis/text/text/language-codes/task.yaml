@@ -1,0 +1,34 @@
+summary: ''
+
+default-model: "language-codes"
+
+inputs:
+  language_code:
+    type: str
+    placeholder: "eng"
+    examples:
+      - "fra"
+  display_output_language:
+    type: str
+    placeholder: "eng"
+    examples:
+      - "fra"
+
+output:
+  name: text
+  type: text
+  example: '{
+  "prediction": "fra",
+  "prediction_raw": {
+    "alpha3": "fra",
+    "alpha2": "fr",
+    "local_display_name": "français",
+    "standardize_tag": "fr",
+    "display_output_language": "français",
+    "script": "",
+    "territory": "",
+    "display_name": "French",
+    "speaking_population": 272965535,
+    "writing_population": 217063693
+  }
+}'
