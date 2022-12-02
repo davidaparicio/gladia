@@ -34,6 +34,8 @@ ENV GLADIA_TMP_PATH=$GLADIA_TMP_PATH \
     PYTORCH_PRETRAINED_BERT_CACHE=$GLADIA_TMP_MODEL_PATH/pytorch_pretrained_bert \
     TORCH_HUB=$GLADIA_TMP_MODEL_PATH/torch/hub \
     NLTK_DATA=$GLADIA_TMP_MODEL_PATH/nltk \
+    MII_CACHE_PATH=$GLADIA_TMP_MODEL_PATH/mii/cache \
+    MII_MODEL_PATH=$GLADIA_TMP_MODEL_PATH/mii/models \
     TOKENIZERS_PARALLELISM="true" \
     LC_ALL="C.UTF-8" \
     LANG="C.UTF-8" \
@@ -49,7 +51,14 @@ ENV GLADIA_TMP_PATH=$GLADIA_TMP_PATH \
     JAX_PLATFORM_NAME=gpu
 
 RUN mkdir -p $GLADIA_TMP_MODEL_PATH \
-    mkdir -p $NLTK_DATA
+    mkdir -p $NLTK_DATA \
+    mkdir -p $MII_MODEL_PATH \
+    mkdir -p $MII_CACHE_PATH
+    
+# TODO: this deepspeed fix should be implemented at the deepspeed 
+# level later with a PR
+# here: https://github.com/microsoft/DeepSpeed-MII/blob/cd6a07f6f6616d2378b3e05c90ec7ba234b888f7/mii/deployment.py#L97
+RUN ln -s $MII_MODEL_PATH /tmp/mii_models
 
 COPY . $PATH_TO_GLADIA_SRC
 
