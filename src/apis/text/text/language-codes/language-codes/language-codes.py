@@ -4,14 +4,15 @@ from langcodes import Language, standardize_tag
 
 
 def predict(
-    lang_code: str, display_output_language: str
+    lang_code: str, display_output_language: str = "en"
 ) -> Dict[str, Union[str, Dict[str, float]]]:
     """
     From a given text, return a json scoring the probability of the given text to be of a certain language
 
     Args:
-        lang_code (str): The text to detect the language of
-
+        lang_code (str): The language code to get informations on
+        displa_output_language (str): The language code used to display information about the languge
+        
     Returns:
         Dict[str, Union[str, Dict[str, float]]]: The language of the text and the probability of the text to be of that language in iso639-3 format
     """
