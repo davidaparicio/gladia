@@ -27,7 +27,7 @@ def predict(original_image: bytes, mask_image: bytes, prompt: str = ""):
     with autocast("cuda"):
         images = pipe(
             prompt=prompt,
-            init_image=original_image,
+            image=original_image,
             mask_image=mask_image,
             strength=0.75,
         ).images
