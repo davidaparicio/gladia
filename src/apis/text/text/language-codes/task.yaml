@@ -3,7 +3,12 @@ summary: ''
 default-model: "language-codes"
 
 inputs:
-  text:
+  language_code:
+    type: str
+    placeholder: "eng"
+    examples:
+      - "fra"
+  display_output_language:
     type: str
     placeholder: "eng"
     examples:
