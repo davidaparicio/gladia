@@ -17,4 +17,18 @@ inputs:
 output:
   name: text
   type: text
-  example: ""
+  example: "{
+  "prediction": "fra",
+  "prediction_raw": {
+    "alpha3": "fra",
+    "alpha2": "fr",
+    "local_display_name": "français",
+    "standardize_tag": "fr",
+    "display_output_language": "français",
+    "script": "",
+    "territory": "",
+    "display_name": "French",
+    "speaking_population": 272965535,
+    "writing_population": 217063693
+  }
+}"
