@@ -2,8 +2,8 @@ import os
 
 import pytest
 import requests
-from tester import create_default_tests
-from tester.utils import get_inputs_to_test, get_models_to_test
+from gladia_api_utils.tester import create_default_tests
+from gladia_api_utils.tester.utils import get_inputs_to_test, get_models_to_test
 
 models = get_models_to_test()
 inputs_to_test = get_inputs_to_test(["context", "question", "top_k"])
