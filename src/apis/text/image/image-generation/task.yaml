@@ -1,6 +1,6 @@
 summary: ''
 
-default-model: "stable-diffusion"
+default-model: "runwayml-sd-15"
 
 inputs:
   prompt:
