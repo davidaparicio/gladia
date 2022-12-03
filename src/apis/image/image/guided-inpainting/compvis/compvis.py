@@ -15,6 +15,7 @@ def predict(original_image: bytes, mask_image: bytes, prompt: str = ""):
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model_id_or_path = "CompVis/stable-diffusion-v1-4"
+
     pipe = StableDiffusionInpaintPipeline.from_pretrained(
         model_id_or_path,
         revision="fp16",
@@ -27,7 +28,7 @@ def predict(original_image: bytes, mask_image: bytes, prompt: str = ""):
     with autocast("cuda"):
         images = pipe(
             prompt=prompt,
-            init_image=original_image,
+            image=original_image,
             mask_image=mask_image,
             strength=0.75,
         ).images
