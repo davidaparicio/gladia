@@ -57,6 +57,8 @@ def predict(
     # TODO implement NSFW filter
     # {'sample': [<PIL.Image.Image image mode=RGB size=512x512 at 0x7F546A97A070>], 'nsfw_content_detected': [False]}
 
+
+    torch.cuda.empty_cache()
     if samples == 1:
         return images_list["images"][0]
     else:
