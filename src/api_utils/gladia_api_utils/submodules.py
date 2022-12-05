@@ -147,10 +147,27 @@ def get_model_versions(root_path: str = None) -> Tuple[List[str], str]:
 
             # Retieve metadata from metadata file and push it to versions,
             # the output of the get road
+
             model = fname
             endpoint = package_path.replace("apis", "")
             model_metadata = get_model_metadata(endpoint, model)
-            versions[fname] = model_metadata
+
+            metadata_model_final = Path(os.path.join(package_path, fname, '.model_metadata.yaml'))
+
+            if metadata_model_final.exists():
+                model_metadata = dict()
+                with open(metadata_model_final, "r") as metadata_model_file:
+                    model_metadata = yaml.safe_load(metadata_model_file)
+
+                # build model version list if version is specified
+                if "versions" in model_metadata:
+                    model_versions = model_metadata["versions"]
+                    for model_version in model_versions:
+                        versions[f"{fname}--{model_version}"] = model_metadata
+                else:
+                    versions[fname] = model_metadata
+            else:
+                versions[fname] = model_metadata
 
     return versions, package_path
 
@@ -488,6 +505,7 @@ class TaskRouter:
         input: List[dict],
         output,
         default_model: str,
+        default_model_version: str = None,
         rel_path=None,
     ):
         """
@@ -508,6 +526,8 @@ class TaskRouter:
         self.output = output
         self.default_model = default_model
 
+        self.default_model_version = default_model_version
+
         self.models_env = {}
 
         self.warmed_up = False
@@ -525,11 +545,11 @@ class TaskRouter:
 
         self.task_name, self.plugin, self.tags = get_module_infos(root_path=rel_path)
         self.versions, self.root_package_path = get_model_versions(full_path)
+
+        #logger.error(self.versions)
         self.endpoint = (
             f"/{rel_path.split('/')[1]}/{rel_path.split('/')[2]}/{self.task_name}/"
         )
-
-        self.default_model = default_model
 
         if not self.__check_if_model_exist():
             return
@@ -542,7 +562,7 @@ class TaskRouter:
             summary=f"Get list of models available for {self.task_name}",
             tags=[self.tags],
         )
-        # This function send bask the get road content to the caller
+        # This function send back the get road content to the caller
         async def get_versions():
             task_metadata = get_task_metadata(self.endpoint)
             get_content = {"models": dict(sorted(self.versions.items()))}
@@ -587,10 +607,17 @@ class TaskRouter:
 
         form_parameters = self.__build_form_parameters(endpoint_parameters_description)
 
+
+        # if self.default_model_version is defined and not null
+        if self.default_model_version:
+            display_default_model_version = self.default_model + "--" + self.default_model_version
+        else:
+            display_default_model_version = self.default_model
+
         query_for_model_name = forge.arg(
             "model",
             type=str,
-            default=Query(self.default_model, enum=set(self.versions.keys())),
+            default=Query(display_default_model_version, enum=set(self.versions.keys())),
         )
 
         self.inputs = self.__get_routeur_inputs()
@@ -618,8 +645,14 @@ class TaskRouter:
             model = parameters_in_body["model"]
             del parameters_in_body["model"]
 
+            # handle model subversions
+            if "--" in model:
+                model, model_version = model.split("--")
+                parameters_in_body["model_version"] = model_version
+
             module_path = f"{self.root_package_path}/{model}/"
             self.module_path = module_path
+
             if not os.path.exists(module_path):
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
