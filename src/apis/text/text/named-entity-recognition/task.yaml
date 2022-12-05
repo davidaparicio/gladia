@@ -1,6 +1,6 @@
-summary: ''
+summary: 'Extract Entities from Text'
 
-default-model: "dbmdz-bert-large-cased-finetuned-conll03-english_deepspeed"
+default-model: "spacy-en"
 
 inputs:
   text:
