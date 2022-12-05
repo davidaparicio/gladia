@@ -69,11 +69,19 @@ def __add_router(
 
         router = APIRouter()
 
+        default_model = task_metadata["default-model"]
+
+        if "default-model-version" in task_metadata:
+            default_model_version = task_metadata["default-model-version"]
+        else:
+            default_model_version = None
+
         task_router = TaskRouter(
             router=router,
             input=inputs,
             output=output,
-            default_model=task_metadata["default-model"],
+            default_model=default_model,
+            default_model_version=default_model_version,
             rel_path=module_path.replace(".", "/"),
         )
 

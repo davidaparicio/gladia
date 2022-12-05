@@ -12,6 +12,12 @@ gladia:
   examples: {}
   format: ''
   latency: ''
+versions:
+  - tiny
+  - base
+  - small
+  - medium
+  - large
 huggingface:
   link: 'https://huggingface.co/openai/whisper-tiny'
 license:

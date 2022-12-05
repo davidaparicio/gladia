@@ -1,6 +1,8 @@
 summary: ''
 
-default-model: "openai-whisper-tiny"
+default-model: "openai-whisper"
+
+default-model-version: "tiny"
 
 inputs:
   audio:
