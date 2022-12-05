@@ -5,7 +5,9 @@ from gladia_api_utils.file_management import input_to_files
 
 
 @input_to_files
-def predict(audio: str, language: str = "en", model_version: str = "tiny") -> Dict[str, str]:
+def predict(
+    audio: str, language: str = "en", model_version: str = "tiny"
+) -> Dict[str, str]:
     """
     Predict the text from the audio: audio -> text for a given language.
 

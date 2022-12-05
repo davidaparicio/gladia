@@ -152,7 +152,9 @@ def get_model_versions(root_path: str = None) -> Tuple[List[str], str]:
             endpoint = package_path.replace("apis", "")
             model_metadata = get_model_metadata(endpoint, model)
 
-            metadata_model_final = Path(os.path.join(package_path, fname, '.model_metadata.yaml'))
+            metadata_model_final = Path(
+                os.path.join(package_path, fname, ".model_metadata.yaml")
+            )
 
             if metadata_model_final.exists():
                 model_metadata = dict()
@@ -546,7 +548,7 @@ class TaskRouter:
         self.task_name, self.plugin, self.tags = get_module_infos(root_path=rel_path)
         self.versions, self.root_package_path = get_model_versions(full_path)
 
-        #logger.error(self.versions)
+        # logger.error(self.versions)
         self.endpoint = (
             f"/{rel_path.split('/')[1]}/{rel_path.split('/')[2]}/{self.task_name}/"
         )
@@ -607,17 +609,20 @@ class TaskRouter:
 
         form_parameters = self.__build_form_parameters(endpoint_parameters_description)
 
-
         # if self.default_model_version is defined and not null
         if self.default_model_version:
-            display_default_model_version = self.default_model + "--" + self.default_model_version
+            display_default_model_version = (
+                self.default_model + "--" + self.default_model_version
+            )
         else:
             display_default_model_version = self.default_model
 
         query_for_model_name = forge.arg(
             "model",
             type=str,
-            default=Query(display_default_model_version, enum=set(self.versions.keys())),
+            default=Query(
+                display_default_model_version, enum=set(self.versions.keys())
+            ),
         )
 
         self.inputs = self.__get_routeur_inputs()
