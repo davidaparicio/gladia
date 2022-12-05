@@ -62,7 +62,9 @@ def predict(
         final_result = diarize_text(asr_result, diarization_result)
 
         prediction_raw = list()
+        prediction = ""
         for segment, speaker, sentence in final_result:
+            prediction += sentence
             prediction_raw.append(
                 {
                     "start": f"{segment.start:.2f}",
@@ -81,4 +83,4 @@ def predict(
     finally:
         delete_file(tmp_file)
 
-    return {"prediction": prediction_raw, "prediction_raw": prediction_raw}
+    return {"prediction": prediction, "prediction_raw": prediction_raw}
