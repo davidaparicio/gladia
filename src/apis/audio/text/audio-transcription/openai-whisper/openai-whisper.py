@@ -1,5 +1,5 @@
-from typing import Dict
 from logging import getLogger
+from typing import Dict
 
 import whisper
 from gladia_api_utils import SECRETS
@@ -20,6 +20,7 @@ error_msg = """Error while loading pipeline: {e}
     Also make sure that you have approved the terms of use for the segmentation and diarization models
     for the HUGGINGFACE_ACCESS_TOKEN related token
     """
+
 
 @input_to_files
 def predict(
@@ -81,4 +82,3 @@ def predict(
         delete_file(tmp_file)
 
     return {"prediction": prediction_raw, "prediction_raw": prediction_raw}
-
