@@ -548,7 +548,6 @@ class TaskRouter:
         self.task_name, self.plugin, self.tags = get_module_infos(root_path=rel_path)
         self.versions, self.root_package_path = get_model_versions(full_path)
 
-        # logger.error(self.versions)
         self.endpoint = (
             f"/{rel_path.split('/')[1]}/{rel_path.split('/')[2]}/{self.task_name}/"
         )
