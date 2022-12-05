@@ -72,7 +72,7 @@ def __add_router(
         default_model = task_metadata["default-model"]
 
         if "default-model-version" in task_metadata:
-            default_model_version = task_metadata["default-model_version"]
+            default_model_version = task_metadata["default-model-version"]
         else:
             default_model_version = None
 
