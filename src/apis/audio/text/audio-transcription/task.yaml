@@ -2,7 +2,7 @@ summary: ''
 
 default-model: "openai-whisper"
 
-default-model_version: "tiny"
+default-model-version: "tiny"
 
 inputs:
   audio:

@@ -15,6 +15,7 @@ from pydub import AudioSegment
 logger = getLogger(__name__)
 
 
+
 error_msg = """Error while loading pipeline: {e}
     Please check your HuggingFace credentials in the environment variables HUGGINGFACE_ACCESS_TOKEN
     Also make sure that you have approved the terms of use for the segmentation and diarization models
@@ -23,17 +24,16 @@ error_msg = """Error while loading pipeline: {e}
 
 
 @input_to_files
+
 def predict(
     audio: str, language: str = "en", model_version: str = "tiny"
 ) -> Dict[str, str]:
     """
     Predict the text from the audio: audio -> text for a given language.
-
     Args:
         audio (bytes): The bytes audio to be transcribed.
         language (str): The language of the audio to be transcribed. (default: "en")
         model_version (str): The model version to use. (default: "tiny")
-
     Outputs:
         Dict[str, str]: The text transcription of the audio.
     """
