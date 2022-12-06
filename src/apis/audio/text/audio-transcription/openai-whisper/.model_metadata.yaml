@@ -19,6 +19,8 @@ versions:
   - small
   - medium
   - large
+  - large-v1
+  - large-v2
 
 huggingface:
   link: 'https://huggingface.co/openai/whisper-tiny'
