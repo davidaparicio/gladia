@@ -158,11 +158,10 @@ docker-compose down
 You can log in one the instances and run the tests
 ```sh
 docker-compose exec gladia /bin/bash
-cd unit-test
-python test.py -c
+cd src ; python -m pytest ./
 ```
 
-To know more about test please check this [readme dedicated to test](https://github.com/gladiaio/gladia/blob/main/src/tests/README.md)
+To know more about test please check this [readme dedicated to test](https://github.com/gladiaio/gladia/tree/main/src/api_utils/gladia_api_utils/tester)
 
 ## As a new developer, very first steps in full control
 
