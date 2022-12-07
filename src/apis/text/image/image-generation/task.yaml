@@ -1,6 +1,6 @@
 summary: ''
 
-default-model: "runwayml-sd-15"
+default-model: "stability-sd-2"
 
 inputs:
   prompt:
