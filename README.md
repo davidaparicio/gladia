@@ -163,6 +163,13 @@ cd src ; python -m pytest ./
 
 To know more about test please check this [readme dedicated to test](https://github.com/gladiaio/gladia/tree/main/src/api_utils/gladia_api_utils/tester)
 
+## Tested Hardware
+- Nvidia V100
+- Nvidia V100s
+- Nvidia P100
+- Nvidia 3070
+- Nvidia 3070 Ti
+
 ## As a new developer, very first steps in full control
 
 We created a [dedicated page](./src/howto101.md) with detailed instructions on how, as a new develper, to perform few first steps actions. The objective is for the new developer to be in full control while performing the following first steps :
