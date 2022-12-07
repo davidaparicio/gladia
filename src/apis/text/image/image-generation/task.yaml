@@ -1,6 +1,8 @@
 summary: ''
 
-default-model: "stability-sd-2"
+default-model: "stable-diffusion"
+
+default-model-version: "stabilityai-sd-20"
 
 inputs:
   prompt:

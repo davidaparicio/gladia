@@ -10,13 +10,20 @@ from torch import autocast
 
 logger = getLogger(__name__)
 
+MODEL_VERSIONS = {
+    "compvis-sd-14": "CompVis/stable-diffusion-v1-4",
+    "runwayml-sd-15": "runwayml/stable-diffusion-v1-5",
+    "stabilityai-sd-20": "stabilityai/stable-diffusion-2",
+}
+
 
 def predict(
-    prompt="A high tech solarpunk utopia in the Amazon rainforest",
-    samples=1,
-    steps=40,
-    scale=7.5,
-    seed=396916372,
+    prompt: str ="A high tech solarpunk utopia in the Amazon rainforest",
+    samples: int = 1,
+    steps: int = 40,
+    scale: float = 7.5,
+    seed: int =396916372,
+    model_version: str = "stabilityai-sd-20"
 ) -> Union[Image.Image, List[str]]:
     """
     Generate an image using the the stable diffusion model.
@@ -29,12 +36,13 @@ def predict(
         steps (int): The number of steps to use for the generation (higher is better)
         scale (float): The scale to use for the generation (recommended between 0.0 and 15.0)
         seed (int): The seed to use for the generation (default: 396916372)
+        model_version (str): The model version to use. (default: stabilityai-sd-20)
 
     Returns:
         Union[Image.Image, List[Image.Image]]: The generated image if samples=1, else a list of generated images in a base64 format
     """
 
-    model_id = "stabilityai/stable-diffusion-2"
+    model_id = MODEL_VERSIONS[model_version]
     device = "cuda"
 
 
