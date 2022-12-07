@@ -18,12 +18,12 @@ MODEL_VERSIONS = {
 
 
 def predict(
-    prompt: str ="A high tech solarpunk utopia in the Amazon rainforest",
+    prompt: str = "A high tech solarpunk utopia in the Amazon rainforest",
     samples: int = 1,
     steps: int = 40,
     scale: float = 7.5,
-    seed: int =396916372,
-    model_version: str = "stabilityai-sd-20"
+    seed: int = 396916372,
+    model_version: str = "stabilityai-sd-20",
 ) -> Union[Image.Image, List[str]]:
     """
     Generate an image using the the stable diffusion model.
@@ -45,7 +45,6 @@ def predict(
     model_id = MODEL_VERSIONS[model_version]
     device = "cuda"
 
-
     pipe = StableDiffusionPipeline.from_pretrained(
         model_id,
         use_auth_token=SECRETS["HUGGINGFACE_ACCESS_TOKEN"],
@@ -62,7 +61,6 @@ def predict(
             guidance_scale=scale,
             generator=generator,
         )
-
 
     torch.cuda.empty_cache()
     if samples == 1:
