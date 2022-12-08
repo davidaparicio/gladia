@@ -1,0 +1,49 @@
+api:
+  content: ''
+  tags: []
+gladia:
+  accelerator: ''
+  example:
+    output:
+      prediction:
+      - end: 18
+        entity_group: ORG
+        score: 0.987525224685669
+        start: 15
+        word: Inc
+      - end: 55
+        entity_group: LOC
+        score: 0.9583774209022522
+        start: 42
+        word: New York City
+      - end: 87
+        entity_group: ORG
+        score: 0.8003666400909424
+        start: 82
+        word: Dumbo
+      - end: 126
+        entity_group: LOC
+        score: 0.9854662418365479
+        start: 117
+        word: Manhattan
+      prediction_raw:
+      - '[[{"entity_group": "ORG", "score": 0.987525224685669, "word": "Inc", "start":
+        15, "end": 18}, {"entity_group": "LOC", "score": 0.9583774209022522, "word":
+        "New York City", "start": 42, "end": 55}, {"entity_group": "ORG", "score":
+        0.8003666400909424, "word": "Dumbo", "start": 82, "end": 87}, {"entity_group":
+        "LOC", "score": 0.9854662418365479, "word": "Manhattan", "start": 117, "end":
+        126}]]'
+  examples: {}
+  format: ''
+  latency: ''
+huggingface:
+  link: ''
+license:
+  content: ''
+  link: ''
+  title: ''
+paper:
+  authors: []
+  citation: ''
+  link: ''
+  title: ''

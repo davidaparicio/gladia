@@ -34,6 +34,8 @@ ENV GLADIA_TMP_PATH=$GLADIA_TMP_PATH \
     PYTORCH_PRETRAINED_BERT_CACHE=$GLADIA_TMP_MODEL_PATH/pytorch_pretrained_bert \
     TORCH_HUB=$GLADIA_TMP_MODEL_PATH/torch/hub \
     NLTK_DATA=$GLADIA_TMP_MODEL_PATH/nltk \
+    MII_CACHE_PATH=$GLADIA_TMP_MODEL_PATH/mii/cache \
+    MII_MODEL_PATH=$GLADIA_TMP_MODEL_PATH/mii/models \
     TOKENIZERS_PARALLELISM="true" \
     LC_ALL="C.UTF-8" \
     LANG="C.UTF-8" \
@@ -45,11 +47,19 @@ ENV GLADIA_TMP_PATH=$GLADIA_TMP_PATH \
     MAMBA_EXE="/usr/local/bin/micromamba" \
     MAMBA_DOCKERFILE_ACTIVATE=1 \
     MAMBA_ALWAYS_YES=true \
-    PATH=$PATH:/usr/local/bin/:$MAMBA_EXE
-
+    PATH=$PATH:/usr/local/bin/:$MAMBA_EXE \
+    JAX_PLATFORM_NAME=gpu \
+    XLA_PYTHON_CLIENT_PREALLOCATE=false
 
 RUN mkdir -p $GLADIA_TMP_MODEL_PATH \
-    mkdir -p $NLTK_DATA
+    mkdir -p $NLTK_DATA \
+    mkdir -p $MII_MODEL_PATH \
+    mkdir -p $MII_CACHE_PATH
+    
+# TODO: this deepspeed fix should be implemented at the deepspeed 
+# level later with a PR
+# here: https://github.com/microsoft/DeepSpeed-MII/blob/cd6a07f6f6616d2378b3e05c90ec7ba234b888f7/mii/deployment.py#L97
+RUN ln -s $MII_MODEL_PATH /tmp/mii_models
 
 COPY . $PATH_TO_GLADIA_SRC
 
@@ -61,7 +71,10 @@ RUN mv $PATH_TO_GLADIA_SRC/tools/docker/_activate_current_env.sh /usr/local/bin/
 
 WORKDIR $PATH_TO_GLADIA_SRC
 
+# 2 times installing jax to force the version and the deps.
 RUN micromamba create -f env.yaml && \
+    micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]==0.3.25\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html" && \
+    micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html" && \
     $PATH_TO_GLADIA_SRC/tools/docker/clean-layer.sh
 
 ENV LD_LIBRARY_PATH=$MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/nvidia/cublas/lib/:$LD_LIBRARY_PATH

@@ -1,6 +1,6 @@
 summary: ''
 
-default-model: "papluca_xlm-roberta-base-language-detection_deepspeed"
+default-model: "toftrup-etal-2021"
 
 inputs:
   text:

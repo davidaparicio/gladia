@@ -112,6 +112,14 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
     tar -xvf git-lfs-linux-386-v3.0.1.tar.gz && \
     bash /tmp/install.sh && \
     rm /tmp/install.sh && \
+    echo "== INSTALLING CUDNN ==" && \
+    wget "https://storage.gra.cloud.ovh.net/v1/AUTH_90df0bdc74f749ce86783e6550b1e4aa/filehosting/cudnn-linux-x86_64-8.5.0.96_cuda11-archive.tar.xz" && \
+    tar -xvf cudnn-linux-x86_64-8.5.0.96_cuda11-archive.tar.xz && \
+    cp cudnn-*-archive/include/cudnn*.h /usr/local/cuda/include && \
+    cp -P cudnn-*-archive/lib/libcudnn* /usr/local/cuda/lib64 && \
+    chmod a+r /usr/local/cuda/include/cudnn*.h /usr/local/cuda/lib64/libcudnn* && \
+    export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH && \
+    rm -rf cudnn* && \
     echo "== INSTALLING UMAMBA ==" && \
     wget -qO- "https://micro.mamba.pm/api/micromamba/linux-64/latest" | tar -xvj bin/micromamba && \
     mv bin/micromamba /usr/local/bin/micromamba && \
@@ -123,3 +131,5 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
     make && \
     make install && \
     $CLEAN_LAYER_SCRIPT
+
+ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH
