@@ -32,11 +32,17 @@ def memory_usage(TestSuite, record_testsuite_property):
     vram_after_test = info.free
 
     record_testsuite_property(
-        f"{TestSuite} delta VRAM", vram_after_test - vram_before_test
-    )
-    record_testsuite_property(
         f"{TestSuite} delta RAM", ram_after_test - ram_before_test
     )
+    record_testsuite_property(
+        f"{TestSuite} delta VRAM", vram_after_test - vram_before_test
+    )
+
+    logger.info(f"{ram_before_test=}")
+    logger.info(f"{ram_after_test=}")
+
+    logger.info(f"{vram_before_test=}")
+    logger.info(f"{vram_after_test=}")
 
     if abs(ram_after_test - ram_before_test) >= 100_000:
         logger.warning(
