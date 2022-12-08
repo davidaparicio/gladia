@@ -76,6 +76,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
     apt update && \
     apt install -y \
         curl \
+        twine \
         unzip \
         libssl-dev \
         libpng-dev \
