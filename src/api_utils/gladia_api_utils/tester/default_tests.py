@@ -1,9 +1,53 @@
+import pytest
+import psutil
+import warnings
+import requests
 import tempfile
+import nvidia_smi
+
 from copy import deepcopy
+from logging import getLogger
 from typing import Any, Callable, Dict, List
 
-import pytest
-import requests
+
+logger = getLogger(__name__)
+
+
+@pytest.fixture(autouse=True)
+def memory_usage(TestSuite, record_testsuite_property):
+
+    # Code run before the test
+    nvidia_smi.nvmlInit()
+
+    handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
+
+    info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
+    ram_before_test = psutil.virtual_memory().percent
+    vram_before_test = info.free
+
+    yield
+
+    # Code run after the test
+    info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
+    ram_after_test = psutil.virtual_memory().percent
+    vram_after_test = info.free
+
+    record_testsuite_property(f"{TestSuite} delta VRAM", vram_after_test - vram_before_test)
+    record_testsuite_property(f"{TestSuite} delta RAM", ram_after_test - ram_before_test)
+
+    if abs(ram_after_test - ram_before_test) >= 100_000:
+        logger.warning(f"{TestSuite} seems to have a memory leak {abs(ram_after_test - vram_before_test)=}")
+        warnings.warn(f"{TestSuite} seems to have a memory leak {abs(ram_after_test - vram_before_test)=}")
+
+    if abs(vram_after_test - vram_before_test) >= 100_000:
+        logger.warning(f"{TestSuite} seems to have a memory leak {abs(vram_after_test - vram_before_test)=}")
+        warnings.warn(f"{TestSuite} seems to have a memory leak {abs(vram_after_test - vram_before_test)=}")
+
+    # TODO: after switch to assert
+    # assert abs(ram_after_test - ram_before_test) < 250_000, f"{TestSuite} seems to have a memory leak {abs(ram_after_test - vram_before_test)=}"
+    # assert abs(vram_after_test - vram_before_test) < 250_000, f"{TestSuite} seems to have a memory leak {abs(vram_after_test - vram_before_test)=}"
+
+    nvidia_smi.nvmlShutdown()
 
 
 def __apply_decorators(func, *decorators):
@@ -294,34 +338,35 @@ def create_default_tests(
             "test_correct_inputs": get_test_correct_inputs(
                 deepcopy(models_to_test), deepcopy(inputs_to_test)
             ),
+            "memory_usage": memory_usage,
             "test_empty_input_task": get_test_empty_input_task(
                 deepcopy(models_to_test),
             ),
         },
     )
 
-    if file_in_inputs:
-        setattr(
-            DefaultTestSuite,
-            "test_correct_inputs_url",
-            get_test_correct_inputs_url(
-                deepcopy(models_to_test), deepcopy(inputs_to_test)
-            ),
-        )
+    # if file_in_inputs:
+    #     setattr(
+    #         DefaultTestSuite,
+    #         "test_correct_inputs_url",
+    #         get_test_correct_inputs_url(
+    #             deepcopy(models_to_test), deepcopy(inputs_to_test)
+    #         ),
+    #     )
 
-        setattr(
-            DefaultTestSuite,
-            "test_invalid_inputs_url",
-            get_test_invalid_inputs_url(
-                deepcopy(models_to_test), deepcopy(inputs_to_test)
-            ),
-        )
+    #     setattr(
+    #         DefaultTestSuite,
+    #         "test_invalid_inputs_url",
+    #         get_test_invalid_inputs_url(
+    #             deepcopy(models_to_test), deepcopy(inputs_to_test)
+    #         ),
+    #     )
 
-    if not only_files_as_input:
-        setattr(
-            DefaultTestSuite,
-            "test_invalid_params",
-            get_test_invalid_params(deepcopy(models_to_test), deepcopy(inputs_to_test)),
-        )
+    # if not only_files_as_input:
+    #     setattr(
+    #         DefaultTestSuite,
+    #         "test_invalid_params",
+    #         get_test_invalid_params(deepcopy(models_to_test), deepcopy(inputs_to_test)),
+    #     )
 
     return DefaultTestSuite
