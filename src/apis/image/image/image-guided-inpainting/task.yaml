@@ -1,0 +1,46 @@
+summary: ''
+
+default-model: "fantasy-studio"
+
+inputs:
+  original_image:
+    type: image
+    placeholder: "Original image to inpaint"
+    examples:
+      - "https://raw.githubusercontent.com/CompVis/latent-diffusion/main/data/inpainting_examples/overture-creations-5sI6fQgYIuo.png"
+  example_image:
+    placeholder: "Image to use as a guiding example"
+    type: image
+    examples:
+      - "https://huggingface.co/spaces/Fantasy-Studio/Paint-by-Example/resolve/main/examples/reference/0.jpg"
+  mask_image:
+    placeholder: "Mask to use for inpainting"
+    type: image
+    examples:
+      - "https://raw.githubusercontent.com/CompVis/latent-diffusion/main/data/inpainting_examples/overture-creations-5sI6fQgYIuo_mask.png"
+  seed:
+    type: int
+    placeholder: "Fixed seed for the random number generator (0 to leave random)"
+    examples: 
+      - 424242
+    min: 0
+    max: 1000000
+  steps:
+    type: int
+    placeholder: "Number of steps to run"
+    examples: 
+      - 50
+    min: 2
+    max: 75
+  guidance_scale:
+    type: int
+    placeholder: "Scale of the guiding example"
+    examples: 
+      - 5
+    min: 5
+    max: 15
+
+output:
+  name: image
+  type: image
+  example: ""
