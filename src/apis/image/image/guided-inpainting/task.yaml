@@ -9,7 +9,7 @@ inputs:
     examples:
       - "https://raw.githubusercontent.com/CompVis/latent-diffusion/main/data/inpainting_examples/overture-creations-5sI6fQgYIuo.png"
   mask_image:
-    placeholder: "Image to use"
+    placeholder: "Mask to use"
     type: image
     examples:
       - "https://raw.githubusercontent.com/CompVis/latent-diffusion/main/data/inpainting_examples/overture-creations-5sI6fQgYIuo_mask.png"
