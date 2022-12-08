@@ -43,8 +43,8 @@ class TestImageGuidedInpainting:
             data={
                 "seed": inputs["seed"],
                 "steps": inputs["steps"],
-                "guidance_scale": inputs["guidance_scale"]
-                }
+                "guidance_scale": inputs["guidance_scale"],
+            },
         )
 
         assert (
@@ -73,8 +73,8 @@ class TestImageGuidedInpainting:
                 "example_image_url": inputs["example_image_url"],
                 "seed": inputs["seed"],
                 "steps": inputs["steps"],
-                "guidance_scale": inputs["guidance_scale"]
-            }
+                "guidance_scale": inputs["guidance_scale"],
+            },
         )
 
         assert (
@@ -108,8 +108,8 @@ class TestImageGuidedInpainting:
             data={
                 "seed": inputs_to_test[0]["seed"],
                 "steps": inputs_to_test[0]["steps"],
-                "guidance_scale": inputs_to_test[0]["guidance_scale"]
-            }
+                "guidance_scale": inputs_to_test[0]["guidance_scale"],
+            },
         )
 
         assert response.status_code == 500  # TODO
@@ -141,8 +141,8 @@ class TestImageGuidedInpainting:
             data={
                 "seed": inputs_to_test[0]["seed"],
                 "steps": inputs_to_test[0]["steps"],
-                "guidance_scale": inputs_to_test[0]["guidance_scale"]
-            }
+                "guidance_scale": inputs_to_test[0]["guidance_scale"],
+            },
         )
 
         assert response.status_code == 422
@@ -174,8 +174,8 @@ class TestImageGuidedInpainting:
             data={
                 "seed": inputs_to_test[0]["seed"],
                 "steps": inputs_to_test[0]["steps"],
-                "guidance_scale": inputs_to_test[0]["guidance_scale"]
-            }
+                "guidance_scale": inputs_to_test[0]["guidance_scale"],
+            },
         )
 
         assert response.status_code == 422
@@ -201,8 +201,8 @@ class TestImageGuidedInpainting:
                 "mask_image_url": inputs_to_test[0]["mask_image_url"],
                 "seed": inputs_to_test[0]["seed"],
                 "steps": inputs_to_test[0]["steps"],
-                "guidance_scale": inputs_to_test[0]["guidance_scale"]
-            }
+                "guidance_scale": inputs_to_test[0]["guidance_scale"],
+            },
         )
 
         assert response.status_code == 500
@@ -229,7 +229,7 @@ class TestImageGuidedInpainting:
                 "mask_image_url": f"{HOST_TO_EXAMPLE_STORAGE}/test/test.mp4",
                 "seed": inputs_to_test[0]["seed"],
                 "steps": inputs_to_test[0]["steps"],
-                "guidance_scale": inputs_to_test[0]["guidance_scale"]
+                "guidance_scale": inputs_to_test[0]["guidance_scale"],
             },
         )
 
@@ -257,7 +257,7 @@ class TestImageGuidedInpainting:
                 "mask_image_url": inputs_to_test[0]["mask_image_url"],
                 "seed": inputs_to_test[0]["seed"],
                 "steps": inputs_to_test[0]["steps"],
-                "guidance_scale": inputs_to_test[0]["guidance_scale"]
+                "guidance_scale": inputs_to_test[0]["guidance_scale"],
             },
         )
 
