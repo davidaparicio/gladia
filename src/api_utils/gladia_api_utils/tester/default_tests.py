@@ -345,28 +345,28 @@ def create_default_tests(
         },
     )
 
-    # if file_in_inputs:
-    #     setattr(
-    #         DefaultTestSuite,
-    #         "test_correct_inputs_url",
-    #         get_test_correct_inputs_url(
-    #             deepcopy(models_to_test), deepcopy(inputs_to_test)
-    #         ),
-    #     )
+    if file_in_inputs:
+        setattr(
+            DefaultTestSuite,
+            "test_correct_inputs_url",
+            get_test_correct_inputs_url(
+                deepcopy(models_to_test), deepcopy(inputs_to_test)
+            ),
+        )
 
-    #     setattr(
-    #         DefaultTestSuite,
-    #         "test_invalid_inputs_url",
-    #         get_test_invalid_inputs_url(
-    #             deepcopy(models_to_test), deepcopy(inputs_to_test)
-    #         ),
-    #     )
+        setattr(
+            DefaultTestSuite,
+            "test_invalid_inputs_url",
+            get_test_invalid_inputs_url(
+                deepcopy(models_to_test), deepcopy(inputs_to_test)
+            ),
+        )
 
-    # if not only_files_as_input:
-    #     setattr(
-    #         DefaultTestSuite,
-    #         "test_invalid_params",
-    #         get_test_invalid_params(deepcopy(models_to_test), deepcopy(inputs_to_test)),
-    #     )
+    if not only_files_as_input:
+        setattr(
+            DefaultTestSuite,
+            "test_invalid_params",
+            get_test_invalid_params(deepcopy(models_to_test), deepcopy(inputs_to_test)),
+        )
 
     return DefaultTestSuite
