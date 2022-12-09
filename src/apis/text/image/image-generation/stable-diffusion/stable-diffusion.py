@@ -23,7 +23,7 @@ def predict(
     samples: int = 1,
     steps: int = 40,
     scale: float = 7.5,
-    seed: int = 396916372,
+    seed: int = 424242,
     model_version: str = "stabilityai-sd-20",
 ) -> Union[Image.Image, List[str]]:
     """
@@ -36,7 +36,7 @@ def predict(
         samples (int): The number of samples to generate. (default: 1)
         steps (int): The number of steps to use for the generation (higher is better)
         scale (float): The scale to use for the generation (recommended between 0.0 and 15.0)
-        seed (int): The seed to use for the generation (default: 396916372)
+        seed (int): The seed to use for the generation (default: 424242)
         model_version (str): The model version to use. (default: stabilityai-sd-20)
 
     Returns:
@@ -53,7 +53,7 @@ def predict(
         torch_dtype=torch.float16,
     ).to(device)
 
-    generator = torch.Generator(device=device).manual_seed(seed)
+    generator = torch.Generator(device).manual_seed(seed) if seed != 0 else None
 
     with autocast("cuda"):
         images_list = pipe(
