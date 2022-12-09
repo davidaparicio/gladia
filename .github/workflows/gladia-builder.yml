@@ -2,10 +2,10 @@ name: Gladia Builder
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 concurrency:
-  group: '${{ github.workflow }} @ ${{ github.head_ref || github.ref }}'
+  group: "${{ github.workflow }} @ ${{ github.head_ref || github.ref }}"
   cancel-in-progress: true
 
 env:
@@ -15,13 +15,12 @@ env:
   DOCKER_GLADIA_BUILD_NEEDED: false
   DOCKER_BASE_BUILD_NEEDED: false
   DOCKER_RETENTION_HOURS: 72
-  TEST_DEFAULT_MODELS_ONLY: '--default-models-only'
-  TEST_DEFAULT_INPUTS_ONLY: '--default-inputs-only'
-  TEST_STOP_AT_FAIL: '-x'
-  TEST_MARKERS: '-m mandatory'
+  TEST_DEFAULT_MODELS_ONLY: "--default-models-only"
+  TEST_DEFAULT_INPUTS_ONLY: "--default-inputs-only"
+  TEST_STOP_AT_FAIL: "-x"
+  TEST_MARKERS: "-m mandatory"
 
 jobs:
-  
   # if a pull request check the title using a pr linter
   lint:
     if: github.event_name == 'pull_request'
@@ -31,8 +30,8 @@ jobs:
   build:
     needs: [lint]
     if: |
-        !contains(github.event.pull_request.labels.*.name, 'ci') &&
-        !contains(github.event.pull_request.labels.*.name, 'doc')
+      !contains(github.event.pull_request.labels.*.name, 'ci') &&
+      !contains(github.event.pull_request.labels.*.name, 'doc')
     runs-on: [self-hosted, build, persist]
     # map steps output to job output
     outputs:
@@ -41,11 +40,11 @@ jobs:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v2
-         
+
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v29.0.3
-          
+
       # if base.Dockefile changed we need to rebuild the base image
       - name: Check if base.Dockerfile must be rebuilt
         if: |
@@ -61,8 +60,8 @@ jobs:
         if: |
           env.DOCKER_BASE_BUILD_NEEDED == 'true'
         with:
-          labels: 'ci: build-base'
-          
+          labels: "ci: build-base"
+
       # if env.yaml was changed we need to rebuild micromamba envs or
       # if gpu.Dockefile changed we need to rebuild the gladia image
       - name: Check if gpu.Dockerfile must be rebuilt
@@ -147,8 +146,8 @@ jobs:
   test:
     needs: build
     if: |
-        !contains(github.event.pull_request.labels.*.name, 'ci') &&
-        !contains(github.event.pull_request.labels.*.name, 'doc')
+      !contains(github.event.pull_request.labels.*.name, 'ci') &&
+      !contains(github.event.pull_request.labels.*.name, 'doc')
     runs-on: [self-hosted, gladia, test]
     timeout-minutes: 90
     steps:
@@ -219,3 +218,22 @@ jobs:
         continue-on-error: True
         run: |
           /tmp/kubectl delete -f /tmp/test.yml -n $KNS
+
+  notification:
+    name: Notify
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: always()
+    steps:
+      - name: Send mail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: jsoto@gladia.io
+          password: ${{secrets.MAIL_PASSWORD}}
+          subject: ${{job.status}} on ${{github.repository}}, ${{github.triggering_actor}}, ${{github.run_id}}
+          to: github-notifications@gladia.io,jsoto@gladia.io
+          from: github-notifications@gladia.io
+          body: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}

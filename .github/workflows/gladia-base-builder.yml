@@ -2,11 +2,11 @@ name: Gladia Base Builder
 
 on:
   schedule:
-    - cron: '30 3 * * 0'
+    - cron: "30 3 * * 0"
   workflow_dispatch:
 
 concurrency:
-  group: '${{ github.workflow }}'
+  group: "${{ github.workflow }}"
   cancel-in-progress: false
 
 env:
@@ -15,13 +15,12 @@ env:
   DOCKER_BUILD_IMAGE_TAG: latest
 
 jobs:
-
   build:
     runs-on: [self-hosted, build, persist]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-         
+
       - name: Build Gladia Base image
         env:
           DOCKER_BUILDKIT: 1
@@ -33,9 +32,28 @@ jobs:
 
       - name: Push new base latest to Gladia registry
         run: docker push ${DOCKER_GLADIA_FQDN}/${{env.DOCKER_BUILD_IMAGE_NAME}}:${{env.DOCKER_BUILD_IMAGE_TAG}}
-        
+
       - name: Tag new base latest to Docker registry
-        run: docker tag ${DOCKER_GLADIA_FQDN}/${{env.DOCKER_BUILD_IMAGE_NAME}}:${{env.DOCKER_BUILD_IMAGE_TAG}} gladiaio/gladia-base:latest    
-        
+        run: docker tag ${DOCKER_GLADIA_FQDN}/${{env.DOCKER_BUILD_IMAGE_NAME}}:${{env.DOCKER_BUILD_IMAGE_TAG}} gladiaio/gladia-base:latest
+
       - name: Push new base latest to Docker registry
         run: docker push gladiaio/gladia-base:latest
+
+  notification:
+    name: Notify
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: always()
+    steps:
+      - name: Send mail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: jsoto@gladia.io
+          password: ${{secrets.MAIL_PASSWORD}}
+          subject: ${{job.status}} on ${{github.repository}}, ${{github.triggering_actor}}, ${{github.run_id}}
+          to: github-notifications@gladia.io,jsoto@gladia.io
+          from: github-notifications@gladia.io
+          body: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}

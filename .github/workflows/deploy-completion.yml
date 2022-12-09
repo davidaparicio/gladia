@@ -26,14 +26,14 @@ jobs:
     steps:
       - name: Notify Slack - Successful deploy
         uses: rtCamp/action-slack-notify@v2.2.0
-        env: 
+        env:
           SLACK_CHANNEL: #releases
           SLACK_COLOR: ${{ needs.get-info.outpus.prOutcome }}
           SLACK_USERNAME: gladia-ai-ci
-          SLACK_TITLE: 'New Docker Hub Release :rocket:'
-          SLACK_MESSAGE: ${{ needs.get-info.outpus.prtitle }} 
+          SLACK_TITLE: "New Docker Hub Release :rocket:"
+          SLACK_MESSAGE: ${{ needs.get-info.outpus.prtitle }}
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_ICON_EMOJI: ':rocket:'
+          SLACK_ICON_EMOJI: ":rocket:"
 
       - name: Trigger CD
         run: |
@@ -42,13 +42,32 @@ jobs:
               "https://api.github.com/repos/${{ secrets.CD_REPO }}/dispatches" \
               -d '{"event_type": "rollout", "client_payload": {"rollout": "public"}}'
 
+  notification:
+    name: Notify
+    runs-on: ubuntu-latest
+    needs: [on-success]
+    if: always()
+    steps:
+      - name: Send mail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: jsoto@gladia.io
+          password: ${{secrets.MAIL_PASSWORD}}
+          subject: ${{job.status}} on ${{github.repository}}, ${{github.triggering_actor}}, ${{github.run_id}}
+          to: github-notifications@gladia.io,jsoto@gladia.io
+          from: github-notifications@gladia.io
+          body: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
+
   # on-failure:
   #   runs-on: ubuntu-latest
   #   if: ${{ github.event.workflow_run.conclusion == 'failure' }}
   #   steps:
   #     - name: Notify Slack - Failed deploy
   #       uses: rtCamp/action-slack-notify@v2.2.0
-  #       env: 
+  #       env:
   #         SLACK_CHANNEL: #releases
   #         SLACK_COLOR: ${{ job.status }}
   #         SLACK_USERNAME: gladia-ai-ci
