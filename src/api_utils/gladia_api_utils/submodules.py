@@ -767,7 +767,7 @@ class TaskRouter:
             dict: the parameters in body
         """
         parameters_in_body = dict()
-        
+
         for key, value in kwargs.items():
             if isinstance(value, BaseModel):
                 parameters_in_body.update(value.dict())
