@@ -14,6 +14,7 @@ MODEL_VERSIONS = {
     "compvis-sd-14": "CompVis/stable-diffusion-v1-4",
     "runwayml-sd-15": "runwayml/stable-diffusion-v1-5",
     "stabilityai-sd-20": "stabilityai/stable-diffusion-2",
+    "stabilityai-sd-21": "stabilityai/stable-diffusion-2-1-base",
 }
 
 
