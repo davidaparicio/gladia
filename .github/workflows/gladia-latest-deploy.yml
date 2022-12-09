@@ -9,20 +9,19 @@ on:
   workflow_dispatch:
     inputs:
       pr:
-        description: 'Force promote & deploy this PR'
+        description: "Force promote & deploy this PR"
         required: true
 
 concurrency:
-  group: '${{ github.workflow }}'
+  group: "${{ github.workflow }}"
   cancel-in-progress: false
 
 env:
   TAG_PROMOTED: ""
   TAG_PROMOTE: latest
   TAG: ${{ inputs.pr }}
-  
-jobs:
 
+jobs:
   promote-gladia-image:
     runs-on: [self-hosted, build, ephemeral]
     if: ${{ (github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch') }}
@@ -84,25 +83,25 @@ jobs:
         run: docker kill gladia-aipi && docker rm gladia-aipi
 
       - name: start docker gladia
-        run: | 
-            docker run -d --name gladia-aipi \
-            --restart unless-stopped \
-            --gpus all --shm-size=5g \
-            -p ${AIPI_SERVICE_PORT}:8080 \
-            -v /tmp/gladia:/tmp/gladia \
-            -e TRITON_SERVER_PORT_HTTP=8000 \
-            -e TRITON_SERVER_URL=${TRITON_SERVER_URL} \
-            -e TRITON_LAZY_DOWNLOAD=false \
-            -e TRITON_MODELS_PATH=/tmp/gladia/triton \
-            -e HUGGINGFACE_ACCESS_TOKEN=${HUGGINGFACE_ACCESS_TOKEN} \
-            -e STABILITY_KEY=${STABILITY_KEY} \
-            ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }}
+        run: |
+          docker run -d --name gladia-aipi \
+          --restart unless-stopped \
+          --gpus all --shm-size=5g \
+          -p ${AIPI_SERVICE_PORT}:8080 \
+          -v /tmp/gladia:/tmp/gladia \
+          -e TRITON_SERVER_PORT_HTTP=8000 \
+          -e TRITON_SERVER_URL=${TRITON_SERVER_URL} \
+          -e TRITON_LAZY_DOWNLOAD=false \
+          -e TRITON_MODELS_PATH=/tmp/gladia/triton \
+          -e HUGGINGFACE_ACCESS_TOKEN=${HUGGINGFACE_ACCESS_TOKEN} \
+          -e STABILITY_KEY=${STABILITY_KEY} \
+          ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }}
 
       - name: Gladia AIPI-1 readiness
         uses: nick-fields/retry@v2
         with:
           timeout_seconds: 60
-          max_attempts: 10
+          max_attempts: 50
           retry_on: error
           command: curl localhost:${AIPI_SERVICE_PORT}/${AIPI_READINESS_PATH} --connect-timeout 5
 
@@ -117,24 +116,24 @@ jobs:
         run: docker kill gladia-aipi && docker rm gladia-aipi
 
       - name: start docker gladia
-        run: | 
-            docker run -d --name gladia-aipi \
-            --restart unless-stopped \
-            --gpus all --shm-size=5g \
-            -p ${AIPI_SERVICE_PORT}:8080 \
-            -v /tmp/gladia:/tmp/gladia \
-            -e TRITON_SERVER_PORT_HTTP=8000 \
-            -e TRITON_SERVER_URL=${TRITON_SERVER_URL} \
-            -e TRITON_LAZY_DOWNLOAD=false \
-            -e TRITON_MODELS_PATH=/tmp/gladia/triton \
-            -e HUGGINGFACE_ACCESS_TOKEN=${HUGGINGFACE_ACCESS_TOKEN} \
-            -e STABILITY_KEY=${STABILITY_KEY} \
-            ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }}
+        run: |
+          docker run -d --name gladia-aipi \
+          --restart unless-stopped \
+          --gpus all --shm-size=5g \
+          -p ${AIPI_SERVICE_PORT}:8080 \
+          -v /tmp/gladia:/tmp/gladia \
+          -e TRITON_SERVER_PORT_HTTP=8000 \
+          -e TRITON_SERVER_URL=${TRITON_SERVER_URL} \
+          -e TRITON_LAZY_DOWNLOAD=false \
+          -e TRITON_MODELS_PATH=/tmp/gladia/triton \
+          -e HUGGINGFACE_ACCESS_TOKEN=${HUGGINGFACE_ACCESS_TOKEN} \
+          -e STABILITY_KEY=${STABILITY_KEY} \
+          ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }}
 
       - name: Gladia AIPI-2 readiness
         uses: nick-fields/retry@v2
         with:
           timeout_seconds: 60
-          max_attempts: 10
+          max_attempts: 50
           retry_on: error
           command: curl localhost:${AIPI_SERVICE_PORT}/${AIPI_READINESS_PATH} --connect-timeout 5
