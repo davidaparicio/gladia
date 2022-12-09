@@ -644,11 +644,13 @@ class TaskRouter:
 
             # cast BaseModel pydantic models into python type
             parameters_in_body = self.__build_parameters_in_body(kwargs)
+
             del kwargs
 
             model = parameters_in_body["model"]
             del parameters_in_body["model"]
 
+            logger.error(parameters_in_body)
             # handle model subversions
             if "--" in model:
                 model, model_version = model.split("--")
@@ -765,7 +767,7 @@ class TaskRouter:
             dict: the parameters in body
         """
         parameters_in_body = dict()
-
+        
         for key, value in kwargs.items():
             if isinstance(value, BaseModel):
                 parameters_in_body.update(value.dict())
@@ -1009,7 +1011,6 @@ async def clean_kwargs_based_on_router_inputs(
     """
     success = True
     error_message = "Empty error message"
-
     for input_name, input_metadata in inputs.items():
         if input_metadata["type"] in FILE_TYPES:
             # if the input file is in kwargs:
@@ -1050,7 +1051,11 @@ async def clean_kwargs_based_on_router_inputs(
         elif input_metadata["type"] in LIST_TYPES:
             kwargs[input_name] = str(kwargs[input_name].value)
         else:
-            if not kwargs.get(input_name, None):
+
+            # don't use
+            # if not kwargs.get(input_name, None):
+            # as it will fail if the value is 0
+            if input_name not in kwargs:
                 error_message = f"Input '{input_name}' of '{input_metadata['type']}' type is missing."
                 success = False
 
