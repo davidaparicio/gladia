@@ -53,7 +53,7 @@ def predict(
         torch_dtype=torch.float16,
     ).to(device)
 
-    generator = torch.Generator(device=device).manual_seed(seed)
+    generator = torch.Generator(device).manual_seed(seed) if seed != 0 else None
 
     with autocast("cuda"):
         images_list = pipe(
