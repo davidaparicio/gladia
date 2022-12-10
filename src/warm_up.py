@@ -1,7 +1,7 @@
+import importlib
 import os
 
 import nltk
-import importlib
 
 
 def main():
