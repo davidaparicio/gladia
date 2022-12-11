@@ -27,10 +27,10 @@ inputs:
 
   seed:
     type: int
-    placeholder: "seed to use"
-    default: 396916372
+    placeholder: "seed to use (0 for random)"
+    default: 424242
     examples:
-      - 396916372
+      - 424242
 
 output:
   name: image
