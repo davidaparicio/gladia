@@ -650,7 +650,6 @@ class TaskRouter:
             model = parameters_in_body["model"]
             del parameters_in_body["model"]
 
-            logger.error(parameters_in_body)
             # handle model subversions
             if "--" in model:
                 model, model_version = model.split("--")
