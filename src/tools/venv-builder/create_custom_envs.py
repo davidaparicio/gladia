@@ -1,3 +1,4 @@
+import shutil
 import argparse
 import logging
 import os
@@ -106,6 +107,7 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
     Raises:
         FileNotFoundError: The provided env file couldn't be found
     """
+
     logger.debug(f"Creating env : {env_name}")
 
     custom_env = yaml.safe_load(open(path_to_env_file, "r"))
@@ -116,13 +118,6 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
         )
 
         env_name = custom_env["name"]
-
-    # if os.path.isdir(os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)):
-    #     logger.info(f"{env_name} already exists, skipping build")
-
-    #     # TODO: here instead perfom a umamba update
-
-    #     return
 
     if "inherit" not in custom_env and "dependencies" not in custom_env:
         error_message = "Provided config env is empty, you must either specify `inherit` or `dependencies`."
@@ -162,29 +157,31 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
 
     try:
 
-        if os.path.isdir(os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)):
-            subprocess.run(
-                f"micromamba update -f {temporary_file.name  + '.yaml'} -y".split(" "),
-                check=True,
-            )
-            logger.info(f"Env {env_name} has been successfully updated")
+        cmd_to_exec = "create"
 
-        else:
-            subprocess.run(
-                f"micromamba create -f {temporary_file.name  + '.yaml'} -y".split(" "),
-                check=True,
-            )
-            logger.info(f"Env {env_name} has been successfully created")
+        if os.path.isdir(os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)):
+            cmd_to_exec = "update"
+
+        subprocess.run(
+            f"micromamba {cmd_to_exec} -f {temporary_file.name  + '.yaml'} -y".split(" "),
+            check=True,
+        )
 
         subprocess.run(
             f"micromamba clean --all --yes".split(" "),
             check=True,
         )
+        logger.info(f"Env {env_name} has been successfully {cmd_to_exec}d")
 
     except subprocess.CalledProcessError as error:
         raise RuntimeError(f"Couldn't create env {env_name}: {error}")
 
     finally:
+        shutil.copyfile(
+            src=temporary_file.name + ".yaml",
+            dst=os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name, f"{env_name}.yaml")
+        )
+
         os.remove(temporary_file.name)
         os.remove(temporary_file.name + ".yaml")
 
