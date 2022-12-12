@@ -237,7 +237,7 @@ def get_metadata(rel_path, file_name, fallback_file_name) -> dict:
     return metadata
 
 
-def _warm_up_in_subprocess(env_name: str, module_path: str, model: str):
+def _prepare_in_subprocess(env_name: str, module_path: str, model: str):
     """
     Execute a model in a subprocess.
     The subprocess is executed in a separate thread.
@@ -258,7 +258,7 @@ def _warm_up_in_subprocess(env_name: str, module_path: str, model: str):
 
     cwd = os.path.abspath(Path(__file__).parent)
 
-    cmd = f"""micromamba run -n {env_name} --cwd {module_full_path} python {os.path.join(cwd, "warm_up_in_custom_env.py")} {module_full_path} {model}"""
+    cmd = f"""micromamba run -n {env_name} --cwd {module_full_path} python {os.path.join(cwd, "prepare_in_custom_env.py")} {module_full_path} {model}"""
 
     logger.debug(f"Executing command: {cmd}")
 
@@ -536,7 +536,7 @@ class TaskRouter:
 
         self.models_env = {}
 
-        self.warmed_up = False
+        self.ready_to_be_used = False
 
         if not rel_path:
             namespace = sys._getframe(1).f_globals
@@ -643,8 +643,8 @@ class TaskRouter:
         @forge.sign(*[*form_parameters, query_for_model_name])
         async def apply(*args, **kwargs):
 
-            if not self.warmed_up:
-                self.warm_up()
+            if not self.ready_to_be_used:
+                self.prepare()
 
             # cast BaseModel pydantic models into python type
             parameters_in_body = self.__build_parameters_in_body(kwargs)
@@ -716,13 +716,13 @@ class TaskRouter:
 
             return self.__post_processing(result)
 
-    def warm_up(self, default_only: bool = True) -> None:
+    def prepare(self, default_only: bool = True) -> None:
         if not self.__check_if_model_exist():
             return
 
         if not default_only:
             logger.warning(
-                "warm_up currently only handle default model. Skipping non-default models."
+                "prepare currently only handle default model. Skipping non-default models."
             )
 
         module_path = f"{self.root_package_path}/{self.default_model}/"
@@ -741,16 +741,16 @@ class TaskRouter:
             module_path = f"{module_path}.{self.default_model}.{self.default_model}"
             module = importlib.import_module(module_path)
 
-            if hasattr(module, "warm_up"):
-                module.warm_up()
+            if hasattr(module, "prepare"):
+                module.prepare()
         else:
-            _warm_up_in_subprocess(
+            _prepare_in_subprocess(
                 env_name=env_name,
                 module_path=module_path,
                 model=self.default_model,
             )
 
-        self.warmed_up = True
+        self.ready_to_be_used = True
 
     def __get_routeur_inputs(self) -> list:
         task_metadata = yaml.safe_load(

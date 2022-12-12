@@ -20,7 +20,7 @@ mkdir -p $MII_MODEL_PATH
 service supervisor start
 
 # initialize the nltk database
-micromamba run -n server --cwd /app python warm_up.py
+micromamba run -n server --cwd /app python prepare.py
 
 micromamba run -n server --cwd /app gunicorn main:app \
 -b 0.0.0.0:${API_SERVER_PORT_HTTP} \

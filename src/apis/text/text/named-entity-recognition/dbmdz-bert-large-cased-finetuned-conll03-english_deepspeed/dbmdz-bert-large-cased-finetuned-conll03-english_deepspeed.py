@@ -1,14 +1,14 @@
 from typing import Dict, Union
 
 import mii
-from gladia_api_utils.deepspeed_helper import warm_up as warm_up_deepspeed
+from gladia_api_utils.deepspeed_helper import prepare as prepare_deepspeed
 
 MODEL_NAME = "dbmdz/bert-large-cased-finetuned-conll03-english"
 DEPLOYMENT_NAME = MODEL_NAME + "-NER-deployment"
 
 
-def warm_up(*_, **__) -> None:
-    warm_up_deepspeed()
+def prepare(*_, **__) -> None:
+    prepare_deepspeed()
 
     mii.deploy(
         task="token-classification",

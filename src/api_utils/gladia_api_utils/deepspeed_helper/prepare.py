@@ -1,4 +1,4 @@
-def warm_up(*_, **__) -> None:
+def prepare(*_, **__) -> None:
 
     PATH_TO_ENV = "/opt/conda/envs/deepspeed-mii"  # TODO: retrieve from kwargs
     PYTHON_VERSION = "3.8"  # TODO: retrieve from kwargs
