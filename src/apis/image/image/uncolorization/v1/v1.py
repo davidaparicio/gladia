@@ -1,5 +1,6 @@
-from PIL import Image
 from gladia_api_utils.io import _open
+from PIL import Image
+
 
 def predict(image: bytes) -> Image:
     """
@@ -12,4 +13,4 @@ def predict(image: bytes) -> Image:
         Image: grayscale image
     """
 
-    return _open(image).convert('L')
+    return _open(image).convert("L")
