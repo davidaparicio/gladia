@@ -117,10 +117,12 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
 
         env_name = custom_env["name"]
 
-    if os.path.isdir(os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)):
-        logger.info(f"{env_name} already exists, skipping build")
+    # if os.path.isdir(os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)):
+    #     logger.info(f"{env_name} already exists, skipping build")
 
-        return
+    #     # TODO: here instead perfom a umamba update
+
+    #     return
 
     if "inherit" not in custom_env and "dependencies" not in custom_env:
         error_message = "Provided config env is empty, you must either specify `inherit` or `dependencies`."
@@ -159,10 +161,21 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
     os.link(temporary_file.name, temporary_file.name + ".yaml")
 
     try:
-        subprocess.run(
-            f"micromamba create -f {temporary_file.name  + '.yaml'} -y".split(" "),
-            check=True,
-        )
+
+        if os.path.isdir(os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)):
+            subprocess.run(
+                f"micromamba update -f {temporary_file.name  + '.yaml'} -y".split(" "),
+                check=True,
+            )
+            logger.info(f"Env {env_name} has been successfully updated")
+
+        else:
+            subprocess.run(
+                f"micromamba create -f {temporary_file.name  + '.yaml'} -y".split(" "),
+                check=True,
+            )
+            logger.info(f"Env {env_name} has been successfully created")
+
         subprocess.run(
             f"micromamba clean --all --yes".split(" "),
             check=True,
@@ -174,8 +187,6 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
     finally:
         os.remove(temporary_file.name)
         os.remove(temporary_file.name + ".yaml")
-
-        logger.info(f"Env {env_name} has been successfully created")
 
 
 def build_specific_envs(paths: List[str]) -> None:
