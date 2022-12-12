@@ -14,8 +14,8 @@ def predict(
     mask_image: bytes,
     example_image: bytes,
     seed: int = 424242,
-    steps: int = 50,
-    guidance_scale: int = 5,
+    steps: int = 75,
+    guidance_scale: int = 15,
 ):
 
     original_image = _open(original_image)

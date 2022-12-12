@@ -29,14 +29,14 @@ inputs:
     type: int
     placeholder: "Number of steps to run"
     examples: 
-      - 50
+      - 75
     min: 2
     max: 75
   guidance_scale:
     type: int
     placeholder: "Scale of the guiding example"
     examples: 
-      - 5
+      - 15
     min: 5
     max: 15
 
