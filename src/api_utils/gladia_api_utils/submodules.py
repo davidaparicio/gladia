@@ -281,6 +281,8 @@ def _warm_up_in_subprocess(env_name: str, module_path: str, model: str):
 
             raise RuntimeError(error_message)
 
+        logger.info(f"subprocess's logs : {proc.stdout.read().decode()}")
+
     except subprocess.CalledProcessError as error:
         error_message = f"Could not run in subprocess command {cmd}: {error}"
 
@@ -330,15 +332,17 @@ def exec_in_subprocess(
             executable="/bin/bash",
         )
 
-        std_outputs, error_message = proc.communicate()
-        logger.debug(f"subprocess stdout: {std_outputs}")
+        proc.wait()
 
-        error_message = f"Subprocess encountered the following error : {error_message}\nCommand executed: {cmd}"
+        logger.info(f"subprocess stdout: {proc.stdout.read().decode()}")
 
         # if the subprocess has failed (return code of shell != 0)
         # raise an exception and log to the console the error message
         if proc.returncode != 0:
+            error_message = f"Subprocess encountered the following error : {proc.stderr.read().decode()}\nCommand executed: {cmd}"
+
             logger.error(error_message)
+
             raise RuntimeError(error_message)
 
     except subprocess.CalledProcessError as error:
