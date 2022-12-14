@@ -24,4 +24,4 @@ def predict(
 
     summary = summarizer(text)
 
-    return {"prediction": summary, "prediction_raw": summary}
+    return {"prediction": summary["summary_text"], "prediction_raw": summary}
