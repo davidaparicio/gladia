@@ -5,9 +5,8 @@ import threading
 from logging import getLogger
 from pathlib import Path
 from urllib.parse import urlparse
-import json
-import spacy
 
+import spacy
 from git import Repo
 
 from .file_management import (
@@ -18,7 +17,6 @@ from .file_management import (
     is_uncompressable,
     uncompress,
 )
-
 from .system import load_config
 
 logger = getLogger(__name__)
@@ -55,6 +53,7 @@ def load_spacy_language_model(language: str) -> spacy.language.Language:
         nlp = spacy.load(language_model)
 
     return nlp
+
 
 def __download_huggingface_model(
     url: str,

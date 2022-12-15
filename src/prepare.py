@@ -1,7 +1,8 @@
+import json
 import os
 
 import nltk
-import json
+
 
 def read_config(config_path: str) -> dict:
     """
@@ -17,12 +18,13 @@ def read_config(config_path: str) -> dict:
         config = json.load(f)
     return config
 
+
 def main():
     config = read_config("config.json")
 
     nltk_warmup_list = ["punkt"]
 
-    spacy_warmup_list = [model['model'] for model in config['spacy']['models'].values()]
+    spacy_warmup_list = [model["model"] for model in config["spacy"]["models"].values()]
 
     download_nltk_data(nltk_warmup_list)
     download_spacy_model(spacy_warmup_list)

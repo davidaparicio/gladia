@@ -1,7 +1,7 @@
 from typing import Dict, List, Union
-from fastpunct import FastPunct
-import truecase
 
+import truecase
+from fastpunct import FastPunct
 
 
 def predict(sentence: str) -> Dict[str, Union[str, List[Dict[str, Union[str, float]]]]]:
@@ -38,4 +38,3 @@ def predict(sentence: str) -> Dict[str, Union[str, List[Dict[str, Union[str, flo
         )
 
     return {"prediction": prediction, "prediction_raw": prediction_raw}
-
