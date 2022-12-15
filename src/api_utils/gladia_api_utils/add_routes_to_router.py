@@ -86,7 +86,7 @@ def __add_router(
         )
 
         if os.getenv("LAZY_WARM_UP", "true").lower() == "false":
-            task_router.warm_up()
+            task_router.prepare()
         else:
             warn(
                 "LAZY_WARM_UP is set to true, this could result in a long first call to the model in order to init it."

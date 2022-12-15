@@ -1,8 +1,8 @@
-import cv2
-import numpy as np
+from gladia_api_utils.io import _open
+from PIL import Image
 
 
-def predict(image: bytes) -> np.ndarray:
+def predict(image: bytes) -> Image:
     """
     Take an image as input and return it as grayscale
 
@@ -10,13 +10,7 @@ def predict(image: bytes) -> np.ndarray:
         image (bytes): image to convert to grayscale
 
     Returns:
-        numpy.ndarray: grayscale image
+        Image: grayscale image
     """
 
-    img = cv2.imdecode(np.fromstring(image, np.uint8), cv2.IMREAD_COLOR)
-
-    gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    _, im_png = cv2.imencode(".png", gray_image, [int(cv2.IMWRITE_PNG_COMPRESSION), 9])
-
-    return im_png
+    return _open(image).convert("L")

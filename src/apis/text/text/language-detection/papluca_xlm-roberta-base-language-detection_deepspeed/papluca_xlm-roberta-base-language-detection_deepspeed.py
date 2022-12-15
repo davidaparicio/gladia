@@ -2,7 +2,7 @@ from json import loads as json_loads
 from typing import Dict, Union
 
 import mii
-from gladia_api_utils.deepspeed_helper import warm_up as warm_up_deepspeed
+from gladia_api_utils.deepspeed_helper import prepare as prepare_deepspeed
 
 MODEL_NAME = "jb2k/bert-base-multilingual-cased-language-detection"
 DEPLOYMENT_NAME = MODEL_NAME + "-LanguageDetection-deployment"
@@ -57,9 +57,9 @@ LABELS = {
 }
 
 
-def warm_up(*_, **__) -> None:
+def prepare(*_, **__) -> None:
 
-    warm_up_deepspeed()
+    prepare_deepspeed()
 
     mii.deploy(
         task="text-classification",

@@ -7,7 +7,7 @@ logger = getLogger(__name__)
 
 
 HELP_STRING = """
-python <PATH_TO_FILE>/warm_up_in_custom_env.py <module_path> <model>
+python <PATH_TO_FILE>/prepare_in_custom_env.py <module_path> <model>
     - module_path : the route to the targeted model (for instance `apis/image/image/face-blurings/ageitgey/`)
     - model : the targeted model name (for instance `ageitgey`)
 """
@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     spec.loader.exec_module(module)
 
-    if hasattr(module, "warm_up"):
-        module.warm_up()
+    if hasattr(module, "prepare"):
+        module.prepare()
 
     sys.exit(0)

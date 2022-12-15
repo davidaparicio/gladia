@@ -50,7 +50,7 @@ jobs:
         if: |
           contains(steps.changed-files.outputs.modified_files, 'base.Dockerfile') ||
           contains(steps.changed-files.outputs.deleted_files, 'base.Dockerfile') ||
-          contains(github.event.pull_request.labels.*.name, 'ci: force-base-build')
+          contains(github.event.pull_request.labels.*.name, 'ci: force-build-base')
         run: |
           echo "DOCKER_BASE_BUILD_NEEDED=true" >> $GITHUB_ENV
           echo "DOCKER_GLADIA_BUILD_NEEDED=true" >> $GITHUB_ENV
@@ -70,7 +70,7 @@ jobs:
           contains(steps.changed-files.outputs.deleted_files, 'env.yaml') ||
           contains(steps.changed-files.outputs.modified_files, 'gpu.Dockerfile') ||
           contains(steps.changed-files.outputs.deleted_files, 'gpu.Dockerfile') ||
-          contains(github.event.pull_request.labels.*.name, 'ci: force-gladia-build')
+          contains(github.event.pull_request.labels.*.name, 'ci: force-build-gladia')
         run: |
           echo "DOCKER_GLADIA_BUILD_NEEDED=true" >> $GITHUB_ENV
 
