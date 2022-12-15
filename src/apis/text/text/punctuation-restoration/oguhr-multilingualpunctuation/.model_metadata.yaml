@@ -8,8 +8,9 @@ gladia:
   examples: {}
   format: ''
   latency: ''
+
 huggingface:
-  link: 'https://huggingface.co/kredor/punctuate-all'
+  link: 'https://huggingface.co/oliverguhr/fullstop-punctuation-multilang-large'
 license:
   content: 'MIT License
 
@@ -32,7 +33,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'
-  link: 'https://github.com/oliverguhr/deepmultilingualpunctuation/blob/main/LICENSE'
+  link: 'https://github.com/VarnithChordia/Multlingual_Punctuation_restoration/blob/master/LICENSE'
   title: 'MIT'
 paper:
   authors: []
@@ -43,7 +44,7 @@ paper:
   month          = {June},
   year           = {2021},
   address        = {Winterthur, Switzerland},
-  publisher      = {CEUR Workshop Proceedings},  
+  publisher      = {CEUR Workshop Proceedings},
   url       = {http://ceur-ws.org/Vol-2957/sepp_paper4.pdf}
 }'
   link: ''

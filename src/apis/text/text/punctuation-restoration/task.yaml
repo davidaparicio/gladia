@@ -1,6 +1,6 @@
-summary: 'Repaire the input sentence punctuation'
+summary: 'Repaire the input sentence punctuation and casing'
 
-default-model: "kredor-punctuate-all"
+default-model: "oguhr-multilingualpunctuation"
 
 inputs:
   sentence:

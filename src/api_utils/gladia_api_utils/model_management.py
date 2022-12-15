@@ -5,6 +5,8 @@ import threading
 from logging import getLogger
 from pathlib import Path
 from urllib.parse import urlparse
+import json
+import spacy
 
 from git import Repo
 
@@ -17,11 +19,42 @@ from .file_management import (
     uncompress,
 )
 
+from .system import load_config
+
 logger = getLogger(__name__)
 
 
 GLADIA_TMP_MODEL_PATH = os.getenv("GLADIA_TMP_MODEL_PATH", "/tmp/gladia/models")
+GLADIA_SRC_PATH = os.getenv("GLADIA_SRC_PATH", "/app")
 
+
+config = load_config()
+SPACY_LANGUAGE_MODEL = config["spacy"]["models"]
+
+
+def load_spacy_language_model(language: str) -> spacy.language.Language:
+    """Load the spaCy natural language processing model for the specified language.
+
+    Args:
+        language_code: The ISO 3 language code of the language to load the model for.
+
+    Returns:
+        The spaCy language model for the specified language.
+    """
+    if language not in SPACY_LANGUAGE_MODEL:
+        language = "others"
+
+    language_model = SPACY_LANGUAGE_MODEL[language]["model"]
+
+    try:
+        nlp = spacy.load(language_model)
+
+    except ModuleNotFoundError:
+        logger.info(f"Download spacy model {language_model}")
+        os.system(f"python -m spacy download {language_model}")
+        nlp = spacy.load(language_model)
+
+    return nlp
 
 def __download_huggingface_model(
     url: str,

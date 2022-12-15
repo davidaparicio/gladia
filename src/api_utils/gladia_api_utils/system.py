@@ -10,7 +10,21 @@ from typing import Union
 
 from genericpath import isdir
 from torch.cuda import is_available as cuda_is_available
+import json
 
+GLADIA_SRC_PATH = os.getenv("GLADIA_SRC_PATH", "/app")
+
+def load_config() -> dict:
+    """Load the config.json file from the GLADIA_SRC_PATH.
+
+    Returns:
+        The config.json file as a dictionary.
+    """
+    #load json file from GLADIA_SRC_PATH and return the dict
+    with open(os.path.join(GLADIA_SRC_PATH, "config.json"), "r") as f:
+        config = json.load(f)
+
+    return config
 
 def copy(source: str, destination: str) -> None:
     """
