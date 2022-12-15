@@ -1,3 +1,5 @@
+name: Deploy in SaaS
+
 on:
   workflow_run:
     workflows: [Gladia Promote & deploy]

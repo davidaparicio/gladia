@@ -24,7 +24,7 @@ ARG VENV_BUILDER_PATH=$PATH_TO_GLADIA_SRC/tools/venv-builder/
 # 3 = INFO, WARNING, and ERROR messages are not printed
 ENV GLADIA_TMP_PATH=$GLADIA_TMP_PATH \
     PATH_TO_GLADIA_SRC=$PATH_TO_GLADIA_SRC \
-    GLADIA_TMP_MODEL_PATH=$GLADIA_TMP_PATH/model \
+    GLADIA_TMP_MODEL_PATH=$GLADIA_TMP_PATH/models \
     VENV_BUILDER_PATH=$VENV_BUILDER_PATH \
     TF_CPP_MIN_LOG_LEVEL=2 \
     CUDA_DEVICE_ORDER=PCI_BUS_ID \
@@ -55,7 +55,7 @@ RUN mkdir -p $GLADIA_TMP_MODEL_PATH \
     mkdir -p $NLTK_DATA \
     mkdir -p $MII_MODEL_PATH \
     mkdir -p $MII_CACHE_PATH
-    
+
 # TODO: this deepspeed fix should be implemented at the deepspeed 
 # level later with a PR
 # here: https://github.com/microsoft/DeepSpeed-MII/blob/cd6a07f6f6616d2378b3e05c90ec7ba234b888f7/mii/deployment.py#L97
@@ -80,32 +80,32 @@ RUN micromamba create -f env.yaml && \
 ENV LD_LIBRARY_PATH=$MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/nvidia/cublas/lib/:$LD_LIBRARY_PATH
 
 RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then \
-        micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*/apis/text/[a-zA-Z ]+/[a-rA-R].*'"; \
+    micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*/apis/text/[a-zA-Z ]+/[a-rA-R].*'"; \
     fi  && \
     $CLEAN_LAYER_SCRIPT
 
 RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then \
-        micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*/apis/text/[a-zA-Z ]+/[s-zS-Z].*'"; \
+    micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*/apis/text/[a-zA-Z ]+/[s-zS-Z].*'"; \
     fi  && \
     $CLEAN_LAYER_SCRIPT
 
 RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then \
-        micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*/apis/video/.*'"; \
+    micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*/apis/video/.*'"; \
     fi  && \
     $CLEAN_LAYER_SCRIPT
 
 RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then \
-        micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*/apis/image/[a-zA-Z ]+/[a-hA-H].*'"; \
+    micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*/apis/image/[a-zA-Z ]+/[a-hA-H].*'"; \
     fi && \
     $CLEAN_LAYER_SCRIPT
 
 RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then \
-        micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*/apis/image/[a-zA-Z ]+/[i-zI-Z].*'"; \
+    micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*/apis/image/[a-zA-Z ]+/[i-zI-Z].*'"; \
     fi && \
     $CLEAN_LAYER_SCRIPT
 
 RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then \
-        micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*/apis/audio/.*'"; \
+    micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*/apis/audio/.*'"; \
     fi && \
     $CLEAN_LAYER_SCRIPT
 
