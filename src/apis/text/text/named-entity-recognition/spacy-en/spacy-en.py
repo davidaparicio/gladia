@@ -1,5 +1,6 @@
-from typing import Dict, Union
 import importlib.util
+from typing import Dict, Union
+
 from gladia_api_utils.model_management import load_spacy_language_model
 
 spec = importlib.util.spec_from_file_location(
