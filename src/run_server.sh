@@ -10,8 +10,16 @@ ln -s /usr/bin/python3.8 /usr/bin/python3
 
 GLADIA_TMP_PATH="${GLADIA_TMP_PATH:-/tmp/gladia}"
 GLADIA_TMP_MODEL_PATH="${GLADIA_TMP_MODEL_PATH:-$GLADIA_TMP_PATH/model}"
+
 MII_CACHE_PATH="${MII_CACHE_PATH:-$GLADIA_TMP_MODEL_PATH/mii/cache}"
 MII_MODEL_PATH="${MII_MODEL_PATH:-$GLADIA_TMP_MODEL_PATH/mii/models}"
+
+GLADIA_TMP_TORCH_CACHE="${GLADIA_TMP_MODEL_PATH:-$GLADIA_TMP_PATH/torch_cache}"
+
+
+mkdir -p $GLADIA_TMP_TORCH_CACHE
+rm -rf /root/.cache/torch
+ln -s $GLADIA_TMP_TORCH_CACHE /root/.cache/torch 
 
 # init mii folders
 mkdir -p $MII_CACHE_PATH
