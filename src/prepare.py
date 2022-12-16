@@ -24,7 +24,7 @@ def main():
 
     nltk_warmup_list = ["punkt"]
 
-    spacy_warmup_list = [model["model"] for model in config["spacy"]["models"].values()]
+    spacy_warmup_list = [model["model"] for model in config["spacy"]["models"].values()] + ["en-core-web-lg"]
 
     download_nltk_data(nltk_warmup_list)
     download_spacy_model(spacy_warmup_list)
