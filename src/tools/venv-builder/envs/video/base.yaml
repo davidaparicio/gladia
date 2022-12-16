@@ -1,4 +1,23 @@
 name: video-base
 
 dependencies:
+  - python=3.8.12
+  - conda-forge::cudatoolkit=11.6
+  - conda-forge::cudnn
+  - conda-forge::ffmpeg-python
+  - conda-forge::onnxruntime
+  - conda-forge::pydub
+  - conda-forge::pysoundfile
+  - conda-forge::ftfy
+  - conda-forge::flax
+  - conda-forge::jax=8.2.0
+  - conda-forge::pydub
   - conda-forge::pip
+  - pip:
+    - --extra-index-url=https://pypi.ngc.nvidia.com --trusted-host pypi.ngc.nvidia.com nvidia-pyindex
+    - --extra-index-url=https://pypi.ngc.nvidia.com --trusted-host pypi.ngc.nvidia.com nvidia-cudnn
+    - -e /app/api_utils/
+    - git+https://github.com/HuggingFace/transformers.git
+    - torchaudio
+    - torchvision
+    - decord
