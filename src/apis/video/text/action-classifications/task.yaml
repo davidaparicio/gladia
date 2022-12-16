@@ -1,0 +1,17 @@
+summary: "video action-classifications"
+
+default-model: "kinetics"
+
+default-model-version: "MCG-NJU/videomae-base-finetuned-kinetics"
+
+inputs:
+  video:
+    type: video
+    placeholder: "Video to analyze"
+    examples:
+      - "http://files.gladia.io/examples/video/text/classif/archery.mp4"
+
+output:
+  name: class
+  type: str
+  example: "Playing a guitar"
