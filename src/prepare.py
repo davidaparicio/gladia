@@ -1,11 +1,32 @@
+import json
 import os
 
 import nltk
 
 
+def read_config(config_path: str) -> dict:
+    """
+    Read config file
+
+    Args:
+        config_path (str): Path to config file
+
+    Returns:
+        dict: Config file
+    """
+    with open(config_path, "r") as f:
+        config = json.load(f)
+    return config
+
+
 def main():
+    config = read_config("config.json")
+
     nltk_warmup_list = ["punkt"]
-    spacy_warmup_list = ["en_core_web_lg"]
+
+    spacy_warmup_list = [
+        model["model"] for model in config["spacy"]["models"].values()
+    ] + ["en-core-web-lg"]
 
     download_nltk_data(nltk_warmup_list)
     download_spacy_model(spacy_warmup_list)
@@ -38,7 +59,6 @@ def download_spacy_model(spacy_warmup_list: list) -> None:
     Returns:
         None
     """
-
     for spacy_model in spacy_warmup_list:
         try:
             __import__(spacy_model)
