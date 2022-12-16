@@ -26,7 +26,7 @@ def main():
 
     spacy_warmup_list = [
         model["model"] for model in config["spacy"]["models"].values()
-    ] + ["en-core-web-lg"]
+    ] + ["en_core_web_lg"]
 
     download_nltk_data(nltk_warmup_list)
     download_spacy_model(spacy_warmup_list)
