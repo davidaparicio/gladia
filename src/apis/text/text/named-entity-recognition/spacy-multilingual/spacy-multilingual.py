@@ -1,7 +1,8 @@
 import importlib.util
 from typing import Dict, Union
-
+import os
 from gladia_api_utils.model_management import load_spacy_language_model
+from gladia_api_utils.nlp import explain_ner
 
 spec = importlib.util.spec_from_file_location(
     "toftrup-etal-2021",
@@ -25,8 +26,8 @@ def predict(text: str) -> Dict[str, Union[str, Dict[str, float]]]:
     return:
         Dict[str, Union[str, Dict[str, float]]]: each token within the sentence associated to its label
     """
-    detected_language = toftrup_etal_2021.predict(sentence)["prediction"]
-    nlp = load_spacy_language_model(language)
+    detected_language = toftrup_etal_2021.predict(text)["prediction"]
+    nlp = load_spacy_language_model(detected_language)
     document = nlp(text)
 
     prediction_raw = []
@@ -34,10 +35,11 @@ def predict(text: str) -> Dict[str, Union[str, Dict[str, float]]]:
 
     for entity in document.ents:
         extraction = {}
+        extraction["content"] = entity.text
+        extraction["name"] = entity.label_
         extraction["first_index"] = entity.start_char
         extraction["last_index"] = entity.end_char
-        extraction["name"] = entity.label_
-        extraction["content"] = entity.text
+        extraction["description"] = explain_ner(entity.label_)
 
         prediction.append({"text": entity.text, "label": entity.label_})
 

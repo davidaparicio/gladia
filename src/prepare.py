@@ -57,7 +57,6 @@ def download_spacy_model(spacy_warmup_list: list) -> None:
     Returns:
         None
     """
-
     for spacy_model in spacy_warmup_list:
         try:
             __import__(spacy_model)

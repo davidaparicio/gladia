@@ -1,6 +1,6 @@
 summary: 'Extract Entities from Text'
 
-default-model: "spacy-en"
+default-model: "spacy-multilingual"
 
 inputs:
   text:

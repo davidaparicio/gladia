@@ -1,0 +1,52 @@
+api:
+  content: ''
+  tags: []
+gladia:
+  accelerator: ''
+  example:
+    output:
+      prediction:
+      - '
+    {
+      "text": "Hugging Face Inc.",
+      "label": "ORG"
+    },
+    {
+      "text": "New York City",
+      "label": "GPE"
+    },
+    {
+      "text": "DUMBO",
+      "label": "ORG"
+    },
+    {
+      "text": "the Manhattan Bridge",
+      "label": "FAC"
+    }
+  ]'
+      prediction_raw:
+      - '[{
+      "first_index": 110,
+      "last_index": 130,
+      "name": "FAC",
+      "description": {
+        "description": "Facilities, such as buildings, airports, highways, bridges, etc.",
+        "short_description": "Facilities",
+        "examples": []
+      },
+      "content": "the Manhattan Bridge"
+    }]'
+  examples: {}
+  format: ''
+  latency: ''
+huggingface:
+  link: ''
+license:
+  content: ''
+  link: ''
+  title: ''
+paper:
+  authors: []
+  citation: ''
+  link: ''
+  title: ''
