@@ -1,8 +1,17 @@
 from typing import Dict, Union
+import importlib.util
+from gladia_api_utils.model_management import load_spacy_language_model
 
-import spacy
+spec = importlib.util.spec_from_file_location(
+    "toftrup-etal-2021",
+    os.path.join(
+        os.getenv("PATH_TO_GLADIA_SRC", "/app"),
+        "apis/text/text/language-detection/toftrup-etal-2021/toftrup-etal-2021.py",
+    ),
+)
 
-EN_CORE_WEB_LG = spacy.load("en_core_web_lg")
+toftrup_etal_2021 = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(toftrup_etal_2021)
 
 
 def predict(text: str) -> Dict[str, Union[str, Dict[str, float]]]:
@@ -15,8 +24,9 @@ def predict(text: str) -> Dict[str, Union[str, Dict[str, float]]]:
     return:
         Dict[str, Union[str, Dict[str, float]]]: each token within the sentence associated to its label
     """
-
-    document = EN_CORE_WEB_LG(text)
+    detected_language = toftrup_etal_2021.predict(sentence)["prediction"]
+    nlp = load_spacy_language_model(language)
+    document = nlp(text)
 
     prediction_raw = []
     prediction = []
