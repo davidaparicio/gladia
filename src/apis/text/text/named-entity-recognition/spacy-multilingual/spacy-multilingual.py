@@ -1,4 +1,5 @@
 import importlib.util
+import os
 from typing import Dict, Union
 import os
 from gladia_api_utils.model_management import load_spacy_language_model
