@@ -39,6 +39,11 @@ def predict(audio: str) -> Dict[str, str]:
     except Exception as e:
         logger.error(error_msg.format(e=e))
 
+        return {
+            "prediction": "Error while loading pipeline",
+            "prediction_raw": error_msg.format(e=e),
+        }
+
     audio_segment = AudioSegment.from_file(audio)
 
     tmp_file = get_tmp_filename()
