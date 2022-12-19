@@ -5,6 +5,7 @@ import os
 import re
 import subprocess
 import tempfile
+import filecmp
 from logging import getLogger
 from typing import List, Tuple
 
@@ -155,36 +156,39 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
 
     os.link(temporary_file.name, temporary_file.name + ".yaml")
 
-    try:
+    if os.path.isdir(os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)) and not filecmp.cmp(temporary_file.name + ".yaml", os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name, f"{env_name}.yaml")):
+        try:
 
-        cmd_to_exec = "create"
+            cmd_to_exec = "create"
 
-        if os.path.isdir(os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)):
-            cmd_to_exec = "update"
+            if os.path.isdir(os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)):
+                cmd_to_exec = "update"
 
-        subprocess.run(
-            f"micromamba {cmd_to_exec} -f {temporary_file.name  + '.yaml'} -y".split(" "),
-            check=True,
-        )
+            subprocess.run(
+                f"micromamba {cmd_to_exec} -f {temporary_file.name  + '.yaml'} -y".split(" "),
+                check=True,
+            )
 
-        subprocess.run(
-            f"micromamba clean --all --yes".split(" "),
-            check=True,
-        )
-        logger.info(f"Env {env_name} has been successfully {cmd_to_exec}d")
+            subprocess.run(
+                f"micromamba clean --all --yes".split(" "),
+                check=True,
+            )
+            logger.info(f"Env {env_name} has been successfully {cmd_to_exec}d")
 
-    except subprocess.CalledProcessError as error:
-        raise RuntimeError(f"Couldn't create env {env_name}: {error}")
+        except subprocess.CalledProcessError as error:
+            raise RuntimeError(f"Couldn't create env {env_name}: {error}")
 
-    finally:
-        shutil.copyfile(
-            src=temporary_file.name + ".yaml",
-            dst=os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name, f"{env_name}.yaml")
-        )
+        finally:
+            shutil.copyfile(
+                src=temporary_file.name + ".yaml",
+                dst=os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name, f"{env_name}.yaml")
+            )
 
-        os.remove(temporary_file.name)
-        os.remove(temporary_file.name + ".yaml")
+            os.remove(temporary_file.name)
+            os.remove(temporary_file.name + ".yaml")
 
+    else:
+        logger.info(f"Env {env_name} already up to date.")
 
 def build_specific_envs(paths: List[str]) -> None:
     """
