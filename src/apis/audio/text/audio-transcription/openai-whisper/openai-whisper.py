@@ -62,13 +62,13 @@ def predict(
         prediction_raw = list()
         prediction = ""
         for segment, speaker, sentence in final_result:
-            prediction += sentence
+            prediction += sentence.strip()
             prediction_raw.append(
                 {
                     "start": f"{segment.start:.2f}",
                     "end": f"{segment.end:.2f}",
                     "speaker": speaker,
-                    "sentence": sentence,
+                    "sentence": sentence.strip(),
                 }
             )
 
