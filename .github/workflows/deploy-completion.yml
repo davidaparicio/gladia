@@ -30,10 +30,10 @@ jobs:
         uses: rtCamp/action-slack-notify@v2.2.0
         env:
           SLACK_CHANNEL: #releases
-          SLACK_COLOR: ${{ needs.get-info.outpus.prOutcome }}
+          SLACK_COLOR: ${{ needs.get-info.outputs.prOutcome }}
           SLACK_USERNAME: gladia-ai-ci
-          SLACK_TITLE: "New Docker Hub Release :rocket:"
-          SLACK_MESSAGE: ${{ needs.get-info.outpus.prtitle }}
+          SLACK_TITLE: "New Gladia Image Released :rocket:"
+          SLACK_MESSAGE: ${{ needs.get-info.outputs.prtitle }}
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_ICON_EMOJI: ":rocket:"
 
