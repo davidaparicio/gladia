@@ -9,11 +9,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DOCKER_BUILD_CACHE: ""
+  DOCKER_BUILD_NO_CACHE: 'false'
+  DOCKER_BUILD_IMAGE_PATH: gladia/light
   DOCKER_BUILD_TAG: ci-${{ github.event.pull_request.number }}
-  DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE: ${DOCKER_GLADIA_FQDN}/gladia/base:latest
-  DOCKER_GLADIA_BUILD_NEEDED: false
-  DOCKER_BASE_BUILD_NEEDED: false
   DOCKER_RETENTION_HOURS: 72
   TEST_DEFAULT_MODELS_ONLY: "--default-models-only"
   TEST_DEFAULT_INPUTS_ONLY: "--default-inputs-only"
@@ -30,124 +28,47 @@ jobs:
   build:
     needs: [lint]
     if: |
-      !contains(github.event.pull_request.labels.*.name, 'ci') &&
-      !contains(github.event.pull_request.labels.*.name, 'doc')
+      !contains(github.event.pull_request.labels.*.name, 'type: ci') &&
+      !contains(github.event.pull_request.labels.*.name, 'type: documentation')
     runs-on: [self-hosted, build, persist]
-    # map steps output to job output
-    outputs:
-      dockerimage: ${{ steps.setoutput.outputs.dockerimage }}
     steps:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v2
 
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v29.0.3
-
-      # if base.Dockefile changed we need to rebuild the base image
-      - name: Check if base.Dockerfile must be rebuilt
-        if: |
-          contains(steps.changed-files.outputs.modified_files, 'base.Dockerfile') ||
-          contains(steps.changed-files.outputs.deleted_files, 'base.Dockerfile') ||
-          contains(github.event.pull_request.labels.*.name, 'ci: force-build-base')
-        run: |
-          echo "DOCKER_BASE_BUILD_NEEDED=true" >> $GITHUB_ENV
-          echo "DOCKER_GLADIA_BUILD_NEEDED=true" >> $GITHUB_ENV
-
-      - name: Label the PR if gladia-base needs a rebuild
-        uses: actions-ecosystem/action-add-labels@v1
-        if: |
-          env.DOCKER_BASE_BUILD_NEEDED == 'true'
-        with:
-          labels: "ci: build-base"
-
-      # if env.yaml was changed we need to rebuild micromamba envs or
-      # if gpu.Dockefile changed we need to rebuild the gladia image
-      - name: Check if gpu.Dockerfile must be rebuilt
-        if: |
-          contains(steps.changed-files.outputs.modified_files, 'env.yaml') ||
-          contains(steps.changed-files.outputs.deleted_files, 'env.yaml') ||
-          contains(steps.changed-files.outputs.modified_files, 'gpu.Dockerfile') ||
-          contains(steps.changed-files.outputs.deleted_files, 'gpu.Dockerfile') ||
-          contains(github.event.pull_request.labels.*.name, 'ci: force-build-gladia')
-        run: |
-          echo "DOCKER_GLADIA_BUILD_NEEDED=true" >> $GITHUB_ENV
-
-      # override DOCKER_BUILD_CACHE if "ci: force-no-cache" in labels
       - name: Force docker cache invalidation
-        id: set-cache-option
         if: |
           contains(github.event.pull_request.labels.*.name, 'ci: force-no-cache')
         run: |
-          echo "DOCKER_BUILD_CACHE=--no-cache" >> $GITHUB_ENV
+          echo "DOCKER_BUILD_NO_CACHE='true'" >> $GITHUB_ENV
 
-      # if label is build-base or base.Dockerfile changed :
-      # build the base image
-      # push the base image to the gladia registry
-      # change: DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE to the new base image
-      - name: Build, Push and Tag Gladia Base image if label is build-base or base.Dockerfile changed
-        id: build-base
-        if: |
-          contains(github.event.pull_request.labels.*.name, 'ci: build-base') ||
-          env.DOCKER_BASE_BUILD_NEEDED == 'true'
-        env:
-          DOCKER_BUILDKIT: 1
-        working-directory: ./src
-        run: >-
-          docker build --pull	
-          ${{env.DOCKER_BUILD_CACHE}}
-          -t ${DOCKER_GLADIA_FQDN}/gladia/base:${{env.DOCKER_BUILD_TAG}}
-          -f docker/base.Dockerfile
-          . &&
-          docker push ${DOCKER_GLADIA_FQDN}/gladia/base:${{env.DOCKER_BUILD_TAG}} &&
-          echo "DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE=${DOCKER_GLADIA_FQDN}/gladia/base:${{env.DOCKER_BUILD_TAG}}" >> $GITHUB_ENV
+      - name: assert ENV
+        run: |
+          echo "DOCKER_GLADIA_FQDN=$DOCKER_GLADIA_FQDN" >> $GITHUB_ENV
 
-      # if label is force-build-gladia or gpu.Dockerfile or *env.yaml changed :
-      # build the gladia image
-      # push the gladia image to the gladia registry
-      - name: Build, Push and Tag Gladia image if label is force-build-gladia or gpu.Dockerfile or env.yaml changed
-        id: build-force-gladia
-        if: |
-          contains(github.event.pull_request.labels.*.name, 'ci: force-build-gladia') ||
-          env.DOCKER_GLADIA_BUILD_NEEDED == 'true'
-        env:
-          DOCKER_BUILDKIT: 1
-        working-directory: ./src
-        run: >-
-          docker build --pull	${{env.DOCKER_BUILD_CACHE}}
-          --build-arg GLADIA_BASE_IMAGE=${{env.DOCKER_BUILD_ARGS_GLADIA_BASE_IMAGE}}
-          -t ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{env.DOCKER_BUILD_TAG}}
-          -f docker/gpu.Dockerfile
-          . &&
-          docker push ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{env.DOCKER_BUILD_TAG}}
+      - name: Set up Docker Context for Buildx
+        run: docker context create builders
 
-      # if label is not force-build-gladia and gpu.Dockerfile nor *env.yaml changed :
-      - name: Push and Tag Gladia image if label is not force-build-gladia nor gpu.Dockerfile nor env.yaml changed
-        id: build-noforce-gladia
-        if: |
-          !contains(github.event.pull_request.labels.*.name, 'ci: force-build-gladia') &&
-          env.DOCKER_GLADIA_BUILD_NEEDED == 'false'
-        env:
-          DOCKER_BUILDKIT: 1
-        working-directory: ./src
-        run: |-
-          { docker build --pull ${{env.DOCKER_BUILD_CACHE}}	-t ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{env.DOCKER_BUILD_TAG}} -f - . <<-EOF
-              FROM ${DOCKER_GLADIA_FQDN}/gladia/gladia:latest
-              COPY . /app/
-              ENTRYPOINT ["micromamba", "run", "-n", "server"]
-              CMD ["/app/run_server.sh"]
-          EOF
-          } && docker push ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{env.DOCKER_BUILD_TAG}}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
+          endpoint: builders
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: ./gladia/AIPI/internal-routing
+          file: ./gladia/AIPI/internal-routing/Dockerfile
+          push: true
+          no-cache: ${{env.DOCKER_BUILD_NO_CACHE}}
+          tags: ${{env.DOCKER_GLADIA_FQDN}}/${{env.DOCKER_BUILD_IMAGE_PATH}}:${{env.DOCKER_BUILD_IMAGE_TAG}}
 
       - name: Docker cleanup
         run: docker system prune -f -a --filter "until=${{env.DOCKER_RETENTION_HOURS}}h"
 
   test:
     needs: build
-    if: |
-      !contains(github.event.pull_request.labels.*.name, 'ci') &&
-      !contains(github.event.pull_request.labels.*.name, 'doc')
     runs-on: [self-hosted, gladia, test]
     timeout-minutes: 90
     steps:
@@ -189,12 +110,36 @@ jobs:
 
       # Wait for pod to start
       - name: Gladia container readiness
-        uses: nick-fields/retry@v2
-        with:
-          timeout_seconds: 1200
-          max_attempts: 120
-          retry_on: error
-          command: curl http://aipi-test-${{env.DOCKER_BUILD_TAG}}.$KNS:8000/v2/health/ready --connect-timeout 5
+        run: |
+          tryInit=200
+          while [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_TAG}} -o=jsonpath='{.status.conditions[?(@.type=="PodScheduled")].status}') != "False" ]]; do                                        ✔ │ 16:28:47  
+              if [ $tryInit -eq 0 ]; then
+                  printf "\nError: TIme out trying to scheduled the test pod. We might be out of GPUs. Retry and/or contact your favorite DevOps <3."
+                  exit 1
+              if [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_TAG}}) =~ "NotFound" ]]
+                  printf "\nError: Test pod disappeared while being scheduled. It probably failed to start. Check logs and/or test your build manually."
+                  exit 1
+              fi
+              printf "."
+              ((tryInit--))
+              sleep 10
+          done
+
+          tryReady=200
+          while [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_TAG}} -o=jsonpath='{.status.conditions[?(@.type=="Ready")].status}') != "False" ]]; do                                        ✔ │ 16:28:47  
+              if [ $tryReady -eq 0 ]; then
+                  printf "\nError: Test pod timed out while waiting for readyness. Check logs and/or test your build manually."
+                  exit 1
+              if [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_TAG}}) =~ "NotFound" ]]
+                  printf "\nError: Test pod disappeared while starting. Check logs and/or test your build manually."
+                  exit 1
+              fi
+              printf "."
+              ((tryReady--))
+              sleep 10
+          done
+
+          # Todo : test url
 
       - name: Run autogenerated tests
         run: >-
