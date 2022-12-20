@@ -52,9 +52,4 @@ jobs:
         run: |
           docker pull ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }} &&
           docker tag ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }} gladiaio/gladia:latest &&
-<<<<<<< HEAD
           docker push gladiaio/gladia:latest
-=======
-          docker push gladiaio/gladia:latest
-
->>>>>>> 9b925be6 (ci: remove deprecated steps)
