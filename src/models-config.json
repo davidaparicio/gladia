@@ -1,0 +1,110 @@
+{
+    "nltk": {
+        "tokenizers": {
+            "eng": {
+                "model": "punkt",
+                "preload": true
+            }
+        }
+    },
+    "spacy": {
+        "models": {
+            "cat": {
+                "model": "ca_core_news_sm",
+                "preload": true
+            },
+            "zho": {
+                "model": "zh_core_web_sm",
+                "preload": true
+            },
+            "hrv": {
+                "model": "hr_core_news_sm",
+                "preload": true
+            },
+            "dan": {
+                "model": "da_core_news_sm",
+                "preload": true
+            },
+            "nld": {
+                "model": "nl_core_news_sm",
+                "preload": true
+            },
+            "eng": {
+                "model": "en_core_web_sm",
+                "preload": true
+            },
+            "fin": {
+                "model": "fi_core_news_sm",
+                "preload": true
+            },
+            "fra": {
+                "model": "fr_core_news_sm",
+                "preload": true
+            },
+            "deu": {
+                "model": "de_core_news_sm",
+                "preload": true
+            },
+            "ell": {
+                "model": "el_core_news_sm",
+                "preload": true
+            },
+            "ita": {
+                "model": "it_core_news_sm",
+                "preload": true
+            },
+            "jpn": {
+                "model": "ja_core_news_sm",
+                "preload": true
+            },
+            "kor": {
+                "model": "ko_core_news_sm",
+                "preload": true
+            },
+            "ltu": {
+                "model": "lt_core_news_sm",
+                "preload": true
+            },
+            "mkd": {
+                "model": "mk_core_news_sm",
+                "preload": true
+            },
+            "nob": {
+                "model": "nb_core_news_sm",
+                "preload": true
+            },
+            "pol": {
+                "model": "pl_core_news_sm",
+                "preload": true
+            },
+            "por": {
+                "model": "pt_core_news_sm",
+                "preload": true
+            },
+            "ron": {
+                "model": "ro_core_news_sm",
+                "preload": true
+            },
+            "rus": {
+                "model": "ru_core_news_sm",
+                "preload": true
+            },
+            "spa": {
+                "model": "es_core_news_sm",
+                "preload": true
+            },
+            "swe": {
+                "model": "sv_core_news_sm",
+                "preload": true
+            },
+            "ukr": {
+                "model": "uk_core_news_sm",
+                "preload": true
+            },
+            "others": {
+                "model": "xx_ent_wiki_sm",
+                "preload": true
+            }
+        }
+    }
+}

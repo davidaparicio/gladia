@@ -17,7 +17,7 @@ from .file_management import (
     is_uncompressable,
     uncompress,
 )
-from .system import load_config
+from .system import load_models_config
 
 logger = getLogger(__name__)
 
@@ -26,8 +26,9 @@ GLADIA_TMP_MODEL_PATH = os.getenv("GLADIA_TMP_MODEL_PATH", "/tmp/gladia/models")
 GLADIA_SRC_PATH = os.getenv("GLADIA_SRC_PATH", "/app")
 SPACY_CACHE_DIR = os.getenv("SPACY_CACHE_DIR", "/gladia/spacy/models")
 
-config = load_config()
-SPACY_LANGUAGE_MODEL = config["spacy"]["models"]
+models_config = load_models_config()
+
+SPACY_LANGUAGE_MODEL = models_config["spacy"]["models"]
 
 
 def load_spacy_language_model(language: str) -> spacy.language.Language:

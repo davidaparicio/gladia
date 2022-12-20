@@ -1,0 +1,18 @@
+summary: 'Prompt beautifier for image generation turns a standard prompt into a prompt that is more suitable for image generation tasks.'
+
+default-model: "ms-promptist"
+
+inputs:
+  prompt:
+    type: str
+    placeholder: "Prompt to beautify"
+    examples:
+      - "A rabbit is wearing a space suit"
+      - "Several railroad tracks with one train passing by"
+      - "The roof is wet from the rain"
+      - "Cats dancing in a space club"
+
+output:
+  name: beautified_prompt
+  type: text
+  example: "A rabbit is wearing a space suit, digital Art, Greg rutkowski, Trending cinematographic artstation"
