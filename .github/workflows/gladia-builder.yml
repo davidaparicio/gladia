@@ -134,7 +134,7 @@ jobs:
                 printf "\nError: Test pod disappeared while starting. Check logs and/or test your build manually."
                 exit 1
               fi
-              echo" $tryReady "
+              echo "$tryReady "
               ((tryReady--))
               sleep 6
           done
