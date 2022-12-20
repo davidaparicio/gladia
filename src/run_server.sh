@@ -1,37 +1,52 @@
 #!/bin/bash
 MODE="${MODE:-standalone}"
 
-API_SERVER_PORT_HTTP="${API_SERVER_PORT_HTTP:-8080}"
-API_SERVER_WORKERS="${API_SERVER_WORKERS:-1}"
-API_SERVER_TIMEOUT="${API_SERVER_TIMEOUT:-1200}"
+P="\e[36m"
+G="\e[32m"
+EC="\e[0m"
 
-rm /usr/bin/python3 && \
-ln -s /usr/bin/python3.8 /usr/bin/python3
+if [ -f $MAMBA_ROOT_PREFIX/envs/server/server.yml ]; then
+        if ! cmp /app/env.yaml $MAMBA_ROOT_PREFIX/envs/server/server.yml; then
+                micromamba update -f env.yaml
+        else
+                echo -e "${G}micromamba server up to date.${EC}"
+        fi
+else
+        micromamba create -f env.yaml
+        cp /app/env.yaml $MAMBA_ROOT_PREFIX/envs/server/server.yml
+        # we need a better way to handle jax install, either in env or with dedicated check
+        micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]==0.3.25\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
+        micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
+fi
 
-GLADIA_TMP_PATH="${GLADIA_TMP_PATH:-/tmp/gladia}"
-GLADIA_TMP_MODEL_PATH="${GLADIA_TMP_MODEL_PATH:-$GLADIA_TMP_PATH/model}"
+export LD_LIBRARY_PATH=$MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/nvidia/cublas/lib/:$LD_LIBRARY_PATH
 
-MII_CACHE_PATH="${MII_CACHE_PATH:-$GLADIA_TMP_MODEL_PATH/mii/cache}"
-MII_MODEL_PATH="${MII_MODEL_PATH:-$GLADIA_TMP_MODEL_PATH/mii/models}"
+micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*' --debug_mode";
 
-GLADIA_TMP_TORCH_CACHE="${GLADIA_TMP_MODEL_PATH:-$GLADIA_TMP_PATH/torch_cache}"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/nvidia/cublas/lib/"
 
+echo -e "${P}== FIXING PROTOBUH ==${EC}" 
+wget https://raw.githubusercontent.com/protocolbuffers/protobuf/main/python/google/protobuf/internal/builder.py -O $MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/google/protobuf/internal/builder.py
 
-mkdir -p $GLADIA_TMP_TORCH_CACHE
-rm -rf /root/.cache/torch
-ln -s $GLADIA_TMP_TORCH_CACHE /root/.cache/torch 
+echo -e "${P}== ADJUSTING path rights ==${EC}" 
+chown -R $DOCKER_USER:$DOCKER_GROUP $PATH_TO_GLADIA_SRC 
+chown -R $DOCKER_USER:$DOCKER_GROUP $GLADIA_TMP_PATH 
 
-# init mii folders
-mkdir -p $MII_CACHE_PATH
-mkdir -p $MII_MODEL_PATH
+echo -e "${P}== FIXING libcurl references ==${EC}" 
+rm $MAMBA_ROOT_PREFIX/envs/server/lib/libcurl.so.4 
+ln -s /usr/lib/x86_64-linux-gnu/libcurl.so.4.6.0 $MAMBA_ROOT_PREFIX/envs/server/lib/libcurl.so.4 
+$CLEAN_LAYER_SCRIPT
 
+echo -e "${P}== Starting supervisor ==${EC}"
 service supervisor start
 
-# initialize the nltk database
-micromamba run -n server --cwd /app python prepare.py
+echo -e "${P}== Initialize the nltk database ==${EC}"
+micromamba run -n server --cwd /app python warm_up.py
 
+echo -e "${P}== Starting Gladia ==${EC}"
 micromamba run -n server --cwd /app gunicorn main:app \
--b 0.0.0.0:${API_SERVER_PORT_HTTP} \
---workers ${API_SERVER_WORKERS} \
+-b 0.0.0.0:${API_SERVER_PORT_HTTP:-8080} \
+--workers ${API_SERVER_WORKERS:-1} \
 --worker-class uvicorn.workers.UvicornWorker \
---timeout ${API_SERVER_TIMEOUT}
+--timeout ${API_SERVER_TIMEOUT:-1200}
