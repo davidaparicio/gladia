@@ -115,7 +115,7 @@ jobs:
                 printf "\nError: TIme out trying to scheduled the test pod. We might be out of GPUs. Retry and/or contact your favorite DevOps <3."
                 exit 1
               fi
-              if [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_TAG}}) =~ "NotFound" ]]
+              if [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_TAG}}) =~ "NotFound" ]]; then
                 printf "\nError: Test pod disappeared while being scheduled. It probably failed to start. Check logs and/or test your build manually."
                 exit 1
               fi
@@ -130,7 +130,7 @@ jobs:
                 printf "\nError: Test pod timed out while waiting for readyness. Check logs and/or test your build manually."
                 exit 1
               fi
-              if [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_TAG}}) =~ "NotFound" ]]
+              if [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_TAG}}) =~ "NotFound" ]]; then
                 printf "\nError: Test pod disappeared while starting. Check logs and/or test your build manually."
                 exit 1
               fi
