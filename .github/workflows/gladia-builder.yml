@@ -110,7 +110,7 @@ jobs:
       - name: Gladia container readiness
         run: |
           tryInit=50
-          while [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_IMAGE_TAG}} -o=jsonpath='{.status.conditions[?(@.type=="PodScheduled")].status}') != "False" ]]; do
+          while [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_IMAGE_TAG}} -o=jsonpath='{.status.conditions[?(@.type=="PodScheduled")].status}') != "True" ]]; do
               if [ $tryInit -eq 0 ]; then
                 printf "\nError: TIme out trying to scheduled the test pod. We might be out of GPUs. Retry and/or contact your favorite DevOps <3."
                 exit 1
@@ -125,7 +125,7 @@ jobs:
           done
 
           tryReady=200
-          while [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_IMAGE_TAG}} -o=jsonpath='{.status.conditions[?(@.type=="Ready")].status}') != "False" ]]; do
+          while [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_IMAGE_TAG}} -o=jsonpath='{.status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
               if [ $tryReady -eq 0 ]; then
                 printf "\nError: Test pod timed out while waiting for readyness. Check logs and/or test your build manually."
                 exit 1
