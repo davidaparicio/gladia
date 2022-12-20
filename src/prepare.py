@@ -21,9 +21,11 @@ def read_config(config_path: str) -> dict:
 
 
 def main():
-    config = read_config("config.json")
+    config = read_config("models-config.json")
 
-    nltk_warmup_list = ["punkt"]
+    nltk_warmup_list = [
+        model["model"] for model in config["nltk"]["tokenizers"].values()
+    ]
 
     spacy_warmup_list = [
         model["model"] for model in config["spacy"]["models"].values()
