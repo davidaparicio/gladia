@@ -77,7 +77,7 @@ jobs:
       # Prepare and start test env
       - name: Assert Template and NS
         run: |
-          sed "s/PRN/${{env.DOCKER_BUILD_TAG}}/g" /ci/test-aipi-podTemplate.yml > /tmp/test.yml
+          sed "s/PRN/${{env.DOCKER_BUILD_IMAGE_TAG}}/g" /ci/test-aipi-podTemplate.yml > /tmp/test.yml
 
       - name: Start test pod
         run: |
