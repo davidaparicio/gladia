@@ -50,6 +50,6 @@ jobs:
     steps:
       - name: Promote *gladia* image to DH Registry
         run: |
-          docker pull ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }} &&
-          docker tag ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }} gladiaio/gladia:latest &&
+          docker pull ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }}
+          docker tag ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }} gladiaio/gladia:latest
           docker push gladiaio/gladia:latest
