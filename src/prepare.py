@@ -67,13 +67,9 @@ def download_spacy_model(spacy_warmup_list: list) -> None:
         os.makedirs(SPACY_CACHE_DIR)
 
     for spacy_model in spacy_warmup_list:
-        # try:
-        #     __import__(spacy_model)
-        # except ImportError:
-        #     os.system("python -m spacy download {}".format(spacy_model))
         try:
             nlp = spacy.load(os.path.join(SPACY_CACHE_DIR, spacy_model))
-        except ModuleNotFoundError:
+        except OSError:
             spacy.cli.download(spacy_model)
             nlp = spacy.load(spacy_model)
             nlp.to_disk(os.path.join(SPACY_CACHE_DIR, spacy_model))
