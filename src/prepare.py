@@ -2,7 +2,7 @@ import json
 import os
 
 import nltk
-
+import spacy
 
 def read_config(config_path: str) -> dict:
     """
@@ -46,7 +46,7 @@ def download_nltk_data(nltk_warmup_list: list) -> None:
         try:
             nltk.data.find(f"tokenizers/{tokenizer}")
         except LookupError:
-            nltk.download(tokenizer)
+            nltk.download(tokenizer,download_dir=os.getenv("NLTK_DATA", "/gladia/nltk_data"))
 
 
 def download_spacy_model(spacy_warmup_list: list) -> None:
@@ -59,11 +59,21 @@ def download_spacy_model(spacy_warmup_list: list) -> None:
     Returns:
         None
     """
+    spacy_cache_dir=os.getenv("SPACY_CACHE_DIR", "/gladia/spacy/models")
+    if not os.path.exists(spacy_cache_dir):
+        os.makedirs(spacy_cache_dir)
+
     for spacy_model in spacy_warmup_list:
+        # try:
+        #     __import__(spacy_model)
+        # except ImportError:
+        #     os.system("python -m spacy download {}".format(spacy_model))
         try:
-            __import__(spacy_model)
-        except ImportError:
-            os.system("python -m spacy download {}".format(spacy_model))
+            nlp = spacy.load(os.path.join(spacy_cache_dir,spacy_model))
+        except OSError:
+            spacy.cli.download(spacy_model)
+            nlp = spacy.load(spacy_model)
+            nlp.to_disk(os.path.join(spacy_cache_dir,spacy_model))
 
 
 if __name__ == "__main__":
