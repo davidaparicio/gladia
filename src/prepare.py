@@ -24,7 +24,7 @@ def main():
     config = read_config("models-config.json")
 
     nltk_warmup_list = [
-        model["tokenizer"] for model in config["nltk"]["tokenizers"].values()
+        model["model"] for model in config["nltk"]["tokenizers"].values()
     ]
 
     spacy_warmup_list = [
