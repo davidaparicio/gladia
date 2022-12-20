@@ -15,17 +15,40 @@ from torch.cuda import is_available as cuda_is_available
 GLADIA_SRC_PATH = os.getenv("GLADIA_SRC_PATH", "/app")
 
 
+def load_json(path: str) -> dict:
+    """
+    Load a json file.
+
+    Args:
+        path (str): path to json file
+
+    Returns:
+        dict: json file as a dictionary
+    """
+
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    return data
+
 def load_config() -> dict:
     """Load the config.json file from the GLADIA_SRC_PATH.
 
     Returns:
         The config.json file as a dictionary.
     """
-    # load json file from GLADIA_SRC_PATH and return the dict
-    with open(os.path.join(GLADIA_SRC_PATH, "config.json"), "r") as f:
-        config = json.load(f)
+    return load_json(os.path.join(GLADIA_SRC_PATH, "config.json"))
 
-    return config
+def load_models_config() -> dict:
+    """
+    Load the models config from the GLADIA_SRC_PATH.
+    Args:
+        None
+
+    Returns:
+        dict: spacy config
+    """
+    return load_json(os.path.join(GLADIA_SRC_PATH, "models-config.json"))
 
 
 def copy(source: str, destination: str) -> None:
