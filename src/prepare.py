@@ -1,10 +1,16 @@
 import json
 import os
+import threading
 
 import nltk
 import spacy
 
+SPACY_CACHE_DIR = os.getenv("SPACY_CACHE_DIR", "/gladia/spacy/models")
+NLTK_DATA = os.getenv("NLTK_DATA", "/gladia/nltk_data")
 
+os.makedirs(SPACY_CACHE_DIR) if not os.path.exists(SPACY_CACHE_DIR) else None    
+os.makedirs(NLTK_DATA) if not os.path.exists(NLTK_DATA) else None
+        
 def read_config(config_path: str) -> dict:
     """
     Read config file
@@ -21,6 +27,17 @@ def read_config(config_path: str) -> dict:
 
 
 def main():
+    """
+    Perform setup tasks for the application.
+
+    This includes reading the configuration file, downloading necessary data and models for natural language processing
+    libraries, and any other setup tasks that need to be done before the application can be used.
+    Args:
+      None
+      
+    Returns:
+        None
+    """
     config = read_config("config.json")
 
     nltk_warmup_list = ["punkt"]
@@ -43,13 +60,22 @@ def download_nltk_data(nltk_warmup_list: list) -> None:
     Returns:
         None
     """
-    for tokenizer in nltk_warmup_list:
+    def _download_data(tokenizer):
         try:
             nltk.data.find(f"tokenizers/{tokenizer}")
         except LookupError:
             nltk.download(
-                tokenizer, download_dir=os.getenv("NLTK_DATA", "/gladia/nltk_data")
+                tokenizer, download_dir=NLTK_DATA
             )
+
+    threads = []
+    for tokenizer in nltk_warmup_list:
+        t = threading.Thread(target=_download_data, args=(tokenizer,))
+        threads.append(t)
+        t.start()
+
+    for t in threads:
+        t.join()
 
 
 def download_spacy_model(spacy_warmup_list: list) -> None:
@@ -62,17 +88,22 @@ def download_spacy_model(spacy_warmup_list: list) -> None:
     Returns:
         None
     """
-    SPACY_CACHE_DIR = os.getenv("SPACY_CACHE_DIR", "/gladia/spacy/models")
-    if not os.path.exists(SPACY_CACHE_DIR):
-        os.makedirs(SPACY_CACHE_DIR)
-
-    for spacy_model in spacy_warmup_list:
+    def _download_model(spacy_model):
         try:
             nlp = spacy.load(os.path.join(SPACY_CACHE_DIR, spacy_model))
         except OSError:
             spacy.cli.download(spacy_model)
             nlp = spacy.load(spacy_model)
             nlp.to_disk(os.path.join(SPACY_CACHE_DIR, spacy_model))
+
+    threads = []
+    for spacy_model in spacy_warmup_list:
+        t = threading.Thread(target=_download_model, args=(spacy_model,))
+        threads.append(t)
+        t.start()
+
+    for t in threads:
+        t.join()
 
 
 if __name__ == "__main__":
