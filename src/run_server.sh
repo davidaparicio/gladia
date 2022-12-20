@@ -7,6 +7,8 @@ SPACY_CACHE_PURGE="${SPACY_CACHE_PURGE:-false}"
 NLTK_DATA="${NLTK_DATA:-/gladia/nltk_data}"
 NLTK_CACHE_PURGE="${NLTK_CACHE_PURGE:-false}"
 
+PATH_TO_GLADIA_SRC="${PATH_TO_GLADIA_SRC:-/app}"
+
 cat tools/version/${GLADIA_VARIANT:-lite}.txt
 echo build: $(cat tools/version/build)
 
@@ -17,20 +19,20 @@ R="\e[31m"
 EC="\e[0m"
 echo -e "${P}== INIT Micromamba Server Env ==${EC}"
 if [ -f $MAMBA_ROOT_PREFIX/envs/server/server.yml ]; then
-    if ! cmp /app/env.yaml $MAMBA_ROOT_PREFIX/envs/server/server.yml; then
+    if ! cmp $PATH_TO_GLADIA_SRC/env.yaml $MAMBA_ROOT_PREFIX/envs/server/server.yml; then
         echo -e "${C}Updating micromamba server env.${EC}"
         micromamba update -f env.yaml
         # we need a better way to handle jax install, either in env or with dedicated check
         micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]==0.3.25\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
         micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
-        cp /app/env.yaml $MAMBA_ROOT_PREFIX/envs/server/server.yml
+        cp $PATH_TO_GLADIA_SRC/env.yaml $MAMBA_ROOT_PREFIX/envs/server/server.yml
     else
         echo -e "${G}Micromamba server already up to date.${EC}"
     fi
 else
     echo -e "${G}Creating micromamba server.${EC}"
     micromamba create -f env.yaml
-    cp /app/env.yaml $MAMBA_ROOT_PREFIX/envs/server/server.yml
+    cp $PATH_TO_GLADIA_SRC/env.yaml $MAMBA_ROOT_PREFIX/envs/server/server.yml
     # we need a better way to handle jax install, either in env or with dedicated check
     micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]==0.3.25\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
     micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
@@ -68,10 +70,10 @@ if [ "$NLTK_CACHE_PURGE" == "true" ]; then
     echo -e "${R}Purging NLTK cache.${EC}"
     rm -rvf $NLTK_DATA
 fi
-micromamba run -n server --cwd /app python prepare.py
+micromamba run -n server --cwd $PATH_TO_GLADIA_SRC python prepare.py
 
 echo -e "${P}== START Gladia ==${EC}"
-micromamba run -n server --cwd /app gunicorn main:app \
+micromamba run -n server --cwd $PATH_TO_GLADIA_SRC gunicorn main:app \
 -b 0.0.0.0:${API_SERVER_PORT_HTTP:-8080} \
 --workers ${API_SERVER_WORKERS:-1} \
 --worker-class uvicorn.workers.UvicornWorker \
