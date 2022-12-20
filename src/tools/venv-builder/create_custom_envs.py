@@ -1,11 +1,11 @@
-import shutil
 import argparse
+import filecmp
 import logging
 import os
 import re
+import shutil
 import subprocess
 import tempfile
-import filecmp
 from logging import getLogger
 from typing import List, Tuple
 
@@ -156,16 +156,27 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
 
     os.link(temporary_file.name, temporary_file.name + ".yaml")
 
-    if os.path.isdir(os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)) and not filecmp.cmp(temporary_file.name + ".yaml", os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name, f"{env_name}.yaml")):
+    if os.path.isdir(
+        os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)
+    ) and not filecmp.cmp(
+        temporary_file.name + ".yaml",
+        os.path.join(
+            os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name, f"{env_name}.yaml"
+        ),
+    ):
         try:
 
             cmd_to_exec = "create"
 
-            if os.path.isdir(os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)):
+            if os.path.isdir(
+                os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)
+            ):
                 cmd_to_exec = "update"
 
             subprocess.run(
-                f"micromamba {cmd_to_exec} -f {temporary_file.name  + '.yaml'} -y".split(" "),
+                f"micromamba {cmd_to_exec} -f {temporary_file.name  + '.yaml'} -y".split(
+                    " "
+                ),
                 check=True,
             )
 
@@ -181,7 +192,9 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
         finally:
             shutil.copyfile(
                 src=temporary_file.name + ".yaml",
-                dst=os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name, f"{env_name}.yaml")
+                dst=os.path.join(
+                    os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name, f"{env_name}.yaml"
+                ),
             )
 
             os.remove(temporary_file.name)
@@ -189,6 +202,7 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
 
     else:
         logger.info(f"Env {env_name} already up to date.")
+
 
 def build_specific_envs(paths: List[str]) -> None:
     """
