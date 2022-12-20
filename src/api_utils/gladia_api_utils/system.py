@@ -31,6 +31,7 @@ def load_json(path: str) -> dict:
 
     return data
 
+
 def load_config() -> dict:
     """Load the config.json file from the GLADIA_SRC_PATH.
 
@@ -38,6 +39,7 @@ def load_config() -> dict:
         The config.json file as a dictionary.
     """
     return load_json(os.path.join(GLADIA_SRC_PATH, "config.json"))
+
 
 def load_models_config() -> dict:
     """
