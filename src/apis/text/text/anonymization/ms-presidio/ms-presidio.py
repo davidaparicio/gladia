@@ -89,17 +89,19 @@ def predict(text: str, language: str = "xx", entities: str = "") -> Dict[str, st
     """
     language = language.lower()
     entities = entities.upper().replace(" ", "").split(",")
+    SPACY_CACHE_DIR = os.getenv("SPACY_CACHE_DIR", "/gladia/spacy/models")
 
     if language in language_model_mapping:
         try:
-            spacy.load(language_model_mapping[language])
+            spacy.load(os.path.join(SPACY_CACHE_DIR,language_model_mapping[language]))
         except:
             logger.info(
                 f"Language {language} loading failing trying to download from cli."
             )
 
             spacy.cli.download(language_model_mapping[language])
-            spacy.load(language_model_mapping[language])
+            nlp = spacy.load(language_model_mapping[language])
+            nlp.to_disk(os.path.join(SPACY_CACHE_DIR,language_model_mapping[language]))
 
         analyzer = AnalyzerEngine()
 

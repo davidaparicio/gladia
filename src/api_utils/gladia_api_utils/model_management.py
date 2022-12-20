@@ -24,7 +24,7 @@ logger = getLogger(__name__)
 
 GLADIA_TMP_MODEL_PATH = os.getenv("GLADIA_TMP_MODEL_PATH", "/tmp/gladia/models")
 GLADIA_SRC_PATH = os.getenv("GLADIA_SRC_PATH", "/app")
-
+SPACY_CACHE_DIR = os.getenv("SPACY_CACHE_DIR", "/gladia/spacy/models")
 
 config = load_config()
 SPACY_LANGUAGE_MODEL = config["spacy"]["models"]
@@ -45,12 +45,12 @@ def load_spacy_language_model(language: str) -> spacy.language.Language:
     language_model = SPACY_LANGUAGE_MODEL[language]["model"]
 
     try:
-        nlp = spacy.load(language_model)
-
+        nlp = spacy.load(os.path.join(SPACY_CACHE_DIR,language_model))
     except ModuleNotFoundError:
         logger.info(f"Download spacy model {language_model}")
-        os.system(f"python -m spacy download {language_model}")
+        spacy.cli.download(language_model)
         nlp = spacy.load(language_model)
+        nlp.to_disk(os.path.join(SPACY_CACHE_DIR,language_model))
 
     return nlp
 
