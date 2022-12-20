@@ -152,7 +152,7 @@ RUN mv $PATH_TO_GLADIA_SRC/tools/docker/_activate_current_env.sh /usr/local/bin/
     echo "source /usr/local/bin/_activate_current_env.sh" >> /etc/skel/.bashrc && \
     echo "micromamba activate server" >> ~/.bashrc
 
-RUN echo $GLADIA_BUILD > tools/version/build
+RUN echo $GLADIA_BUILD > $PATH_TO_GLADIA_SRC/tools/version/build
 
 WORKDIR $PATH_TO_GLADIA_SRC
 
