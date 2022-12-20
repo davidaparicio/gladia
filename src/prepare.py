@@ -1,5 +1,6 @@
 import json
 import os
+import threading
 
 import nltk
 
@@ -42,11 +43,21 @@ def download_nltk_data(nltk_warmup_list: list) -> None:
     Returns:
         None
     """
-    for tokenizer in nltk_warmup_list:
+
+    def _download_data(tokenizer):
         try:
             nltk.data.find(f"tokenizers/{tokenizer}")
         except LookupError:
             nltk.download(tokenizer)
+
+    threads = []
+    for tokenizer in nltk_warmup_list:
+        t = threading.Thread(target=_download_data, args=(tokenizer,))
+        threads.append(t)
+        t.start()
+
+    for t in threads:
+        t.join()
 
 
 def download_spacy_model(spacy_warmup_list: list) -> None:
@@ -59,11 +70,21 @@ def download_spacy_model(spacy_warmup_list: list) -> None:
     Returns:
         None
     """
-    for spacy_model in spacy_warmup_list:
+
+    def _download_model(spacy_model):
         try:
             __import__(spacy_model)
         except ImportError:
             os.system("python -m spacy download {}".format(spacy_model))
+
+    threads = []
+    for spacy_model in spacy_warmup_list:
+        t = threading.Thread(target=_download_model, args=(spacy_model,))
+        threads.append(t)
+        t.start()
+
+    for t in threads:
+        t.join()
 
 
 if __name__ == "__main__":
