@@ -1,9 +1,9 @@
 import json
 import os
+import threading
 
 import nltk
-import os
-import threading
+
 
 def read_config(config_path: str) -> dict:
     """
@@ -43,6 +43,7 @@ def download_nltk_data(nltk_warmup_list: list) -> None:
     Returns:
         None
     """
+
     def _download_data(tokenizer):
         try:
             nltk.data.find(f"tokenizers/{tokenizer}")
@@ -69,6 +70,7 @@ def download_spacy_model(spacy_warmup_list: list) -> None:
     Returns:
         None
     """
+
     def _download_model(spacy_model):
         try:
             __import__(spacy_model)
