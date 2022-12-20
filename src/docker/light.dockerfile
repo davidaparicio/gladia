@@ -20,6 +20,7 @@ ARG API_SERVER_PORT_HTTP=8080
 ARG MAMBA_ALWAYS_SOFTLINK="true"
 ARG CLEAN_LAYER_SCRIPT=$PATH_TO_GLADIA_SRC/tools/docker/clean-layer.sh
 ARG VENV_BUILDER_PATH=$PATH_TO_GLADIA_SRC/tools/venv-builder/
+ARG GLADIA_BUILD="unknown"
 
 ENV PATH_TO_GLADIA_SRC=$PATH_TO_GLADIA_SRC \
     VENV_BUILDER_PATH=$VENV_BUILDER_PATH \
@@ -150,6 +151,8 @@ RUN mv $PATH_TO_GLADIA_SRC/tools/docker/_activate_current_env.sh /usr/local/bin/
     echo "source /usr/local/bin/_activate_current_env.sh" >> ~/.bashrc && \
     echo "source /usr/local/bin/_activate_current_env.sh" >> /etc/skel/.bashrc && \
     echo "micromamba activate server" >> ~/.bashrc
+
+RUN echo $GLADIA_BUILD > tools/version/build
 
 WORKDIR $PATH_TO_GLADIA_SRC
 

@@ -62,6 +62,8 @@ jobs:
           file: ./gladia/AIPI/internal-routing/Dockerfile
           push: true
           no-cache: ${{env.DOCKER_BUILD_NO_CACHE}}
+          build-args: |
+            GLADIA_BUILD=${{ github.event.pull_request.number }}
           tags: ${{env.DOCKER_GLADIA_FQDN}}/${{env.DOCKER_BUILD_IMAGE_PATH}}:${{env.DOCKER_BUILD_IMAGE_TAG}}
 
       - name: Docker cleanup
