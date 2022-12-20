@@ -1,7 +1,7 @@
 #!/bin/bash
 MODE="${MODE:-standalone}"
 
-cat tools/version/lite.txt
+cat tools/version/${GLADIA_VARIANT:-lite}.txt
 echo build: $(cat tools/version/build)
 
 P="\e[35m"
