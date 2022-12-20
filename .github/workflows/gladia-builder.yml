@@ -10,7 +10,7 @@ concurrency:
 
 env:
   DOCKER_BUILD_NO_CACHE: 'false'
-  DOCKER_BUILD_IMAGE_PATH: gladia/lite
+  DOCKER_BUILD_IMAGE_PATH: gladia/gladia
   DOCKER_BUILD_IMAGE_TAG: ci-${{ github.event.pull_request.number }}
   DOCKER_RETENTION_HOURS: 72
   TEST_DEFAULT_MODELS_ONLY: "--default-models-only"
