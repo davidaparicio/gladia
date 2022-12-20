@@ -10,8 +10,8 @@ concurrency:
 
 env:
   DOCKER_BUILD_NO_CACHE: 'false'
-  DOCKER_BUILD_IMAGE_PATH: gladia/light
-  DOCKER_BUILD_TAG: ci-${{ github.event.pull_request.number }}
+  DOCKER_BUILD_IMAGE_PATH: gladia/lite
+  DOCKER_BUILD_IMAGE_TAG: ci-${{ github.event.pull_request.number }}
   DOCKER_RETENTION_HOURS: 72
   TEST_DEFAULT_MODELS_ONLY: "--default-models-only"
   TEST_DEFAULT_INPUTS_ONLY: "--default-inputs-only"
@@ -58,8 +58,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ./gladia/AIPI/internal-routing
-          file: ./gladia/AIPI/internal-routing/Dockerfile
+          context: ./src
+          file: ./src/docker/lite.Dockerfile
           push: true
           no-cache: ${{env.DOCKER_BUILD_NO_CACHE}}
           build-args: |
@@ -114,7 +114,7 @@ jobs:
       - name: Gladia container readiness
         run: |
           tryInit=200
-          while [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_TAG}} -o=jsonpath='{.status.conditions[?(@.type=="PodScheduled")].status}') != "False" ]]; do                                        ✔ │ 16:28:47  
+          while [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_TAG}} -o=jsonpath='{.status.conditions[?(@.type=="PodScheduled")].status}') != "False" ]]; do
               if [ $tryInit -eq 0 ]; then
                   printf "\nError: TIme out trying to scheduled the test pod. We might be out of GPUs. Retry and/or contact your favorite DevOps <3."
                   exit 1
@@ -128,7 +128,7 @@ jobs:
           done
 
           tryReady=200
-          while [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_TAG}} -o=jsonpath='{.status.conditions[?(@.type=="Ready")].status}') != "False" ]]; do                                        ✔ │ 16:28:47  
+          while [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_TAG}} -o=jsonpath='{.status.conditions[?(@.type=="Ready")].status}') != "False" ]]; do
               if [ $tryReady -eq 0 ]; then
                   printf "\nError: Test pod timed out while waiting for readyness. Check logs and/or test your build manually."
                   exit 1
