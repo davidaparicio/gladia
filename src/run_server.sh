@@ -1,12 +1,19 @@
 #!/bin/bash
 MODE="${MODE:-standalone}"
 
+SPACY_CACHE_DIR="${SPACY_CACHE_DIR:-/gladia/spacy/models}"
+SPACY_CACHE_PURGE="${SPACY_CACHE_PURGE:-false}"
+
+NLTK_DATA="${NLTK_DATA:-/gladia/nltk_data}"
+NLTK_CACHE_PURGE="${NLTK_CACHE_PURGE:-false}"
+
 cat tools/version/${GLADIA_VARIANT:-lite}.txt
 echo build: $(cat tools/version/build)
 
 P="\e[35m"
 C="\e[36m"
 G="\e[32m"
+R="\e[31m"
 EC="\e[0m"
 echo -e "${P}== INIT Micromamba Server Env ==${EC}"
 if [ -f $MAMBA_ROOT_PREFIX/envs/server/server.yml ]; then
@@ -53,6 +60,14 @@ echo -e "${P}== START supervisor ==${EC}"
 service supervisor start
 
 echo -e "${P}== INIT nltk + Spacy ==${EC}"
+if [ "$SPACY_CACHE_PURGE" == "true" ]; then 
+    echo -e "${R}Purging Spacy cache.${EC}"
+    rm -rvf $SPACY_CACHE_DIR
+fi
+if [ "$NLTK_CACHE_PURGE" == "true" ]; then 
+    echo -e "${R}Purging NLTK cache.${EC}"
+    rm -rvf $NLTK_DATA
+fi
 micromamba run -n server --cwd /app python prepare.py
 
 echo -e "${P}== START Gladia ==${EC}"
