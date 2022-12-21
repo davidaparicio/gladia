@@ -168,17 +168,13 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
         os.path.join(MAMBA_ROOT_PREFIX, "envs", env_name)
     ) and not filecmp.cmp(
         temporary_file.name + ".yaml",
-        os.path.join(
-            MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}.yaml"
-        ),
+        os.path.join(MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}.yaml"),
     ):
         try:
 
             cmd_to_exec = "create"
 
-            if os.path.isdir(
-                os.path.join(MAMBA_ROOT_PREFIX, "envs", env_name)
-            ):
+            if os.path.isdir(os.path.join(MAMBA_ROOT_PREFIX, "envs", env_name)):
                 cmd_to_exec = "update"
 
             subprocess.run(
