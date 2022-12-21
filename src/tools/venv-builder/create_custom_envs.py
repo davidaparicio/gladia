@@ -1,5 +1,4 @@
 import argparse
-import filecmp
 import logging
 import os
 import re
@@ -190,14 +189,11 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
     finally:
         shutil.copyfile(
             src=temporary_file.name + ".yaml",
-            dst=os.path.join(
-                MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}.yaml"
-            ),
+            dst=os.path.join(MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}.yaml"),
         )
 
         os.remove(temporary_file.name)
         os.remove(temporary_file.name + ".yaml")
-
 
 
 def build_specific_envs(paths: List[str]) -> None:
