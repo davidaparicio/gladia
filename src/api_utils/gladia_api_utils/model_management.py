@@ -22,7 +22,7 @@ from .system import load_models_config
 logger = getLogger(__name__)
 
 
-GLADIA_TMP_MODEL_PATH = os.getenv("GLADIA_TMP_MODEL_PATH", "/tmp/gladia/models")
+GLADIA_MODEL_PATH = os.getenv("GLADIA_MODEL_PATH", "/gladia/models")
 GLADIA_SRC_PATH = os.getenv("GLADIA_SRC_PATH", "/app")
 SPACY_CACHE_DIR = os.getenv("SPACY_CACHE_DIR", "/gladia/spacy/models")
 
@@ -168,7 +168,7 @@ def create_folder_in_model_cache_directory(folder_path: str) -> str:
         namespace = sys._getframe(1).f_globals
         rel_path = str(os.path.dirname(namespace["__file__"]))
 
-        folder_path = GLADIA_TMP_MODEL_PATH + rel_path + "/" + folder_path
+        folder_path = GLADIA_MODEL_PATH + rel_path + "/" + folder_path
         logger.debug(f"Relative path detected, using {folder_path} as path")
 
     else:
@@ -209,7 +209,7 @@ def download_model(
         namespace = sys._getframe(1).f_globals
         rel_path = str(os.path.dirname(namespace["__file__"]))
 
-        output_path = GLADIA_TMP_MODEL_PATH + rel_path + "/" + output_path
+        output_path = GLADIA_MODEL_PATH + rel_path + "/" + output_path
         logger.debug(f"Relative path detected, using {output_path} as output path")
 
     if not os.path.exists(Path(output_path).parent):
@@ -262,7 +262,7 @@ def download_models(model_list: dict) -> dict:
     for key, model in model_list.items():
         if not os.path.isabs(model["output_path"]):
             model["output_path"] = os.path.join(
-                GLADIA_TMP_MODEL_PATH, rel_path, model["output_path"]
+                GLADIA_MODEL_PATH, rel_path, model["output_path"]
             )
 
             t = threading.Thread(

@@ -11,7 +11,6 @@ ARG SKIP_YARN_CACHE_CLEANING="false"
 ARG SKIP_NPM_CACHE_CLEANING="false"
 ARG SKIP_TMPFILES_CACHE_CLEANING="false"
 ARG GLADIA_TMP_PATH="/tmp/gladia"
-ARG GLADIA_TMP_MODEL_PATH=$GLADIA_TMP_PATH/models
 ARG GLADIA_PERSISTENT_PATH="/gladia"
 ARG PATH_TO_GLADIA_SRC="/app"
 ARG DOCKER_USER=root
@@ -24,16 +23,15 @@ ARG GLADIA_BUILD="unknown"
 
 ENV PATH_TO_GLADIA_SRC=$PATH_TO_GLADIA_SRC \
     VENV_BUILDER_PATH=$VENV_BUILDER_PATH \
-    GLADIA_TMP_PATH=$GLADIA_TMP_PATH \
-    GLADIA_TMP_MODEL_PATH=$GLADIA_TMP_PATH/model \
-    TRANSFORMERS_CACHE=$GLADIA_TMP_MODEL_PATH/transformers \
-    TORCH_HOME=$GLADIA_TMP_MODEL_PATH/torch/hub \
-    PYTORCH_TRANSFORMERS_CACHE=$GLADIA_TMP_MODEL_PATH/pytorch_transformers \
-    PYTORCH_PRETRAINED_BERT_CACHE=$GLADIA_TMP_MODEL_PATH/pytorch_pretrained_bert \
-    TORCH_HUB=$GLADIA_TMP_MODEL_PATH/torch/hub \
-    MII_CACHE_PATH=$GLADIA_TMP_MODEL_PATH/mii/cache \
-    MII_MODEL_PATH=$GLADIA_TMP_MODEL_PATH/mii/models \
-    NLTK_DATA=$GLADIA_PERSISTENT_PATH/nltk \    
+    GLADIA_MODEL_PATH=$GLADIA_PERSISTENT_PATH/model \
+    TRANSFORMERS_CACHE=$GLADIA_MODEL_PATH/transformers \
+    TORCH_HOME=$GLADIA_MODEL_PATH/torch/hub \
+    PYTORCH_TRANSFORMERS_CACHE=$GLADIA_MODEL_PATH/pytorch_transformers \
+    PYTORCH_PRETRAINED_BERT_CACHE=$GLADIA_MODEL_PATH/pytorch_pretrained_bert \
+    TORCH_HUB=$GLADIA_MODEL_PATH/torch/hub \
+    MII_CACHE_PATH=$GLADIA_MODEL_PATH/mii/cache \
+    MII_MODEL_PATH=$GLADIA_MODEL_PATH/mii/models \
+    NLTK_DATA=$GLADIA_PERSISTENT_PATH/nltk \
     PIPENV_VENV_IN_PROJECT="enabled" \
     TOKENIZERS_PARALLELISM="true" \
     LC_ALL="C.UTF-8" \
@@ -47,13 +45,15 @@ ENV PATH_TO_GLADIA_SRC=$PATH_TO_GLADIA_SRC \
     MAMBA_ALWAYS_YES=true \
     PATH=$PATH:/usr/local/bin/:$MAMBA_EXE \
     API_SERVER_WORKERS=1 \
-    API_SERVER_PORT_HTTP=$API_SERVER_PORT_HTTP \       
+    API_SERVER_PORT_HTTP=$API_SERVER_PORT_HTTP \
     TF_CPP_MIN_LOG_LEVEL=2 \
     CUDA_DEVICE_ORDER=PCI_BUS_ID \
     JAX_PLATFORM_NAME=gpu \
     XLA_PYTHON_CLIENT_PREALLOCATE=false
 
 RUN mkdir -p $GLADIA_TMP_PATH \
+             $GLADIA_PERSISTENT_PATH \
+             $GLADIA_MODEL_PATH \
              $TRANSFORMERS_CACHE \
              $PYTORCH_TRANSFORMERS_CACHE \
              $PYTORCH_PRETRAINED_BERT_CACHE \
@@ -139,7 +139,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
 
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH
 
-# TODO: this deepspeed fix should be implemented at the deepspeed 
+# TODO: this deepspeed fix should be implemented at the deepspeed
 # level later with a PR
 # here: https://github.com/microsoft/DeepSpeed-MII/blob/cd6a07f6f6616d2378b3e05c90ec7ba234b888f7/mii/deployment.py#L97
 RUN ln -s $MII_MODEL_PATH /tmp/mii_models
@@ -158,4 +158,4 @@ WORKDIR $PATH_TO_GLADIA_SRC
 
 ENTRYPOINT ["micromamba", "run", "-n", "server"]
 
-CMD ["/app/run_server.sh"]
+CMD ["$PATH_TO_GLADIA_SRC/run_server.sh"]

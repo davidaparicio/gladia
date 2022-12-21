@@ -51,7 +51,7 @@ class SpeechToTextEngine:
         app_prefix = "/".join(app_prefix[1:].split("/")[:3])
 
         model_path_prefix = os.path.join(
-            os.getenv("GLADIA_TMP_MODEL_PATH", "/tmp/gladia/models"),
+            os.getenv("GLADIA_MODEL_PATH", "/gladia/models"),
             app_prefix,
             "audio",
             "text",
