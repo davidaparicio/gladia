@@ -1,6 +1,7 @@
 import json
 import os
 import threading
+from termcolor import colored
 
 import nltk
 import spacy
@@ -66,9 +67,13 @@ def download_nltk_data(nltk_warmup_list: list) -> None:
 
     def _download_data(tokenizer):
         try:
+            print(colored(f"NLTK/{tokenizer}: ", 'cyan'), end='')
             nltk.data.find(f"tokenizers/{tokenizer}")
         except LookupError:
+            print(colored(f"download", 'orange'))
             nltk.download(tokenizer, download_dir=NLTK_DATA)
+        else:
+            print(colored(f"cache", 'green'))
 
     threads = []
     for tokenizer in nltk_warmup_list:
@@ -93,11 +98,15 @@ def download_spacy_model(spacy_warmup_list: list) -> None:
 
     def _download_model(spacy_model):
         try:
+            print(colored(f"Spacy/{spacy_model}: ", 'cyan'), end='')
             nlp = spacy.load(os.path.join(SPACY_CACHE_DIR, spacy_model))
         except OSError:
+            print(colored(f"download", 'orange'))
             spacy.cli.download(spacy_model)
             nlp = spacy.load(spacy_model)
             nlp.to_disk(os.path.join(SPACY_CACHE_DIR, spacy_model))
+        else:
+            print(colored(f"cache", 'green'))
 
     threads = []
     for spacy_model in spacy_warmup_list:
