@@ -158,4 +158,4 @@ WORKDIR $PATH_TO_GLADIA_SRC
 
 ENTRYPOINT ["micromamba", "run", "-n", "server"]
 
-CMD ["$PATH_TO_GLADIA_SRC/run_server.sh"]
+CMD ["run_server.sh"]
