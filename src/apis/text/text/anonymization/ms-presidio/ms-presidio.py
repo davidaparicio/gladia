@@ -2,10 +2,9 @@ import json
 from logging import getLogger
 from typing import Dict
 
+from gladia_api_utils.model_management import get_spacy_language_code
 from presidio_analyzer import AnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine
-
-from gladia_api_utils.model_management import get_spacy_language_code
 
 logger = getLogger(__name__)
 
@@ -59,7 +58,9 @@ def predict(text: str, language: str = "xxx", entities: str = "") -> Dict[str, s
 
     # Call analyzer to get results
     if entities:
-        results = analyzer.analyze(text=text, entities=entities, language=spacy_language_code)
+        results = analyzer.analyze(
+            text=text, entities=entities, language=spacy_language_code
+        )
     else:
         results = analyzer.analyze(text=text, language=spacy_language_code)
 
