@@ -50,8 +50,7 @@ echo -e "${P}== FIX Protobuh ==${EC}"
 wget https://raw.githubusercontent.com/protocolbuffers/protobuf/main/python/google/protobuf/internal/builder.py -O $MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/google/protobuf/internal/builder.py
 
 echo -e "${P}== ADJUST path rights ==${EC}" 
-chown -R $DOCKER_USER:$DOCKER_GROUP $PATH_TO_GLADIA_SRC
-chown -R $DOCKER_USER:$DOCKER_GROUP $GLADIA_TMP_PATH
+chown -R $DOCKER_USER:$DOCKER_GROUP $PATH_TO_GLADIA_SRC $GLADIA_TMP_PATH $GLADIA_TMP_PATH $GLADIA_PERSISTENT_PATH
 
 echo -e "${P}== FIX libcurl references ==${EC}" 
 rm $MAMBA_ROOT_PREFIX/envs/server/lib/libcurl.so.4
