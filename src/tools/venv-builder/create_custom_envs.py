@@ -18,6 +18,9 @@ logger = getLogger(__name__)
 
 ENV_DEFAULT_FILENAME = "env.yaml"
 
+GLADIA_PERSISTENT_PATH = os.getenv("GLADIA_PERSISTENT_PATH", "/gladia")
+MAMBA_ROOT_PREFIX = os.getenv("MAMBA_ROOT_PREFIX", f"{GLADIA_PERSISTENT_PATH}/conda")
+
 
 def retrieve_package_from_env_file(env_file: dict) -> Tuple[List[str], List[str]]:
     """
@@ -157,11 +160,11 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
     os.link(temporary_file.name, temporary_file.name + ".yaml")
 
     if os.path.isdir(
-        os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)
+        os.path.join(MAMBA_ROOT_PREFIX, "envs", env_name)
     ) and not filecmp.cmp(
         temporary_file.name + ".yaml",
         os.path.join(
-            os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name, f"{env_name}.yaml"
+            MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}.yaml"
         ),
     ):
         try:
@@ -169,7 +172,7 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
             cmd_to_exec = "create"
 
             if os.path.isdir(
-                os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)
+                os.path.join(MAMBA_ROOT_PREFIX, "envs", env_name)
             ):
                 cmd_to_exec = "update"
 
@@ -193,7 +196,7 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
             shutil.copyfile(
                 src=temporary_file.name + ".yaml",
                 dst=os.path.join(
-                    os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name, f"{env_name}.yaml"
+                    MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}.yaml"
                 ),
             )
 

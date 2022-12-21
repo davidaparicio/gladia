@@ -1,13 +1,17 @@
 #!/bin/bash
 MODE="${MODE:-standalone}"
 
-SPACY_CACHE_DIR="${SPACY_CACHE_DIR:-/gladia/spacy/models}"
+PATH_TO_GLADIA_SRC="${PATH_TO_GLADIA_SRC:-/app}"
+
+GLADIA_PERSISTENT_PATH="${GLADIA_PERSISTENT_PATH:-/gladia}"
+
+SPACY_CACHE_DIR="${SPACY_CACHE_DIR:-$GLADIA_PERSISTENT_PATH/spacy/models}"
 SPACY_CACHE_PURGE="${SPACY_CACHE_PURGE:-false}"
 
-NLTK_DATA="${NLTK_DATA:-/gladia/nltk_data}"
+NLTK_DATA="${NLTK_DATA:-/$GLADIA_PERSISTENT_PATH/nltk_data}"
 NLTK_CACHE_PURGE="${NLTK_CACHE_PURGE:-false}"
 
-PATH_TO_GLADIA_SRC="${PATH_TO_GLADIA_SRC:-/app}"
+MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-/$GLADIA_PERSISTENT_PATH/conda}"
 
 cat tools/version/${GLADIA_VARIANT:-lite}.txt
 echo build: $(cat tools/version/build)
@@ -46,13 +50,13 @@ micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_c
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/nvidia/cublas/lib/"
 
-echo -e "${P}== FIX Protobuh ==${EC}" 
+echo -e "${P}== FIX Protobuh ==${EC}"
 wget https://raw.githubusercontent.com/protocolbuffers/protobuf/main/python/google/protobuf/internal/builder.py -O $MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/google/protobuf/internal/builder.py
 
-echo -e "${P}== ADJUST path rights ==${EC}" 
+echo -e "${P}== ADJUST path rights ==${EC}"
 chown -R $DOCKER_USER:$DOCKER_GROUP $PATH_TO_GLADIA_SRC $GLADIA_TMP_PATH $GLADIA_TMP_PATH $GLADIA_PERSISTENT_PATH
 
-echo -e "${P}== FIX libcurl references ==${EC}" 
+echo -e "${P}== FIX libcurl references ==${EC}"
 rm $MAMBA_ROOT_PREFIX/envs/server/lib/libcurl.so.4
 ln -s /usr/lib/x86_64-linux-gnu/libcurl.so.4.6.0 $MAMBA_ROOT_PREFIX/envs/server/lib/libcurl.so.4
 $CLEAN_LAYER_SCRIPT
@@ -61,11 +65,11 @@ echo -e "${P}== START supervisor ==${EC}"
 service supervisor start
 
 echo -e "${P}== INIT nltk + Spacy ==${EC}"
-if [ "$SPACY_CACHE_PURGE" == "true" ]; then 
+if [ "$SPACY_CACHE_PURGE" == "true" ]; then
     echo -e "${R}Purging Spacy cache.${EC}"
     rm -rvf $SPACY_CACHE_DIR
 fi
-if [ "$NLTK_CACHE_PURGE" == "true" ]; then 
+if [ "$NLTK_CACHE_PURGE" == "true" ]; then
     echo -e "${R}Purging NLTK cache.${EC}"
     rm -rvf $NLTK_DATA
 fi

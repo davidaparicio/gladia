@@ -17,6 +17,10 @@ SERVICE_PATH = "/etc/supervisor/conf.d/"
 LOGS_PATH = "/var/log/supervisor/"
 
 
+GLADIA_PERSISTENT_PATH = os.getenv("GLADIA_PERSISTENT_PATH", "/gladia")
+MAMBA_ROOT_PREFIX = os.getenv("MAMBA_ROOT_PREFIX", f"{GLADIA_PERSISTENT_PATH}/conda")
+
+
 def __create_subprocess_api_config(api_name_to_build: str) -> Tuple[str, str, str, int]:
     """
     Build the command to start a api for a subprocess
@@ -77,7 +81,6 @@ def __create_unit_file_for_api(api_name: str) -> str:
     # 2. get the path to the supervisor service
     service_file_path = os.path.join(SERVICE_PATH, f"{service_name}.conf")
     cwd = os.path.dirname(os.path.abspath(__file__))
-    mamba_root_prefix = os.getenv("MAMBA_ROOT_PREFIX", "/opt/conda")
 
     # 3. create the log file
     log_path = os.path.join(LOGS_PATH, f"{service_name}")
@@ -91,7 +94,7 @@ nodaemon=false
 [program:{service_name}]
 user=root
 directory={cwd}
-command=/usr/local/bin/micromamba run -r {mamba_root_prefix} -n {micromamba_env_name} --cwd={subprocess_api_dir} python3 {cwd}/fastapi_runner.py {port} {subprocess_api_dir}/{model_name}.py
+command=/usr/local/bin/micromamba run -r {MAMBA_ROOT_PREFIX} -n {micromamba_env_name} --cwd={subprocess_api_dir} python3 {cwd}/fastapi_runner.py {port} {subprocess_api_dir}/{model_name}.py
 stdout_logfile={log_path}
 stdout_logfile_maxbytes=0
 stderr_logfile={log_path}
@@ -132,7 +135,6 @@ def __enable_api_service() -> None:
     Returns:
         None
     """
-
     subprocess.run(["supervisorctl", "update"])
 
 
@@ -146,7 +148,6 @@ def __start_api_service(service_name: str) -> None:
     Returns:
         None
     """
-
     subprocess.run(["supervisorctl", "start", service_name])
 
 
@@ -174,7 +175,6 @@ def __get_api_port(api_name: str) -> Union[int, bool]:
     Returns:
         Union[int, bool]: Port of the subprocess api if it exists, False otherwise
     """
-
     port = os.getenv(__clean_name_for_env_var(api_name), False)
 
     if not port:

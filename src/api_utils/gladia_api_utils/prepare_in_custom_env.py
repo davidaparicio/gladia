@@ -5,6 +5,8 @@ from logging import getLogger
 
 logger = getLogger(__name__)
 
+GLADIA_PERSISTENT_PATH = os.getenv("GLADIA_PERSISTENT_PATH", "/gladia")
+MAMBA_ROOT_PREFIX = os.getenv("MAMBA_ROOT_PREFIX", f"{GLADIA_PERSISTENT_PATH}/conda")
 
 HELP_STRING = """
 python <PATH_TO_FILE>/prepare_in_custom_env.py <module_path> <model>
@@ -26,7 +28,7 @@ if __name__ == "__main__":
 
     os.environ[
         "LD_LIBRARY_PATH"
-    ] = "/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/opt/conda/lib"
+    ] = f"/usr/local/nvidia/lib64:/usr/local/cuda/lib64:{MAMBA_ROOT_PREFIX}/lib"
 
     # if module_path is not absolute
     # then prepend the PATH_TO_GLADIA_SRC

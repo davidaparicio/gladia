@@ -27,7 +27,7 @@ Once this is done, the next steps would be to follow instructions in the reposit
 
 Please see the [Claap video](https://app.claap.io/gladia/howto101-build-the-image-from-the-source-c-IPbrCarAMH-qixm_orQ84ZT).
 
-Provided that you cloned the repo, build your own Docker image. We are giving it a memorable user defined name ( `oboulant/mamba` ) in order to retrieve it later on
+Provided that you cloned the repo, build your own Docker image. We are giving it a memorable user defined name ( `johndoe/mamba` ) in order to retrieve it later on
 
 ```bash
 > git clone https://github.com/gladiaio/gladia.git
@@ -47,7 +47,7 @@ The `docker build` command may take some time to run since it is building the co
 Please see the [Claap video](https://app.claap.io/gladia/howto101-start-a-container-using-your-own-image-c-IPbrCarAMH-F_dxT_URkA7L).
 
 ```bash
-> docker run -it --gpus all -e CUDA_VISIBLE_DEVICES=0 --shm-size 8g -p 8080:8080 -v $PWD:/app --name whatever_name_dev oboulant/mamba /bin/bash
+> docker run -it --gpus all -e CUDA_VISIBLE_DEVICES=0 --shm-size 8g -p 8080:8080 -v $PWD:/app --name whatever_name_dev johndoe/mamba /bin/bash
 ```
 
 Few comments :
@@ -64,7 +64,7 @@ Few comments :
 ```
 
 * `-v $PWD:/app` tells docker to mount a volume on the container (more on this later on)
-* `oboulant/mamba` tells docker which `REPOSITORY` image to use
+* `johndoe/mamba` tells docker which `REPOSITORY` image to use
 * `/bin/bash` tells docker to start a bash console
 
 ## Start the Gladia server from within your own running container
