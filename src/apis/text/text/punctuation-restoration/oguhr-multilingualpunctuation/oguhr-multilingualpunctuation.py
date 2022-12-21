@@ -97,7 +97,7 @@ def restore_capitalization(sentence: str, language: str) -> str:
 
     Args:
         sentence (str): The input string to be capitalized
-        language (str): The language of the input string
+        language (str): The language of the input string ISO 639-3 code
 
     Returns:
         str: The capitalized string

@@ -13,6 +13,12 @@ NLTK_CACHE_PURGE="${NLTK_CACHE_PURGE:-false}"
 
 MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-/$GLADIA_PERSISTENT_PATH/conda}"
 
+for path in $PATH_TO_GLADIA_SRC $GLADIA_PERSISTENT_PATH $SPACY_CACHE_DIR $NLTK_DATA $MAMBA_ROOT_PREFIX; do
+    if [ ! -d $path ]; then
+        mkdir -p $path
+    fi
+done
+
 cat tools/version/${GLADIA_VARIANT:-lite}.txt
 echo build: $(cat tools/version/build)
 

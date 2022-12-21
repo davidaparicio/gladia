@@ -31,11 +31,28 @@ models_config = load_models_config()
 SPACY_LANGUAGE_MODEL = models_config["spacy"]["models"]
 
 
+def get_spacy_language_code(language_code: str) -> str:
+    """Get the spaCy language code for the specified language.
+
+    Args:
+        language_code (str): The 639-3 language code of the language to get the spaCy language code for. (e.g. "eng")
+
+    Returns:
+        str: The spaCy language code for the specified language.
+    """
+    if language_code not in SPACY_LANGUAGE_MODEL:
+        language_code = "xx"
+    else:
+        language_code = SPACY_LANGUAGE_MODEL["language_code"]["model"][:2]
+
+    return language_code
+
+
 def load_spacy_language_model(language: str) -> spacy.language.Language:
     """Load the spaCy natural language processing model for the specified language.
 
     Args:
-        language_code: The ISO 3 language code of the language to load the model for.
+        language_code: The 639-3 language code of the language to load the model for.
 
     Returns:
         The spaCy language model for the specified language.

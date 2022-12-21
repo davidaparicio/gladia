@@ -18,6 +18,7 @@ logger = getLogger(__name__)
 
 ENV_DEFAULT_FILENAME = "env.yaml"
 
+PATH_TO_GLADIA_SRC = os.getenv("PATH_TO_GLADIA_SRC", "/app/src")
 GLADIA_PERSISTENT_PATH = os.getenv("GLADIA_PERSISTENT_PATH", "/gladia")
 MAMBA_ROOT_PREFIX = os.getenv("MAMBA_ROOT_PREFIX", f"{GLADIA_PERSISTENT_PATH}/conda")
 
@@ -111,7 +112,6 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
     Raises:
         FileNotFoundError: The provided env file couldn't be found
     """
-
     logger.debug(f"Creating env : {env_name}")
 
     custom_env = yaml.safe_load(open(path_to_env_file, "r"))
@@ -151,6 +151,11 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
         pip_packages, channel_packages = retrieve_package_from_env_file(env_file)
 
         packages_to_install_from_pip += pip_packages
+
+        # install mandatory package gladia-api-utils to handle 
+        # input and output of the api natively
+        packages_to_install_from_pip += f"-e {PATH_TO_GLADIA_SRC}/api_utils/"
+
         packages_to_install_from_channel += channel_packages
 
     temporary_file = create_temp_env_file(
@@ -220,7 +225,6 @@ def build_specific_envs(paths: List[str]) -> None:
     Raises:
         FileNotFoundError: The profided model folder or env file couldn't be founded
     """
-
     paths = set(paths)
 
     for path in paths:
