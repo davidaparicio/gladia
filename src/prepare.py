@@ -4,6 +4,7 @@ import threading
 
 import nltk
 import spacy
+from termcolor import colored
 
 SPACY_CACHE_DIR = os.getenv("SPACY_CACHE_DIR", "/gladia/spacy/models")
 NLTK_DATA = os.getenv("NLTK_DATA", "/gladia/nltk_data")
@@ -98,7 +99,7 @@ def download_spacy_model(spacy_warmup_list: list) -> None:
 
     def _download_model(spacy_model):
         try:
-            print(colored(f"Spacy/{spacy_model}: ", 'cyan'), end='')
+            print(colored(f"Spacy/{spacy_model}: ", "cyan"), end="")
             nlp = spacy.load(os.path.join(SPACY_CACHE_DIR, spacy_model))
         except OSError:
             status = "download"
