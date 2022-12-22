@@ -154,7 +154,7 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
 
         # install mandatory package gladia-api-utils to handle
         # input and output of the api natively
-        packages_to_install_from_pip += f"-e {PATH_TO_GLADIA_SRC}/api_utils/"
+        packages_to_install_from_pip += [f"-e {PATH_TO_GLADIA_SRC}/api_utils/"]
 
         packages_to_install_from_channel += channel_packages
 
