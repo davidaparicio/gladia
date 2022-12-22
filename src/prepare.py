@@ -73,7 +73,7 @@ def download_nltk_data(nltk_warmup_list: list) -> None:
             nltk.download(tokenizer, download_dir=NLTK_DATA)
         else:
             status = "cache"
-        print("\033[31m" + f"NLTK/{tokenizer} > {status}" + "\033[39m")
+        print("\033[36m" + f"NLTK/{tokenizer} > {status}" + "\033[39m")
 
     threads = []
     for tokenizer in nltk_warmup_list:

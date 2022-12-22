@@ -29,16 +29,12 @@ R="\e[31m"
 EC="\e[0m"
 echo -e "${P}== INIT Micromamba Server Env ==${EC}"
 if [ -f $MAMBA_ROOT_PREFIX/envs/server/server.yml ]; then
-    if ! cmp $PATH_TO_GLADIA_SRC/env.yaml $MAMBA_ROOT_PREFIX/envs/server/server.yml; then
-        echo -e "${C}Updating micromamba server env.${EC}"
-        micromamba update -f env.yaml
-        # we need a better way to handle jax install, either in env or with dedicated check
-        micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]==0.3.25\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
-        micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
-        cp $PATH_TO_GLADIA_SRC/env.yaml $MAMBA_ROOT_PREFIX/envs/server/server.yml
-    else
-        echo -e "${G}Micromamba server already up to date.${EC}"
-    fi
+    echo -e "${C}Updating micromamba server env.${EC}"
+    micromamba update -f env.yaml
+    # we need a better way to handle jax install, either in env or with dedicated check
+    micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]==0.3.25\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
+    micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
+    cp $PATH_TO_GLADIA_SRC/env.yaml $MAMBA_ROOT_PREFIX/envs/server/server.yml
 else
     echo -e "${G}Creating micromamba server.${EC}"
     micromamba create -f env.yaml
