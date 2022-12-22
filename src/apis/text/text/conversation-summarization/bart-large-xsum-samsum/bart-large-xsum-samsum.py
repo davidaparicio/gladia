@@ -20,7 +20,7 @@ def predict(
     summarizer = pipeline("summarization", model="knkarthick/bart-large-xsum-samsum")
 
     chunk_size = int(len(text) // 3.5)
-    chunks = [text[i:i + chunk_size] for i in range(0, len(text), chunk_size)]
+    chunks = [text[i : i + chunk_size] for i in range(0, len(text), chunk_size)]
 
     predictions = []
     predictions_raw = []
