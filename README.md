@@ -88,6 +88,12 @@ $ docker run -d --gpus all --shm-size=5g -p 8080:8080 gladiaio/gladia:latest
 
 Your Gladia service is now available at [http://localhost:8080/docs](http://localhost:8080/docs)
 
+To avoid downloading all the packages between restart, it is highly recommend to mount a volume :
+
+```sh
+$ docker run -d --gpus all --shm-size=5g -v /path/to/storage:/gladia -p 8080:8080 gladiaio/gladia:latest
+```
+
 ## :mechanical_arm: Full Start
 
 if you want to get a taste of Gladia full power, use it with the integrations !
@@ -114,7 +120,7 @@ You're ready to go !
 # getting STABILITY_KEY here https://beta.dreamstudio.ai/membership
 # getting HUGGINGFACE_ACCESS_TOKEN here https://huggingface.co/settings/tokens
 
-$ docker run -d --gpus all --shm-size=5g -p 8080:8080 -e STABILITY_KEY=sk-***** -e HUGGINGFACE_ACCESS_TOKEN=hf_***** gladiaio/gladia:latest
+$ docker run -d --gpus all --shm-size=5g -p 8080:8080 -v /path/to/storage:/gladia -e STABILITY_KEY=sk-***** -e HUGGINGFACE_ACCESS_TOKEN=hf_***** gladiaio/gladia:latest
 
 ```
 
@@ -135,12 +141,12 @@ git clone https://github.com/gladiaio/gladia.git
 cd gladia/src
 
 #building the Docker Image
-docker build -t gladia -f gpu.Dockerfile .
+docker build -t gladia -f docker/lite.Dockerfile .
 ```
 
 ## Running the dev environement
 
-This will create a 'model' volume that will store, once and for all, the AI models
+In `src/docker` Update volumes paths in `docker-compose.yaml` to your needs, then :
 
 ```sh
 docker-compose down && \
@@ -156,7 +162,7 @@ docker-compose down
 
 ## Running the production environement
 
-This will create a 'model' volume that will store, once and for all, the AI models
+In `src/docker` Update volumes paths in `docker-compose.yaml` to your needs, then :
 
 ```sh
 docker-compose down && \
