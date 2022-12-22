@@ -2,8 +2,8 @@
 
 from typing import Dict
 
-from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
+from geopy.geocoders import Nominatim
 
 geolocator = Nominatim(user_agent="gladia")
 geocode = RateLimiter(geolocator.geocode, min_delay_seconds=2, max_retries=3)
