@@ -20,5 +20,7 @@ def predict(address: str) -> Dict[str, str]:
     """
 
     location = geocode(address, addressdetails=True)
+    if location is None:
+        return {"detail": "No address found for this input"}
 
     return {"prediction": location.address, "raw_prediction": location.raw}
