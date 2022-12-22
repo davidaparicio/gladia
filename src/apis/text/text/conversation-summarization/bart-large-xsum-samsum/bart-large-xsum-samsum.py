@@ -12,9 +12,6 @@ def predict(
 
     Args:
       text (str): text to summarize
-      source_language (str): language of the text
-      min_len (int): minimum length of the summary
-      max_len (int): maximum length of the summary
 
     Returns:
         Dict[str, str]: summary of the conversation
@@ -22,6 +19,14 @@ def predict(
 
     summarizer = pipeline("summarization", model="knkarthick/bart-large-xsum-samsum")
 
-    summary = summarizer(text)
+    chunk_size = int(len(text) // 3.5)
+    chunks = [text[i : i + chunk_size] for i in range(0, len(text), chunk_size)]
 
-    return {"prediction": summary[0]["summary_text"], "prediction_raw": summary}
+    predictions = []
+    predictions_raw = []
+    for chunk in chunks:
+        prediction = summarizer(chunk)
+        predictions.append(prediction[0]["summary_text"])
+        predictions_raw.append(prediction)
+
+    return {"prediction": " ".join(predictions), "prediction_raw": predictions_raw}
