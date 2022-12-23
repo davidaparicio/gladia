@@ -172,11 +172,7 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
             cmd_to_exec = "update"
             cmd_opts = "-a"
 
-        logger.info(
-            "\032[36m"
-            + f"Env {env_name} will be {cmd_to_exec}d"
-            + "\033[39m"
-        )
+        logger.info("\032[36m" + f"Env {env_name} will be {cmd_to_exec}d" + "\033[39m")
 
         subprocess.run(
             f"micromamba {cmd_to_exec} -f {temporary_file.name  + '.yaml'} {cmd_opts}".split(
