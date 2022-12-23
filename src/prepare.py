@@ -107,7 +107,7 @@ def download_spacy_model(spacy_warmup_list: list) -> None:
         else:
             status = "cache"
 
-        print("\033[31m" + f"NLTK/{spacy_model} > {status}" + "\033[39m")
+        print("\033[36m" + f"Spacy/{spacy_model} > {status}" + "\033[39m")
 
     threads = []
     for spacy_model in spacy_warmup_list:
