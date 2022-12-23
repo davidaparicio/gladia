@@ -17,6 +17,8 @@ ARG DOCKER_USER=root
 ARG DOCKER_GROUP=root
 ARG API_SERVER_PORT_HTTP=8080
 ARG MAMBA_ALWAYS_SOFTLINK="true"
+ARG MAMBA_ALLOW_UNINSTALL="true"
+ARG MAMBA_ALLOW_DOWNGRADE="true"
 ARG CLEAN_LAYER_SCRIPT=$PATH_TO_GLADIA_SRC/tools/docker/clean-layer.sh
 ARG VENV_BUILDER_PATH=$PATH_TO_GLADIA_SRC/tools/venv-builder/
 ARG GLADIA_BUILD="unknown"
@@ -133,6 +135,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
     mv bin/micromamba /usr/local/bin/micromamba && \
     micromamba shell init -s bash && \
     micromamba config set always_softlink $MAMBA_ALWAYS_SOFTLINK && \
+    micromamba config set allow-uninstall $MAMBA_ALLOW_UNINSTALL && \
+    micromamba config set allow-downgrade $MAMBA_ALLOW_DOWNGRADE && \
     git clone https://github.com/Tencent/rapidjson.git && \
     cd rapidjson && \
     cmake . && \
