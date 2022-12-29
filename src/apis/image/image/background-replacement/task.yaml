@@ -18,7 +18,7 @@ inputs:
       - "http://files.gladia.io/examples/image/image/bck-grd/green-forest.png"
 
   alignment:
-    type: enum
+    type: list
     placeholder: "Alignment to use"
     examples:
       - "center"
