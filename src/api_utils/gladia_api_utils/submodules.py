@@ -472,7 +472,9 @@ def create_description_for_the_endpoint_parameter(endpoint_param: dict) -> dict:
     }
 
     if endpoint_param["type"] in ARRAY_TYPES:
-        parameters_to_add[endpoint_param["name"]]["example"] = parameters_to_add[endpoint_param["name"]]["examples"]
+        parameters_to_add[endpoint_param["name"]]["example"] = parameters_to_add[
+            endpoint_param["name"]
+        ]["examples"]
 
     # TODO: add validator checking that file and file_url can both be empty
     if endpoint_param["type"] in FILE_TYPES:
