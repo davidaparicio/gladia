@@ -1065,7 +1065,6 @@ async def clean_kwargs_based_on_router_inputs(
                 kwargs[input_name] = kwargs[input_name][0].split(",")
             else:
                 kwargs[input_name] = list(kwargs[input_name])
-            print(kwargs[input_name])
         else:
 
             # don't use
