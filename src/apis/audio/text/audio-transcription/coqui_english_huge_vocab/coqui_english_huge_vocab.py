@@ -4,7 +4,8 @@ from gladia_api_utils.CoquiEngineHelper import SpeechToTextEngine
 from gladia_api_utils.io import _open
 
 
-def predict(audio: bytes, language: str = "eng", nb_speakers: int = 0
+def predict(
+    audio: bytes, language: str = "eng", nb_speakers: int = 0
 ) -> Dict[str, str]:
     """
     Predict the text from the audio: audio -> text for a given language.
