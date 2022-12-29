@@ -1,7 +1,7 @@
 # inspired from https://huggingface.co/spaces/ml6team/post-processing-summarization/
 from typing import Dict
 
-from transformers import pipeline
+from transformers import BartTokenizerFast, pipeline
 
 
 def predict(
@@ -19,8 +19,14 @@ def predict(
 
     summarizer = pipeline("summarization", model="knkarthick/bart-large-xsum-samsum")
 
-    chunk_size = int(len(text) // 3.5)
-    chunks = [text[i : i + chunk_size] for i in range(0, len(text), chunk_size)]
+    tok = BartTokenizerFast.from_pretrained("knkarthick/bart-large-xsum-samsum")
+
+    tokenized = tok(text, return_tensors="pt")
+    tensor = tokenized["input_ids"]
+
+    chunks = []
+    for i in range(0, tensor.shape[1], 1000):
+        chunks.append(tok.decode(tensor[0][i : i + 1000]))
 
     predictions = []
     predictions_raw = []
