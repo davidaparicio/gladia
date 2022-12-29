@@ -41,8 +41,10 @@ LIST_TYPES = ["list", "tuple", "set"]
 NUMBER_TYPES = ["number", "int", "integer"]
 DECIMAL_TYPES = ["float", "decimal"]
 BOOLEAN_TYPES = ["bool", "boolean"]
+ARRAY_TYPES = ["array"]
 SINGULAR_TYPES = FILE_TYPES + NUMBER_TYPES + DECIMAL_TYPES + BOOLEAN_TYPES
 
+# NOTE: On ARRAY_TYPES swagger will concatenate the array with a comma (,) but will normally work with separate objects in regular queries.
 
 # take several dictionaries in input and return a merged one
 def merge_dicts(*args: dict) -> dict:
@@ -413,6 +415,7 @@ def get_endpoint_parameter_type(parameter: dict) -> Any:
     type_correspondence.update({key: float for key in DECIMAL_TYPES})
     type_correspondence.update({key: bool for key in BOOLEAN_TYPES})
     type_correspondence.update({key: Optional[UploadFile] for key in FILE_TYPES})
+    type_correspondence.update({key: list for key in ARRAY_TYPES})
 
     parameter_type = type_correspondence.get(parameter["type"], None)
 
@@ -467,6 +470,9 @@ def create_description_for_the_endpoint_parameter(endpoint_param: dict) -> dict:
         else endpoint_param.get("examples", {}),
         "description": endpoint_param.get("placeholder", ""),
     }
+
+    if endpoint_param["type"] in ARRAY_TYPES:
+        parameters_to_add[endpoint_param["name"]]["example"] = parameters_to_add[endpoint_param["name"]]["examples"]
 
     # TODO: add validator checking that file and file_url can both be empty
     if endpoint_param["type"] in FILE_TYPES:
@@ -1053,6 +1059,13 @@ async def clean_kwargs_based_on_router_inputs(
                 del kwargs[f"{input_name}_url"]
         elif input_metadata["type"] in LIST_TYPES:
             kwargs[input_name] = str(kwargs[input_name].value)
+        elif input_metadata["type"] in ARRAY_TYPES:
+            if len(kwargs[input_name]) == 1:
+                # need to split at first string to works correctly in swagger (Swagger limitation)
+                kwargs[input_name] = kwargs[input_name][0].split(",")
+            else:
+                kwargs[input_name] = list(kwargs[input_name])
+            print(kwargs[input_name])
         else:
 
             # don't use
