@@ -20,12 +20,13 @@ error_msg = """Error while loading pipeline: {e}
 
 
 @input_to_files
-def predict(audio: str) -> Dict[str, str]:
+def predict(audio: str, nb_speakers: int = 0) -> Dict[str, str]:
     """
     Predict the text from the audio: audio -> text for a given language.
 
     Args:
         audio (bytes): The bytes audio to be transcribed.
+        nb_speakers (int): The number of speakers in the audio. If 0, the number of speakers is automatically detected.
 
     Outputs:
         Dict[str, str]: The text of the audio splitted into segmented speakers.
@@ -53,7 +54,11 @@ def predict(audio: str) -> Dict[str, str]:
     # Bytes are said to be supported but it doesn't work
     audio_segment.export(tmp_file, format="wav")
     try:
-        diarization = pipeline(tmp_file)
+        if nb_speakers > 0:
+            diarization = pipeline(tmp_file, num_speakers=nb_speakers)
+        else:
+            diarization = pipeline(tmp_file)
+
     except Exception as e:
         logger.error(f"Error while running pipeline: {e}")
         return {
