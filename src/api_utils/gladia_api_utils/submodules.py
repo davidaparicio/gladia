@@ -37,7 +37,7 @@ ENV_YAML = "env.yaml"
 
 FILE_TYPES = ["image", "audio", "video"]
 TEXT_TYPES = ["text", "str", "string"]
-LIST_TYPES = ["list", "tuple", "set"]
+ENUM_TYPES = ["enum"]
 NUMBER_TYPES = ["number", "int", "integer"]
 DECIMAL_TYPES = ["float", "decimal"]
 BOOLEAN_TYPES = ["bool", "boolean"]
@@ -411,7 +411,7 @@ def get_endpoint_parameter_type(parameter: dict) -> Any:
 
     type_correspondence = {key: str for key in TEXT_TYPES}
     type_correspondence.update({key: int for key in NUMBER_TYPES})
-    type_correspondence.update({key: Enum for key in LIST_TYPES})
+    type_correspondence.update({key: Enum for key in ENUM_TYPES})
     type_correspondence.update({key: float for key in DECIMAL_TYPES})
     type_correspondence.update({key: bool for key in BOOLEAN_TYPES})
     type_correspondence.update({key: Optional[UploadFile] for key in FILE_TYPES})
@@ -1057,7 +1057,7 @@ async def clean_kwargs_based_on_router_inputs(
             # remove the url arg to avoid it to be passed in predict
             if f"{input_name}_url" in kwargs:
                 del kwargs[f"{input_name}_url"]
-        elif input_metadata["type"] in LIST_TYPES:
+        elif input_metadata["type"] in ENUM_TYPES:
             kwargs[input_name] = str(kwargs[input_name].value)
         elif input_metadata["type"] in ARRAY_TYPES:
             if len(kwargs[input_name]) == 1:
