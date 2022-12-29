@@ -1,8 +1,7 @@
 # inspired from https://huggingface.co/spaces/ml6team/post-processing-summarization/
 from typing import Dict
 
-from transformers import pipeline
-from transformers import BartTokenizerFast
+from transformers import BartTokenizerFast, pipeline
 
 
 def predict(
