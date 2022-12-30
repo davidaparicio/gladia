@@ -11,6 +11,17 @@ inputs:
       - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.m4a"
       - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.wav"
 
+  nb_speakers:
+    type: int
+    placeholder: "Number of speakers (leave 0 to detect automatically)"
+    default: 1
+    examples:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+
 output:
   name: transcription
   type: str

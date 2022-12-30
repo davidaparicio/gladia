@@ -24,14 +24,16 @@ error_msg = """Error while loading pipeline: {e}
 
 @input_to_files
 def predict(
-    audio: str, language: str = "en", model_version: str = "tiny"
+    audio: str, language: str = "en", nb_speakers: int = 0, model_version: str = "tiny"
 ) -> Dict[str, str]:
     """
     Predict the text from the audio: audio -> text for a given language.
     Args:
         audio (bytes): The bytes audio to be transcribed.
         language (str): The language of the audio to be transcribed. (default: "en")
+        nb_speakers (int): The number of speakers in the audio. If 0, the number of speakers is automatically detected.
         model_version (str): The model version to use. (default: "tiny")
+
     Outputs:
         Dict[str, str]: The text transcription of the audio.
     """
@@ -56,7 +58,10 @@ def predict(
     try:
         model = whisper.load_model(model_version)
         asr_result = model.transcribe(tmp_file)
-        diarization_result = pipeline(tmp_file)
+        if nb_speakers > 0:
+            diarization_result = pipeline(tmp_file, num_speakers=nb_speakers)
+        else:
+            diarization_result = pipeline(tmp_file)
         final_result = diarize_text(asr_result, diarization_result)
 
         prediction_raw = list()

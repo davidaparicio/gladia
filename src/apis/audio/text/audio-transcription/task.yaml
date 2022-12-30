@@ -14,10 +14,22 @@ inputs:
       - "http://files.gladia.io/examples/audio/text/audio-transcription/audio.wav"
 
   language:
-    placeholder: "Language of the input audio"
     type: str
+    placeholder: "Language of the input audio"
+    default: "en"
     examples:
       - "en"
+
+  nb_speakers:
+    type: int
+    placeholder: "Number of speakers (leave 0 to detect automatically)"
+    default: 1
+    examples:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
 
 output:
   name: transcription

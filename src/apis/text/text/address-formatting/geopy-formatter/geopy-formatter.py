@@ -2,7 +2,11 @@
 
 from typing import Dict
 
+from geopy.extra.rate_limiter import RateLimiter
 from geopy.geocoders import Nominatim
+
+geolocator = Nominatim(user_agent="gladia")
+geocode = RateLimiter(geolocator.geocode, min_delay_seconds=2, max_retries=3)
 
 
 def predict(address: str) -> Dict[str, str]:
@@ -15,10 +19,8 @@ def predict(address: str) -> Dict[str, str]:
         Dict[str, str]: The formated address
     """
 
-    geolocator = Nominatim(user_agent="gladia")
+    location = geocode(address, addressdetails=True)
+    if location is None:
+        return {"detail": "No address found for this input"}
 
-    location = geolocator.geocode(address, addressdetails=True)
-
-    raw_prediction = location.raw
-
-    return {"prediction": location.address, "raw_prediction": raw_prediction}
+    return {"prediction": location.address, "raw_prediction": location.raw}
