@@ -88,7 +88,7 @@ $ docker run -d --gpus all --shm-size=5g -p 8080:8080 gladiaio/gladia:latest
 
 Your Gladia service is now available at [http://localhost:8080/docs](http://localhost:8080/docs)
 
-To avoid downloading all the packages between restart, it is highly recommend to mount a volume :
+To avoid downloading all the packages between restarts, it is highly recommended to mount a volume:
 
 ```sh
 $ docker run -d --gpus all --shm-size=5g -v /path/to/storage:/gladia -p 8080:8080 gladiaio/gladia:latest
