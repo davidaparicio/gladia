@@ -43,7 +43,7 @@ def get_spacy_language_code(language_code: str) -> str:
     if language_code not in SPACY_LANGUAGE_MODEL:
         language_code = "xx"
     else:
-        language_code = SPACY_LANGUAGE_MODEL["language_code"]["model"][:2]
+        language_code = SPACY_LANGUAGE_MODEL[language_code]["model"][:2]
 
     return language_code
 
