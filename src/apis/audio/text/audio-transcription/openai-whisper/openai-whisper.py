@@ -1,7 +1,9 @@
 from logging import getLogger
 from typing import Dict
 
+import os
 import whisper
+import yaml
 from gladia_api_utils import SECRETS
 from gladia_api_utils.file_management import (
     delete_file,
@@ -21,11 +23,17 @@ error_msg = """Error while loading pipeline: {e}
     for the HUGGINGFACE_ACCESS_TOKEN related token
     """
 
-model = {
-    "version": None,
-    "model": None,
-}
 
+default_model_version = yaml.load(
+    os.path.join(
+        os.path.split(__file__)[0],
+        "..", "task.yaml"
+))["default-model-version"]
+
+default_model = {
+    "version": default_model_version,
+    "model": whisper.load_model(default_model_version),
+}
 
 @input_to_files
 def predict(
@@ -62,10 +70,12 @@ def predict(
 
     try:
 
-        if model["version"] != model_version:
-            model["model"] = whisper.load_model(model_version)
+        if default_model["version"] != model_version:
+            model = whisper.load_model(model_version)
+        else:
+            model = default_model
 
-        asr_result = model["model"].transcribe(tmp_file)
+        asr_result = model.transcribe(tmp_file)
 
         if nb_speakers > 0:
             diarization_result = pipeline(tmp_file, num_speakers=nb_speakers)
