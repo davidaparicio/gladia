@@ -1,7 +1,7 @@
+import os
 from logging import getLogger
 from typing import Dict
 
-import os
 import whisper
 import yaml
 from gladia_api_utils import SECRETS
@@ -25,15 +25,14 @@ error_msg = """Error while loading pipeline: {e}
 
 
 default_model_version = yaml.load(
-    os.path.join(
-        os.path.split(__file__)[0],
-        "..", "task.yaml"
-))["default-model-version"]
+    os.path.join(os.path.split(__file__)[0], "..", "task.yaml")
+)["default-model-version"]
 
 default_model = {
     "version": default_model_version,
     "model": whisper.load_model(default_model_version),
 }
+
 
 @input_to_files
 def predict(
