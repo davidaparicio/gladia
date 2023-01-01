@@ -23,6 +23,7 @@ error_msg = """Error while loading pipeline: {e}
 
 models = {}
 
+
 @input_to_files
 def predict(
     audio: str, language: str = "en", nb_speakers: int = 0, model_version: str = "tiny"
