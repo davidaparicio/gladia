@@ -21,7 +21,10 @@ error_msg = """Error while loading pipeline: {e}
     for the HUGGINGFACE_ACCESS_TOKEN related token
     """
 
-models = {}
+model = {
+    "version": None,
+    "model": None,
+}
 
 @input_to_files
 def predict(
@@ -58,10 +61,10 @@ def predict(
 
     try:
 
-        if model_version not in models:
-            models[model_version] = whisper.load_model(model_version)
+        if model["version"] != model_version:
+            model["model"] = whisper.load_model(model_version)
 
-        asr_result = models[model_version].transcribe(tmp_file)
+        asr_result = model["model"].transcribe(tmp_file)
 
         if nb_speakers > 0:
             diarization_result = pipeline(tmp_file, num_speakers=nb_speakers)
