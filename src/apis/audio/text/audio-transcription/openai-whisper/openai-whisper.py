@@ -21,6 +21,7 @@ error_msg = """Error while loading pipeline: {e}
     for the HUGGINGFACE_ACCESS_TOKEN related token
     """
 
+models = {}
 
 @input_to_files
 def predict(
@@ -56,16 +57,22 @@ def predict(
     audio_segment.export(tmp_file, format="wav")
 
     try:
-        model = whisper.load_model(model_version)
-        asr_result = model.transcribe(tmp_file)
+
+        if model_version not in models:
+            models[model_version] = whisper.load_model(model_version)
+
+        asr_result = models[model_version].transcribe(tmp_file)
+
         if nb_speakers > 0:
             diarization_result = pipeline(tmp_file, num_speakers=nb_speakers)
         else:
             diarization_result = pipeline(tmp_file)
+
         final_result = diarize_text(asr_result, diarization_result)
 
-        prediction_raw = list()
         prediction = ""
+        prediction_raw = list()
+
         for segment, speaker, sentence in final_result:
             prediction += sentence.strip()
             prediction_raw.append(
@@ -79,10 +86,12 @@ def predict(
 
     except Exception as e:
         logger.error(f"Error while running pipeline: {e}")
+
         return {
             "prediction": "Error while running pipeline",
             "prediction_raw": error_msg.format(e=e),
         }
+
     finally:
         delete_file(tmp_file)
 
