@@ -52,7 +52,7 @@ export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/pyth
 
 echo -e "${P}== FORCE pip upgrade in virtualenvs ==${EC}"
 # Not optimal since we run this everytime, even after afresh install
-for d in ${MAMBA_ROOT_PREFIX}/conda/envs/*/; do
+for d in ${MAMBA_ROOT_PREFIX}/envs/*/; do
     cd $d
     echo "${C}Updating $(basename $d) pip packages.${EC}"
     micromamba activate $(basename $d)
