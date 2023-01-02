@@ -54,14 +54,12 @@ echo -e "${P}== FORCE pip upgrade in virtualenvs ==${EC}"
 # Not optimal since we run this everytime, even after afresh install
 for d in ${MAMBA_ROOT_PREFIX}/envs/*/; do
     cd $d
-    echo "${C}Updating $(basename $d) pip packages.${EC}"
-    micromamba activate $(basename $d)
+    echo -e "${C}Updating $(basename $d) pip packages.${EC}"
     if [ -f "./$(basename $d).yaml" ]; then csplit -s --suppress-matched $d/$(basename $d).yaml '/- pip:/' '{*}'; fi
     if [ -f "./$(basename $d).yml" ]; then csplit -s --suppress-matched $d/$(basename $d).yml '/- pip:/' '{*}'; fi
     sed "s/ - //" xx01 > reqs.txt
-    pip install --upgrade -r reqs.txt
+    micromamba run -n $(basename $d) /bin/bash -c "pip install --upgrade -r reqs.txt"
 done
-micromamba activate server
 
 echo -e "${P}== FIX Protobuh ==${EC}"
 wget https://raw.githubusercontent.com/protocolbuffers/protobuf/main/python/google/protobuf/internal/builder.py -O $MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/google/protobuf/internal/builder.py
