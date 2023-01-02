@@ -24,7 +24,7 @@ error_msg = """Error while loading pipeline: {e}
     """
 
 
-default_model_version = yaml.load(
+default_model_version = yaml.safe_load(
     os.path.join(os.path.split(__file__)[0], "..", "task.yaml")
 )["default-model-version"]
 
