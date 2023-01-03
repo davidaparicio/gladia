@@ -30,7 +30,7 @@ EC="\e[0m"
 echo -e "${P}== INIT Micromamba Server Env ==${EC}"
 if [ -f $MAMBA_ROOT_PREFIX/envs/server/server.yml ]; then
     echo -e "${C}Updating micromamba server env.${EC}"
-    micromamba install -f $PATH_TO_GLADIA_SRC/env.yaml -a
+    micromamba install -f $PATH_TO_GLADIA_SRC/env.yaml -y
     cp $PATH_TO_GLADIA_SRC/env.yaml $MAMBA_ROOT_PREFIX/envs/server/server.yml
     micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]==0.3.25\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
     micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
