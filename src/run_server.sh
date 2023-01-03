@@ -30,7 +30,7 @@ EC="\e[0m"
 echo -e "${P}== INIT Micromamba Server Env ==${EC}"
 if [ -f $MAMBA_ROOT_PREFIX/envs/server/server.yml ]; then
     echo -e "${C}Updating micromamba server env.${EC}"
-    micromamba update -f $PATH_TO_GLADIA_SRC/env.yaml -a
+    micromamba install -f $PATH_TO_GLADIA_SRC/env.yaml -a
     cp $PATH_TO_GLADIA_SRC/env.yaml $MAMBA_ROOT_PREFIX/envs/server/server.yml
     micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]==0.3.25\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
     micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
@@ -49,17 +49,6 @@ micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_c
 
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/nvidia/cublas/lib/"
-
-echo -e "${P}== FORCE pip upgrade in virtualenvs ==${EC}"
-# Not optimal since we run this everytime, even after afresh install
-for d in ${MAMBA_ROOT_PREFIX}/envs/*/; do
-    cd $d
-    echo -e "${C}Updating $(basename $d) pip packages.${EC}"
-    if [ -f "./$(basename $d).yaml" ]; then csplit -s --suppress-matched $d/$(basename $d).yaml '/- pip:/' '{*}'; fi
-    if [ -f "./$(basename $d).yml" ]; then csplit -s --suppress-matched $d/$(basename $d).yml '/- pip:/' '{*}'; fi
-    sed "s/ - //" xx01 > reqs.txt
-    micromamba run -n $(basename $d) /bin/bash -c "pip install --upgrade -r reqs.txt"
-done
 
 echo -e "${P}== FIX Protobuh ==${EC}"
 wget https://raw.githubusercontent.com/protocolbuffers/protobuf/main/python/google/protobuf/internal/builder.py -O $MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/google/protobuf/internal/builder.py
