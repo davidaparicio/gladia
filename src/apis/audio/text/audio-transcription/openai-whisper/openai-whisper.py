@@ -1,7 +1,9 @@
 from logging import getLogger
+from pathlib import Path
 from typing import Dict
 
 import whisper
+import yaml
 from gladia_api_utils import SECRETS
 from gladia_api_utils.file_management import (
     delete_file,
@@ -15,11 +17,20 @@ from pydub import AudioSegment
 logger = getLogger(__name__)
 
 
-error_msg = """Error while loading pipeline: {e}
+ERROR_MSG = """Error while loading pipeline: {e}
     Please check your HuggingFace credentials in the environment variables HUGGINGFACE_ACCESS_TOKEN
     Also make sure that you have approved the terms of use for the segmentation and diarization models
     for the HUGGINGFACE_ACCESS_TOKEN related token
     """
+
+DEFAULT_MODEL_VERSION = yaml.safe_load(
+    open(str(Path(__file__).parent.parent.joinpath("task.yaml")))
+)["default-model-version"]
+
+DEFAULT_MODEL = {
+    "version": DEFAULT_MODEL_VERSION,
+    "model": whisper.load_model(DEFAULT_MODEL_VERSION),
+}
 
 
 @input_to_files
@@ -44,7 +55,7 @@ def predict(
             use_auth_token=SECRETS["HUGGINGFACE_ACCESS_TOKEN"],
         )
     except Exception as e:
-        logger.error(error_msg.format(e=e))
+        logger.error(ERROR_MSG.format(e=e))
 
     audio_segment = AudioSegment.from_file(audio)
 
@@ -56,16 +67,24 @@ def predict(
     audio_segment.export(tmp_file, format="wav")
 
     try:
-        model = whisper.load_model(model_version)
+
+        if DEFAULT_MODEL["version"] != model_version:
+            model = whisper.load_model(model_version)
+        else:
+            model = DEFAULT_MODEL
+
         asr_result = model.transcribe(tmp_file)
+
         if nb_speakers > 0:
             diarization_result = pipeline(tmp_file, num_speakers=nb_speakers)
         else:
             diarization_result = pipeline(tmp_file)
+
         final_result = diarize_text(asr_result, diarization_result)
 
-        prediction_raw = list()
         prediction = ""
+        prediction_raw = list()
+
         for segment, speaker, sentence in final_result:
             prediction += sentence.strip()
             prediction_raw.append(
@@ -79,10 +98,12 @@ def predict(
 
     except Exception as e:
         logger.error(f"Error while running pipeline: {e}")
+
         return {
             "prediction": "Error while running pipeline",
-            "prediction_raw": error_msg.format(e=e),
+            "prediction_raw": ERROR_MSG.format(e=e),
         }
+
     finally:
         delete_file(tmp_file)
 
