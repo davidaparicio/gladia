@@ -1,9 +1,9 @@
-import yaml
-import whisper
-
-from typing import Dict
-from pathlib import Path
 from logging import getLogger
+from pathlib import Path
+from typing import Dict
+
+import whisper
+import yaml
 from gladia_api_utils import SECRETS
 from gladia_api_utils.file_management import (
     delete_file,
