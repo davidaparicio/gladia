@@ -172,7 +172,7 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
             cmd_to_exec = "update"
             cmd_opts = "-a"
 
-        logger.info("\032[36m" + f"Env {env_name} will be {cmd_to_exec}d" + "\033[39m")
+        logger.info("\x1b[36m" + f"Env {env_name} will be {cmd_to_exec}d" + "\x1b[39m")
 
         subprocess.run(
             f"micromamba {cmd_to_exec} -f {temporary_file.name  + '.yaml'} {cmd_opts}".split(
@@ -187,9 +187,9 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
         #     check=True,
         # )
         logger.info(
-            "\032[36m"
+            "\x1b[36m"
             + f"Env {env_name} has been successfully {cmd_to_exec}d"
-            + "\033[39m"
+            + "\x1b[39m"
         )
 
     except subprocess.CalledProcessError as error:
