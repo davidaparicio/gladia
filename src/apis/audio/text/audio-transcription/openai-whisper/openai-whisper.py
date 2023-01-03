@@ -1,9 +1,9 @@
-import os
-from logging import getLogger
-from typing import Dict
-
-import whisper
 import yaml
+import whisper
+
+from typing import Dict
+from pathlib import Path
+from logging import getLogger
 from gladia_api_utils import SECRETS
 from gladia_api_utils.file_management import (
     delete_file,
@@ -17,20 +17,19 @@ from pydub import AudioSegment
 logger = getLogger(__name__)
 
 
-error_msg = """Error while loading pipeline: {e}
+ERROR_MSG = """Error while loading pipeline: {e}
     Please check your HuggingFace credentials in the environment variables HUGGINGFACE_ACCESS_TOKEN
     Also make sure that you have approved the terms of use for the segmentation and diarization models
     for the HUGGINGFACE_ACCESS_TOKEN related token
     """
 
-
-default_model_version = yaml.safe_load(
-    os.path.join(os.path.split(__file__)[0], "..", "task.yaml")
+DEFAULT_MODEL_VERSION = yaml.safe_load(
+    open(str(Path(__file__).parent.parent.joinpath("task.yaml")))
 )["default-model-version"]
 
-default_model = {
-    "version": default_model_version,
-    "model": whisper.load_model(default_model_version),
+DEFAULT_MODEL = {
+    "version": DEFAULT_MODEL_VERSION,
+    "model": whisper.load_model(DEFAULT_MODEL_VERSION),
 }
 
 
@@ -56,7 +55,7 @@ def predict(
             use_auth_token=SECRETS["HUGGINGFACE_ACCESS_TOKEN"],
         )
     except Exception as e:
-        logger.error(error_msg.format(e=e))
+        logger.error(ERROR_MSG.format(e=e))
 
     audio_segment = AudioSegment.from_file(audio)
 
@@ -69,10 +68,10 @@ def predict(
 
     try:
 
-        if default_model["version"] != model_version:
+        if DEFAULT_MODEL["version"] != model_version:
             model = whisper.load_model(model_version)
         else:
-            model = default_model
+            model = DEFAULT_MODEL
 
         asr_result = model.transcribe(tmp_file)
 
@@ -102,7 +101,7 @@ def predict(
 
         return {
             "prediction": "Error while running pipeline",
-            "prediction_raw": error_msg.format(e=e),
+            "prediction_raw": ERROR_MSG.format(e=e),
         }
 
     finally:
