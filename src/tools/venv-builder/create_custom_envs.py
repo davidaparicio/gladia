@@ -170,7 +170,6 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
 
         if os.path.isdir(os.path.join(MAMBA_ROOT_PREFIX, "envs", env_name)):
             cmd_to_exec = "install"
-            cmd_opts = "-a"
 
         logger.info("\x1b[36m" + f"Env {env_name} will be {cmd_to_exec}d" + "\x1b[39m")
 
