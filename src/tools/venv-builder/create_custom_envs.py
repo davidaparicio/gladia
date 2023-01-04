@@ -51,7 +51,7 @@ def retrieve_package_from_env_file(env_file: dict) -> Tuple[List[str], List[str]
     return packages_to_install_from_pip, packages_to_install_from_channel
 
 
-def create_temp_env_file(
+def create_temp_env_files(
     env_name: str,
     packages_to_install_from_channel: List[str],
     packages_to_install_from_pip: List[str],
@@ -66,11 +66,13 @@ def create_temp_env_file(
 
     Returns:
         str: Path to the temporary env file
+        str: Path to the temporary env package only file
+        str: Path to the temporary env pip only file
     """
 
-    tmp = tempfile.NamedTemporaryFile(delete=False)
+    tmp, tmpchan, tmppip = tempfile.NamedTemporaryFile(delete=False), tempfile.NamedTemporaryFile(delete=False), tempfile.NamedTemporaryFile(delete=False)
 
-    content = (
+    content_chan = (
         """
 name: """
         + env_name
@@ -80,21 +82,36 @@ dependencies:"""
         + "".join([f"\n  - {package}" for package in packages_to_install_from_channel])
     )
 
+    content = content_chan
+    content_pip = str()
+
     if (
         packages_to_install_from_pip is not None
         and len(packages_to_install_from_pip) > 0
     ):
-        content += """
-  - pip:""" + "".join(
+        content_pip = "".join(
             [f"\n    - {package}" for package in packages_to_install_from_pip]
         )
+
+        content += """
+  - pip:""" + content_pip
 
     with open(tmp.name, "w") as f:
         f.write(content)
 
     tmp.close()
 
-    return tmp
+    with open(tmpchan.name, "w") as f:
+        f.write(content_chan)
+
+    tmpchan.close()
+
+    with open(tmppip.name, "w") as f:
+        f.write(content_pip)
+
+    tmppip.close()
+
+    return tmp, tmpchan, tmppip
 
 
 def create_custom_env(env_name: str, path_to_env_file: str) -> None:
@@ -157,34 +174,44 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
 
         packages_to_install_from_channel += channel_packages
 
-    temporary_file = create_temp_env_file(
+    temporary_file, temporary_file_channel, temporary_file_pip = create_temp_env_files(
         env_name, packages_to_install_from_channel, packages_to_install_from_pip
     )
 
-    os.link(temporary_file.name, temporary_file.name + ".yaml")
-
     try:
-
+        os.link(temporary_file.name, temporary_file.name + ".yaml")
         cmd_to_exec = "create"
         cmd_opts = "-y"
+        action = "created"
 
-        if os.path.isdir(os.path.join(MAMBA_ROOT_PREFIX, "envs", env_name)):
+        if os.path.exists(os.path.join(MAMBA_ROOT_PREFIX, "envs", env_name)):
             cmd_to_exec = "install"
+            action = "updated"
+            if os.stat(temporary_file_pip.name).st_size != 0:
+                os.remove(temporary_file.name + ".yaml")
+                os.link(temporary_file_channel.name,temporary_file.name + ".yaml")
+                os.link(temporary_file_pip.name, temporary_file_pip.name + ".yaml")
 
-        logger.info("\x1b[36m" + f"Env {env_name} will be {cmd_to_exec}d" + "\x1b[39m")
+        logger.info("\x1b[36m" + f"Env {env_name} will be {action}" + "\x1b[39m")
 
         subprocess.run(
-            f"micromamba {cmd_to_exec} -f {temporary_file.name  + '.yaml'} {cmd_opts}".split(
+            f"micromamba {cmd_to_exec} -f {temporary_file.name + '.yaml'} {cmd_opts}".split(
                 " "
             ),
             check=True,
         )
+
+        if  os.stat(temporary_file_pip.name).st_size != 0:
+            logger.info("\x1b[36m" + f"Env {env_name} updating pip requirements" + "\x1b[39m")
+            subprocess.run(['micromamba', 'run', '-n', env_name, '/bin/bash', '-c', 'pip install --upgrade -r '+ temporary_file_pip.name +'.yaml'])
+
 
         # todo : make it optionnal - when storing permamently, we want to keep the cache
         # subprocess.run(
         #     f"micromamba clean --all --yes".split(" "),
         #     check=True,
         # )
+
         logger.info(
             "\x1b[36m"
             + f"Env {env_name} has been successfully {cmd_to_exec}d"
@@ -196,11 +223,23 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
 
     finally:
         shutil.copyfile(
-            src=temporary_file.name + ".yaml",
+            src=temporary_file.name,
             dst=os.path.join(MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}.yaml"),
         )
+        if  os.stat(temporary_file_pip.name).st_size != 0:
+            shutil.copyfile(
+                src=temporary_file_channel.name,
+                dst=os.path.join(MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}-channel.yaml"),
+            )
+            shutil.copyfile(
+                src=temporary_file_pip.name,
+                dst=os.path.join(MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}-pip.yaml"),
+            )
+            os.remove(temporary_file_pip.name + ".yaml")
 
         os.remove(temporary_file.name)
+        os.remove(temporary_file_channel.name)
+        os.remove(temporary_file_pip.name)
         os.remove(temporary_file.name + ".yaml")
 
 
