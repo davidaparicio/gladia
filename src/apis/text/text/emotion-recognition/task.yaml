@@ -3,11 +3,13 @@ summary: ''
 default-model: "mrm8488-t5-base-finetuned-emotion"
 
 inputs:
-  text:
-    type: str
+  texts:
+    type: array
     placeholder: "input text"
     examples:
-      - "I love you."
+      - ["I love you.", "I hate you.", "I am happy."]
+      - ["I think you are a good person.", "I think you are a bad person.", "I think you are a nice person."]
+      - ["I am happy.", "I am sad.", "I am angry."]
 
 output:
   name: text

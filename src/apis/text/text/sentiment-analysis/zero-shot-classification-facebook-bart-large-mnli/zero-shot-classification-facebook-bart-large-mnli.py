@@ -5,7 +5,7 @@ import truecase
 from transformers import pipeline
 
 
-def predict(text: str) -> Dict[str, Union[str, List[float]]]:
+def predict(texts: List[str]) -> Dict[str, Union[str, List[float]]]:
     """
     For a given text, predict if it's POSITIVE, NEUTRAL or NEGATIVE
 
@@ -17,11 +17,15 @@ def predict(text: str) -> Dict[str, Union[str, List[float]]]:
     """
 
     classifier = pipeline("zero-shot-classification")
-    prediction = classifier(
-        truecase.get_true_case(text),
-        candidate_labels=["POSITIVE", "NEUTRAL", "NEGATIVE"],
-    )
 
-    label = prediction["labels"][np.argmax(prediction["scores"])]
+    prediction = []
+    prediction_raw = []
+    for text in texts:
+        pred = classifier(
+            truecase.get_true_case(text),
+            candidate_labels=["POSITIVE", "NEUTRAL", "NEGATIVE"],
+        )
+        prediction.append(pred["labels"][np.argmax(pred["scores"])])
+        prediction_raw.append(pred)
 
-    return {"prediction": label, "prediction_raw": prediction}
+    return {"prediction": prediction, "prediction_raw": prediction_raw}
