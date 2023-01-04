@@ -70,7 +70,11 @@ def create_temp_env_files(
         str: Path to the temporary env pip only file
     """
 
-    tmp, tmpchan, tmppip = tempfile.NamedTemporaryFile(delete=False), tempfile.NamedTemporaryFile(delete=False), tempfile.NamedTemporaryFile(delete=False)
+    tmp, tmpchan, tmppip = (
+        tempfile.NamedTemporaryFile(delete=False),
+        tempfile.NamedTemporaryFile(delete=False),
+        tempfile.NamedTemporaryFile(delete=False),
+    )
 
     content_chan = (
         """
@@ -93,8 +97,11 @@ dependencies:"""
             [f"\n    - {package}" for package in packages_to_install_from_pip]
         )
 
-        content += """
-  - pip:""" + content_pip
+        content += (
+            """
+  - pip:"""
+            + content_pip
+        )
 
     with open(tmp.name, "w") as f:
         f.write(content)
@@ -189,7 +196,7 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
             action = "updated"
             if os.stat(temporary_file_pip.name).st_size != 0:
                 os.remove(temporary_file.name + ".yaml")
-                os.link(temporary_file_channel.name,temporary_file.name + ".yaml")
+                os.link(temporary_file_channel.name, temporary_file.name + ".yaml")
                 os.link(temporary_file_pip.name, temporary_file_pip.name + ".yaml")
 
         logger.info("\x1b[36m" + f"Env {env_name} will be {action}" + "\x1b[39m")
@@ -201,10 +208,21 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
             check=True,
         )
 
-        if  os.stat(temporary_file_pip.name).st_size != 0:
-            logger.info("\x1b[36m" + f"Env {env_name} updating pip requirements" + "\x1b[39m")
-            subprocess.run(['micromamba', 'run', '-n', env_name, '/bin/bash', '-c', 'pip install --upgrade -r '+ temporary_file_pip.name +'.yaml'])
-
+        if os.stat(temporary_file_pip.name).st_size != 0:
+            logger.info(
+                "\x1b[36m" + f"Env {env_name} updating pip requirements" + "\x1b[39m"
+            )
+            subprocess.run(
+                [
+                    "micromamba",
+                    "run",
+                    "-n",
+                    env_name,
+                    "/bin/bash",
+                    "-c",
+                    "pip install --upgrade -r " + temporary_file_pip.name + ".yaml",
+                ]
+            )
 
         # todo : make it optionnal - when storing permamently, we want to keep the cache
         # subprocess.run(
@@ -226,14 +244,18 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
             src=temporary_file.name,
             dst=os.path.join(MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}.yaml"),
         )
-        if  os.stat(temporary_file_pip.name).st_size != 0:
+        if os.stat(temporary_file_pip.name).st_size != 0:
             shutil.copyfile(
                 src=temporary_file_channel.name,
-                dst=os.path.join(MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}-channel.yaml"),
+                dst=os.path.join(
+                    MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}-channel.yaml"
+                ),
             )
             shutil.copyfile(
                 src=temporary_file_pip.name,
-                dst=os.path.join(MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}-pip.yaml"),
+                dst=os.path.join(
+                    MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}-pip.yaml"
+                ),
             )
             os.remove(temporary_file_pip.name + ".yaml")
 
