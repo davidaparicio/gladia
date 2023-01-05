@@ -1,11 +1,11 @@
 NER_LOOKUP = {
     "CARDINAL": {
-        "description": "Numerals that do not fall under another type",
+        "long_description": "Numerals that do not fall under another type",
         "short_description": "Numerals",
         "examples": ["0", "1", "2", "20", "2017", "40", "fifty", "one-hundred"],
     },
     "DATE": {
-        "description": "Absolute or relative dates or periods",
+        "long_description": "Absolute or relative dates or periods",
         "short_description": "Dates",
         "examples": [
             "today",
@@ -19,17 +19,17 @@ NER_LOOKUP = {
         ],
     },
     "EVENT": {
-        "description": "Named hurricanes, battles, wars, sports events, etc.",
+        "long_description": "Named hurricanes, battles, wars, sports events, etc.",
         "short_description": "Events",
         "examples": ["Hurricane Katrina", "World War II", "9/11", "Super Bowl 50"],
     },
     "FAC": {
-        "description": "Facilities, such as buildings, airports, highways, bridges, etc.",
+        "long_description": "Facilities, such as buildings, airports, highways, bridges, etc.",
         "short_description": "Facilities",
         "examples": [],
     },
     "GPE": {
-        "description": "Geopolitical entity, i.e. countries, cities, states.",
+        "long_description": "Geopolitical entity, i.e. countries, cities, states.",
         "short_description": "Geopolitical entity",
         "examples": [
             "Germany",
@@ -41,7 +41,7 @@ NER_LOOKUP = {
         ],
     },
     "LANGUAGE": {
-        "description": "Any named language",
+        "long_description": "Any named language",
         "short_description": "Languages",
         "examples": [
             "English",
@@ -49,7 +49,7 @@ NER_LOOKUP = {
         ],
     },
     "LAW": {
-        "description": "Named documents made into laws.",
+        "long_description": "Named documents made into laws.",
         "short_description": "Laws",
         "examples": [
             "The Patriot Act",
@@ -57,7 +57,7 @@ NER_LOOKUP = {
         ],
     },
     "LOC": {
-        "description": "Non-GPE locations, mountain ranges, bodies of water",
+        "long_description": "Non-GPE locations, mountain ranges, bodies of water",
         "short_description": "Locations",
         "examples": [
             "the Alps",
@@ -65,7 +65,7 @@ NER_LOOKUP = {
         ],
     },
     "MISC": {
-        "description": "Miscellaneous entities, e.g. events, nationalities, products or works of art",
+        "long_description": "Miscellaneous entities, e.g. events, nationalities, products or works of art",
         "short_description": "Miscellaneous",
         "examples": [
             "the Mona Lisa",
@@ -73,7 +73,7 @@ NER_LOOKUP = {
         ],
     },
     "MONEY": {
-        "description": "Monetary values, including unit",
+        "long_description": "Monetary values, including unit",
         "short_description": "Monetary values",
         "examples": [
             "100 dollars",
@@ -82,7 +82,7 @@ NER_LOOKUP = {
         ],
     },
     "NORP": {
-        "description": "Nationalities or religious or political groups",
+        "long_description": "Nationalities or religious or political groups",
         "short_description": "Nationalities, religions, political groups",
         "examples": [
             "the Catholic Church",
@@ -90,7 +90,7 @@ NER_LOOKUP = {
         ],
     },
     "ORDINAL": {
-        "description": 'Ordinals element like "first", "second", etc.',
+        "long_description": 'Ordinals element like "first", "second", etc.',
         "short_description": "Ordinals",
         "examples": [
             "first",
@@ -98,7 +98,7 @@ NER_LOOKUP = {
         ],
     },
     "ORG": {
-        "description": "Organizations: Companies, agencies, institutions, etc.",
+        "long_description": "Organizations: Companies, agencies, institutions, etc.",
         "short_description": "Organizations",
         "examples": [
             "Google",
@@ -106,7 +106,7 @@ NER_LOOKUP = {
         ],
     },
     "PERCENT": {
-        "description": 'Percentage, including "%"',
+        "long_description": 'Percentage, including "%"',
         "short_description": "Percentages",
         "examples": [
             "50%",
@@ -114,7 +114,7 @@ NER_LOOKUP = {
         ],
     },
     "PERSON": {
-        "description": "People, including fictional",
+        "long_description": "People, including fictional",
         "short_description": "People",
         "examples": [
             "Barack Obama",
@@ -122,7 +122,7 @@ NER_LOOKUP = {
         ],
     },
     "PRODUCT": {
-        "description": "Products: Objects, vehicles, foods, etc. (not services)",
+        "long_description": "Products: Objects, vehicles, foods, etc. (not services)",
         "short_description": "Products",
         "examples": [
             "iPhone",
@@ -130,14 +130,14 @@ NER_LOOKUP = {
         ],
     },
     "QUANTITY": {
-        "description": "Measurements, as of weight or distance",
+        "long_description": "Measurements, as of weight or distance",
         "short_description": "Measurements",
         "examples": [
             "100 meters",
         ],
     },
     "TIME": {
-        "description": "Times smaller than a day",
+        "long_description": "Times smaller than a day",
         "short_description": "Time in a day",
         "examples": [
             "3:30pm",
@@ -145,7 +145,7 @@ NER_LOOKUP = {
         ],
     },
     "WORK_OF_ART": {
-        "description": "Titles of books, songs, etc.",
+        "long_description": "Titles of books, songs, etc.",
         "short_description": "Work of art",
         "examples": [
             "Harry Potter",
@@ -153,7 +153,7 @@ NER_LOOKUP = {
         ],
     },
     "UNKNOWN": {
-        "description": "Unknown entity",
+        "long_description": "Unknown entity",
         "short_description": "Unknown entity",
         "examples": [
             "Unknown entity",
@@ -172,10 +172,8 @@ NER_SHORTCUTS = {
 def explain_ner(ner_tag: str) -> dict:
     """
     Explain NER entity
-
     Args:
         text (str): NER entity
-
     Returns:
         dict: NER entity explanation
     """

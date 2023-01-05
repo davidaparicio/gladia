@@ -1,12 +1,13 @@
-import os
-import shutil
 import sys
+import os
 import threading
 from logging import getLogger
 from pathlib import Path
 from urllib.parse import urlparse
 
 import spacy
+from spacy.cli.download import get_compatibility
+
 from git import Repo
 
 from .file_management import (
@@ -31,6 +32,18 @@ models_config = load_models_config()
 SPACY_LANGUAGE_MODEL = models_config["spacy"]["models"]
 
 
+def get_spacy_cache_dir_for_model(model: str) -> str:
+    """Get the spaCy cache directory for the specified model.
+
+    Args:
+        model (str): The name of the spaCy model to get the cache directory for.
+
+    Returns:
+        str: The spaCy cache directory for the specified model.
+    """
+    return os.path.join(SPACY_CACHE_DIR, model)
+
+
 def get_spacy_language_code(language_code: str) -> str:
     """Get the spaCy language code for the specified language.
 
@@ -40,10 +53,13 @@ def get_spacy_language_code(language_code: str) -> str:
     Returns:
         str: The spaCy language code for the specified language.
     """
-    if language_code not in SPACY_LANGUAGE_MODEL:
+    spacy_models = get_compatibility()
+    if language_code in SPACY_LANGUAGE_MODEL:
+        language_code = SPACY_LANGUAGE_MODEL[language_code]["model"][:2]
+    elif language_code not in spacy_models:
         language_code = "xx"
     else:
-        language_code = SPACY_LANGUAGE_MODEL[language_code]["model"][:2]
+        pass
 
     return language_code
 
@@ -57,10 +73,14 @@ def load_spacy_language_model(language: str) -> spacy.language.Language:
     Returns:
         The spaCy language model for the specified language.
     """
-    if language not in SPACY_LANGUAGE_MODEL:
-        language = "others"
-
-    language_model = SPACY_LANGUAGE_MODEL[language]["model"]
+    language_model = None
+    spacy_models = get_compatibility()
+    if language in spacy_models:
+        language_model = language
+    elif language not in SPACY_LANGUAGE_MODEL:
+        language_model = SPACY_LANGUAGE_MODEL["others"]["model"]
+    else:
+        language_model = SPACY_LANGUAGE_MODEL[language]["model"]
 
     try:
         nlp = spacy.load(os.path.join(SPACY_CACHE_DIR, language_model))

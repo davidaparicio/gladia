@@ -2,8 +2,9 @@ import json
 from logging import getLogger
 from typing import Dict
 
-from gladia_api_utils.model_management import get_spacy_language_code
+from gladia_api_utils.model_management import get_spacy_cache_dir_for_model
 from presidio_analyzer import AnalyzerEngine
+from presidio_analyzer.nlp_engine import NlpEngineProvider
 from presidio_anonymizer import AnonymizerEngine
 
 logger = getLogger(__name__)
@@ -50,19 +51,43 @@ def predict(text: str, language: str = "xxx", entities: str = "") -> Dict[str, s
     Returns:
         Dict[str, str]: The anonymized text.
     """
-    spacy_language_code = get_spacy_language_code(language.lower())
+
+    # Create configuration containing engine name and models
+    # presidio-analyzer only supports en and es
+    configuration = {
+        "nlp_engine_name": "spacy",
+        "models": [
+            {
+                "lang_code": "es",
+                "model_name": get_spacy_cache_dir_for_model("es_core_news_md"),
+            },
+            {
+                "lang_code": "en",
+                "model_name": get_spacy_cache_dir_for_model("en_core_web_lg"),
+            },
+        ],
+    }
+
+    # Create NLP engine based on configuration
+    provider = NlpEngineProvider(nlp_configuration=configuration)
+    nlp_engine_with_spanish = provider.create_engine()
+
+    analyzer = AnalyzerEngine(
+        nlp_engine=nlp_engine_with_spanish, supported_languages=["en", "es"]
+    )
 
     entities = entities.upper().replace(" ", "").split(",")
 
-    analyzer = AnalyzerEngine()
+    if language.lower() == "esp":
+        language = "es"
+    else:
+        language = "en"
 
     # Call analyzer to get results
     if entities:
-        results = analyzer.analyze(
-            text=text, entities=entities, language=spacy_language_code
-        )
+        results = analyzer.analyze(text=text, entities=entities, language=language)
     else:
-        results = analyzer.analyze(text=text, language=spacy_language_code)
+        results = analyzer.analyze(text=text, language=language)
 
     # Analyzer results are passed to the AnonymizerEngine for anonymization
 
