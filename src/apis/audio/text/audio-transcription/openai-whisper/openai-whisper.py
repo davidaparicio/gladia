@@ -71,7 +71,7 @@ def predict(
         if DEFAULT_MODEL["version"] != model_version:
             model = whisper.load_model(model_version)
         else:
-            model = DEFAULT_MODEL
+            model = DEFAULT_MODEL["model"]
 
         asr_result = model.transcribe(tmp_file)
 
