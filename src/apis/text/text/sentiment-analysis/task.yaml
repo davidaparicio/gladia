@@ -3,11 +3,12 @@ summary: ''
 default-model: "distilbert-base-uncased-finetuned-sst-2-english"
 
 inputs:
-  text:
-    type: str
+  texts:
+    type: array
     placeholder: "input text"
     examples:
-      - "I like you. I love you"
+      - ["I think you are a good person.", "I think you are a bad person."]
+      - ["I like you. I love you", "I hate you. you are so bad"]
 
 output:
   name: text

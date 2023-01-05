@@ -1,10 +1,10 @@
-from typing import Dict, Union
+from typing import Dict, List, Union
 
 import truecase
 from happytransformer import HappyTextClassification
 
 
-def predict(text: str) -> Dict[str, Union[str, Dict[str, Union[str, float]]]]:
+def predict(texts: List[str]) -> Dict[str, Union[str, Dict[str, Union[str, float]]]]:
     """
     For a given text, predict if it's POSITIVE or NEGATIVE
 
@@ -20,8 +20,11 @@ def predict(text: str) -> Dict[str, Union[str, Dict[str, Union[str, float]]]]:
         model_name="distilbert-base-uncased-finetuned-sst-2-english",
     )
 
-    result = happy_tc.classify_text(truecase.get_true_case(text))
+    prediction = []
+    prediction_raw = []
+    for text in texts:
+        result = happy_tc.classify_text(truecase.get_true_case(text))
+        prediction.append(result.label)
+        prediction_raw.append({"label": result.label, "score": result.score})
 
-    prediction_raw = {"label": result.label, "score": result.score}
-
-    return {"prediction": result.label, "prediction_raw": prediction_raw}
+    return {"prediction": prediction, "prediction_raw": prediction_raw}

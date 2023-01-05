@@ -471,11 +471,6 @@ def create_description_for_the_endpoint_parameter(endpoint_param: dict) -> dict:
         "description": endpoint_param.get("placeholder", ""),
     }
 
-    if endpoint_param["type"] in ARRAY_TYPES:
-        parameters_to_add[endpoint_param["name"]]["example"] = parameters_to_add[
-            endpoint_param["name"]
-        ]["examples"]
-
     # TODO: add validator checking that file and file_url can both be empty
     if endpoint_param["type"] in FILE_TYPES:
         parameters_to_add[f"{endpoint_param['name']}_url"] = {
@@ -1067,6 +1062,11 @@ async def clean_kwargs_based_on_router_inputs(
                 kwargs[input_name] = kwargs[input_name][0].split(",")
             else:
                 kwargs[input_name] = list(kwargs[input_name])
+                if len(kwargs[input_name]) == 0:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"Input '{input_name}' of '{input_metadata['type']}' type is missing.",
+                    )
         else:
 
             # don't use
