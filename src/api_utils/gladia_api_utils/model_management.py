@@ -1,14 +1,13 @@
-import sys
 import os
+import sys
 import threading
 from logging import getLogger
 from pathlib import Path
 from urllib.parse import urlparse
 
 import spacy
-from spacy.cli.download import get_compatibility
-
 from git import Repo
+from spacy.cli.download import get_compatibility
 
 from .file_management import (
     delete_directory,

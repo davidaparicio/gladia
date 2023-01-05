@@ -1,8 +1,10 @@
 from setuptools import setup
 
+
 def readme():
     with open("README.md") as f:
         return f.read()
+
 
 REQUIREMENTS = [i.strip() for i in open("requirements.txt").readlines()]
 
