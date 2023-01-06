@@ -181,11 +181,13 @@ To know more about test please check this [readme dedicated to test](https://git
 
 ## Tested Hardware
 
-- Nvidia V100
-- Nvidia V100s
-- Nvidia P100
-- Nvidia 3070
-- Nvidia 3070 Ti
+- Nvidia A100 ✅
+- Nvidia A10 ✅
+- Nvidia V100 ✅
+- Nvidia V100s ✅
+- Nvidia P100 ✅
+- Nvidia 3070 => Need ImageGeneration Memory Slicing (coming soon)
+- Nvidia 3070 Ti => Need ImageGeneration Memory Slicing (coming soon)
 
 ## As a new developer, very first steps in full control
 
