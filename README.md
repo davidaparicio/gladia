@@ -187,11 +187,15 @@ To know more about test please check this [readme dedicated to test](https://git
 
 ## Tested Hardware
 
-- Nvidia V100
-- Nvidia V100s
-- Nvidia P100
-- Nvidia 3070
-- Nvidia 3070 Ti
+- Nvidia A100 PCIe (40GB) ✅
+- Nvidia A100 SXM4 (40GB) ✅
+- Nvidia A100 SXM4 (80GB) ✅
+- Nvidia A10 PCIe (24GB) ✅
+- Nvidia V100 PCIe (16GB) ✅
+- Nvidia V100s PCIe (32GB) ✅
+- Nvidia P100 PCIe (16GB) ✅
+- Nvidia 3070 => Need ImageGeneration Memory Slicing (coming soon)
+- Nvidia 3070 Ti => Need ImageGeneration Memory Slicing (coming soon)
 
 ## As a new developer, very first steps in full control
 
