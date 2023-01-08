@@ -112,9 +112,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
         ffmpeg \
         nvidia-cuda-toolkit \
         protobuf-compiler && \
-    #echo "== ADJUSTING binaries ==" && \
-    #ln -sf /usr/bin/python38 /usr/bin/python3 && \
-    #ln -sf /usr/bin/python /usr/bin/python3 && \
     echo "== INSTALLING GITLFS ==" && \
     cd /tmp && \
     wget https://github.com/git-lfs/git-lfs/releases/download/v3.0.1/git-lfs-linux-386-v3.0.1.tar.gz && \
