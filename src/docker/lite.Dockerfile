@@ -62,9 +62,7 @@ RUN mkdir -p $GLADIA_TMP_PATH \
              $PYTORCH_TRANSFORMERS_CACHE \
              $PYTORCH_PRETRAINED_BERT_CACHE \
              $NLTK_DATA \
-             $PATH_TO_GLADIA_SRC \
-             $MII_CACHE_PATH \
-             $MII_MODEL_PATH
+             $PATH_TO_GLADIA_SRC
 
 COPY ./tools/docker/clean-layer.sh $CLEAN_LAYER_SCRIPT
 
