@@ -142,10 +142,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
 
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH
 
-# TODO: this deepspeed fix should be implemented at the deepspeed
-# level later with a PR
-# here: https://github.com/microsoft/DeepSpeed-MII/blob/cd6a07f6f6616d2378b3e05c90ec7ba234b888f7/mii/deployment.py#L97
-RUN ln -s $MII_MODEL_PATH /tmp/mii_models
 
 COPY . $PATH_TO_GLADIA_SRC
 
