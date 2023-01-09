@@ -29,7 +29,7 @@ DEFAULT_MODEL_VERSION = yaml.safe_load(
 
 DEFAULT_MODEL = {
     "version": DEFAULT_MODEL_VERSION,
-    "model": whisper.load_model(DEFAULT_MODEL_VERSION),
+    "model": None,
 }
 
 
@@ -70,7 +70,11 @@ def predict(
 
         if DEFAULT_MODEL["version"] != model_version:
             model = whisper.load_model(model_version)
+
         else:
+            if not DEFAULT_MODEL["model"]:
+                DEFAULT_MODEL["model"] = whisper.load_model(DEFAULT_MODEL_VERSION)
+
             model = DEFAULT_MODEL["model"]
 
         asr_result = model.transcribe(tmp_file)
