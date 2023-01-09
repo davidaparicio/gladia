@@ -13,6 +13,45 @@ NLTK_CACHE_PURGE="${NLTK_CACHE_PURGE:-false}"
 
 MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-/$GLADIA_PERSISTENT_PATH/conda}"
 
+# if MANUAL_FORCE_UPDATE is true, skip the update
+# this is useful for devs for faster server start
+# its a flag from the bash
+# Initialize the flag variable
+MANUAL_SKIP_UPDATE=false
+MANUAL_SKIP_PREPARE=false
+
+# Use getopts to parse the options
+while getopts ":sp" opt; do
+  case $opt in
+    s) MANUAL_SKIP_UPDATE=true;;
+    p) MANUAL_SKIP_PREPARE=true;;
+    \?) echo "Invalid option: -$OPTARG" >&2
+        exit 1;;
+  esac
+done
+
+# Shift the options to the left to remove them from the positional parameters
+shift $((OPTIND - 1))
+
+# Check the value of the flag
+if [ $MANUAL_SKIP_UPDATE -eq 1 ]; then
+  # Do something if the flag is set
+  echo "MANUAL_SKIP_UPDATE is set"
+else
+  # Do something if the flag is not set
+  echo "MANUAL_SKIP_UPDATE is not set"
+fi
+
+# Check the value of the flag
+if [ $MANUAL_SKIP_PREPARE -eq 1 ]; then
+  # Do something if the flag is set
+  echo "MANUAL_SKIP_PREPARE is set"
+else
+  # Do something if the flag is not set
+  echo "MANUAL_SKIP_PREPARE is not set"
+fi
+
+
 for path in $PATH_TO_GLADIA_SRC $GLADIA_PERSISTENT_PATH $SPACY_CACHE_DIR $NLTK_DATA $MAMBA_ROOT_PREFIX; do
     if [ ! -d $path ]; then
         mkdir -p $path
@@ -36,19 +75,25 @@ else
   echo -e "${C}Server env doesn't exists.${EC}"
   echo -e "${C}Creating server env.${EC}"
   micromamba create -n server -y
+
+  echo -e "${C}Installing minimal requirements.${EC}"
+  micromamba -n server install conda-forge::pyyaml conda-forge::tqdm
 fi
 
-echo -e "${C}Installing minimal requirements.${EC}"
-micromamba -n server install conda-forge::pyyaml conda-forge::tqdm
+# if MANUAL_SKIP_UPDATE is set to true, skip the update
+# this is useful for devs for faster server start
+# its a flag from the bash
+if [ "$MANUAL_SKIP_UPDATE" == "true" ]; then
+  echo -e "${C}Skipping Server env update manually .${EC}"
+else
+  echo -e "${C}Updating Server env.${EC}"
+  micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py  --server_env --debug_mode --debug_mode --force_update"
+  echo -e "${P}== INIT Micromamba Venvs if needed==${EC}"
+  micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*' --debug_mode";
+fi
 
-echo -e "${C}Installing env server requirements.${EC}"
-micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py  --server_env --debug_mode --force_update"
-
-echo -e "${P}== INIT Micromamba Venvs ==${EC}"
-micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*' --debug_mode";
-
-
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/nvidia/cublas/lib/"
 
 # Check if the string is already present in .bashrc
 # If not, add it
@@ -90,7 +135,15 @@ if [ "$NLTK_CACHE_PURGE" == "true" ]; then
     rm -rvf $NLTK_DATA
 fi
 
-micromamba run -n server --cwd $PATH_TO_GLADIA_SRC python prepare.py
+#if MANUAL_SKIP_PREPARE is set to true, skip the prepare
+# this is useful for devs for faster server start
+# its a flag from the bash
+if [ "$MANUAL_SKIP_PREPARE" == "true" ]; then
+  echo -e "${C}Skipping prepare manually .${EC}"
+else
+  echo -e "${P}== PREPARE Gladia ==${EC}"
+  micromamba run -n server --cwd $PATH_TO_GLADIA_SRC python prepare.py
+fi
 
 echo -e "${P}== START Gladia ==${EC}"
 micromamba run -n server --cwd $PATH_TO_GLADIA_SRC gunicorn main:app \
