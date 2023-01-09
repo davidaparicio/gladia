@@ -298,11 +298,17 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
     )
 
     final_env_channel_file_path = os.path.join(
-        MAMBA_ROOT_PREFIX, "envs", env_name, f"{ENV_DEFAULT_FILENAME_WITHOUT_EXTENSION}-channel.yaml"
+        MAMBA_ROOT_PREFIX,
+        "envs",
+        env_name,
+        f"{ENV_DEFAULT_FILENAME_WITHOUT_EXTENSION}-channel.yaml",
     )
 
     final_env_pip_file_path = os.path.join(
-        MAMBA_ROOT_PREFIX, "envs", env_name, f"{ENV_DEFAULT_FILENAME_WITHOUT_EXTENSION}-pip.txt"
+        MAMBA_ROOT_PREFIX,
+        "envs",
+        env_name,
+        f"{ENV_DEFAULT_FILENAME_WITHOUT_EXTENSION}-pip.txt",
     )
 
     try:
