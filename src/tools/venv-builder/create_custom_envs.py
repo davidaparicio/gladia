@@ -41,6 +41,7 @@ def delete_file(file_path: str) -> None:
     if os.path.exists(file_path):
         os.remove(file_path)
 
+
 def get_gladia_api_utils_package() -> Tuple[List[str], List[str]]:
     """
     Retrieve the packages to install from the gladia api utils env file
