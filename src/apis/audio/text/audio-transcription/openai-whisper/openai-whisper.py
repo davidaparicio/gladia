@@ -68,7 +68,7 @@ def predict(
 
     try:
 
-        if DEFAULT_MODEL["version"] != model_version:
+        if model_version != DEFAULT_MODEL["version"]:
             model = whisper.load_model(model_version)
 
         else:
