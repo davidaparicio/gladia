@@ -710,6 +710,9 @@ def main():
 
         return env
     else:
+        # avoid importing this api_utils at the top of the file
+        # to avoid issue at the init of the server env
+        global get_activated_task_path
         from gladia_api_utils import get_activated_task_path
 
         return build_env_for_activated_tasks(

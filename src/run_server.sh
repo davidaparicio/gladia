@@ -20,11 +20,20 @@ MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-/$GLADIA_PERSISTENT_PATH/conda}"
 MANUAL_SKIP_UPDATE=false
 MANUAL_SKIP_PREPARE=false
 
+help_message="Usage: ./run_server.sh [-f] [-s] [-h]
+
+Options:
+  -s  Set the flag to skip manually server env update
+  -v  Set the flag to skip manually venvs updates
+  -h  Display this help message"
+
 # Use getopts to parse the options
-while getopts ":sp" opt; do
+while getopts ":svh" opt; do
   case $opt in
     s) MANUAL_SKIP_UPDATE=true;;
-    p) MANUAL_SKIP_PREPARE=true;;
+    v) MANUAL_SKIP_PREPARE=true;;
+    h) echo "$help_message"
+       exit 0;;
     \?) echo "Invalid option: -$OPTARG" >&2
         exit 1;;
   esac
@@ -124,7 +133,7 @@ $CLEAN_LAYER_SCRIPT
 
 echo -e "${P}== START supervisor ==${EC}"
 service supervisor start
-
+echo
 echo -e "${P}== INIT nltk + Spacy ==${EC}"
 if [ "$SPACY_CACHE_PURGE" == "true" ]; then
     echo -e "${R}Purging Spacy cache.${EC}"
