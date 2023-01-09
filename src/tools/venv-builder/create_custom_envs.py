@@ -27,6 +27,20 @@ MAMBA_ROOT_PREFIX = os.getenv("MAMBA_ROOT_PREFIX", f"{GLADIA_PERSISTENT_PATH}/co
 
 FORCE_ENV_UPDATE = os.getenv("FORCE_ENV_UPDATE", "False").lower() == "true"
 
+
+def delete_file(file_path: str) -> None:
+    """
+    Delete a file if it exists
+
+    Args:
+        file_path (str): path to the file to delete
+
+    Returns:
+        None
+    """
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
 def get_gladia_api_utils_package() -> Tuple[List[str], List[str]]:
     """
     Retrieve the packages to install from the gladia api utils env file
@@ -460,12 +474,12 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
             )
             Path(temporary_file_pip.name)
 
-        Path(temporary_file.name).unlink()
-        Path(temporary_file.name + ".yaml").unlink()
-        Path(temporary_file_channel.name).unlink()
-        Path(temporary_file_channel.name + ".yaml").unlink()
-        Path(temporary_file_pip.name).unlink()
-        Path(temporary_file_pip.name + ".txt").unlink()
+        delete_file(temporary_file.name)
+        delete_file(temporary_file.name + ".yaml")
+        delete_file(temporary_file_channel.name)
+        delete_file(temporary_file_channel.name + ".yaml")
+        delete_file(temporary_file_pip.name)
+        delete_file(temporary_file_pip.name + ".txt")
 
 
 def build_specific_envs(paths: List[str]) -> None:
