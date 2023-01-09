@@ -20,18 +20,20 @@ MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-/$GLADIA_PERSISTENT_PATH/conda}"
 MANUAL_SKIP_UPDATE=false
 MANUAL_SKIP_PREPARE=false
 
-help_message="Usage: ./run_server.sh [-f] [-s] [-h]
+help_message="Usage: ./run_server.sh [-f] [-s] [-h] [-p]
 
 Options:
   -s  Set the flag to skip manually server env update
   -v  Set the flag to skip manually venvs updates
+  -p  Set the flag to skip manually gladia preparation's steps
   -h  Display this help message"
 
 # Use getopts to parse the options
-while getopts ":svh" opt; do
+while getopts ":svph" opt; do
   case $opt in
-    s) MANUAL_SKIP_UPDATE=true;;
-    v) MANUAL_SKIP_PREPARE=true;;
+    s) MANUAL_SKIP_SERVER_UPDATE=true;;
+    v) MANUAL_SKIP_VENV_UPDATE=true;;
+    p) MANUAL_SKIP_PREPARE=true;;
     h) echo "$help_message"
        exit 0;;
     \?) echo "Invalid option: -$OPTARG" >&2
@@ -43,12 +45,20 @@ done
 shift $((OPTIND - 1))
 
 # Check the value of the flag
-if [ $MANUAL_SKIP_UPDATE -eq 1 ]; then
+if [ $MANUAL_SKIP_SERVER_UPDATE -eq 1 ]; then
   # Do something if the flag is set
-  echo "MANUAL_SKIP_UPDATE is set"
+  echo "MANUAL_SKIP_SERVER_UPDATE is set"
 else
   # Do something if the flag is not set
-  echo "MANUAL_SKIP_UPDATE is not set"
+  echo "MANUAL_SKIP_SERVER_UPDATE is not set"
+fi
+
+if [ $MANUAL_SKIP_VENV_UPDATE -eq 1 ]; then
+  # Do something if the flag is set
+  echo "MANUAL_SKIP_VENV_UPDATE is set"
+else
+  # Do something if the flag is not set
+  echo "MANUAL_SKIP_VENV_UPDATE is not set"
 fi
 
 # Check the value of the flag
@@ -92,11 +102,16 @@ fi
 # if MANUAL_SKIP_UPDATE is set to true, skip the update
 # this is useful for devs for faster server start
 # its a flag from the bash
-if [ "$MANUAL_SKIP_UPDATE" == "true" ]; then
+if [ "$MANUAL_SKIP_SERVER_UPDATE" == "true" ]; then
   echo -e "${C}Skipping Server env update manually .${EC}"
 else
   echo -e "${C}Updating Server env.${EC}"
   micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py  --server_env --debug_mode --debug_mode --force_update"
+fi
+
+if [ "$MANUAL_SKIP_VENV_UPDATE" == "true" ]; then
+  echo -e "${C}Skipping Venvs update manually .${EC}"
+else
   echo -e "${P}== INIT Micromamba Venvs if needed==${EC}"
   micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*' --debug_mode";
 fi

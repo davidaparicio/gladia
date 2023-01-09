@@ -18,8 +18,8 @@ logger = getLogger(__name__)
 LOGGER_COLOR_CYAN = "\x1b[36m"
 LOGGER_COLOR_RESET = "\x1b[39m"
 
-
-ENV_DEFAULT_FILENAME = "env.yaml"
+ENV_DEFAULT_FILENAME_WITHOUT_EXTENSION = "env"
+ENV_DEFAULT_FILENAME = f"{ENV_DEFAULT_FILENAME_WITHOUT_EXTENSION}.yaml"
 
 PATH_TO_GLADIA_SRC = os.getenv("PATH_TO_GLADIA_SRC", "/app/src")
 GLADIA_PERSISTENT_PATH = os.getenv("GLADIA_PERSISTENT_PATH", "/gladia")
@@ -294,15 +294,15 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
     )
 
     final_env_file_path = os.path.join(
-        MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}.yaml"
+        MAMBA_ROOT_PREFIX, "envs", env_name, ENV_DEFAULT_FILENAME
     )
 
     final_env_channel_file_path = os.path.join(
-        MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}-channel.yaml"
+        MAMBA_ROOT_PREFIX, "envs", env_name, f"{ENV_DEFAULT_FILENAME_WITHOUT_EXTENSION}-channel.yaml"
     )
 
     final_env_pip_file_path = os.path.join(
-        MAMBA_ROOT_PREFIX, "envs", env_name, f"{env_name}-pip.txt"
+        MAMBA_ROOT_PREFIX, "envs", env_name, f"{ENV_DEFAULT_FILENAME_WITHOUT_EXTENSION}-pip.txt"
     )
 
     try:
@@ -484,6 +484,7 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
             )
             Path(temporary_file_pip.name)
 
+        delete_file(temp_env_file_path)
         delete_file(temporary_file.name)
         delete_file(temporary_file.name + ".yaml")
         delete_file(temporary_file_channel.name)
