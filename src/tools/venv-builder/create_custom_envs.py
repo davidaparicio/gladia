@@ -2,12 +2,12 @@ import argparse
 import difflib
 import logging
 import os
-from pathlib import Path
 import re
 import shutil
 import subprocess
 import tempfile
 from logging import getLogger
+from pathlib import Path
 from typing import List, Tuple
 
 import yaml
@@ -288,7 +288,6 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
     # input and output of the api natively
     packages_to_install_from_pip += [f"-e {PATH_TO_GLADIA_SRC}/api_utils/"]
 
-
     temporary_file, temporary_file_channel, temporary_file_pip = create_temp_env_files(
         env_name, packages_to_install_from_channel, list_of_pip_packages_to_install
     )
@@ -340,7 +339,15 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
             # if the env file has changed we will update the env
             elif len(diff_lines(final_env_file_path, temp_env_file_path)) > 0:
 
-                if final_env_channel_file_path_exists and len(diff_lines(final_env_channel_file_path, temporary_file_channel.name)) > 0:
+                if (
+                    final_env_channel_file_path_exists
+                    and len(
+                        diff_lines(
+                            final_env_channel_file_path, temporary_file_channel.name
+                        )
+                    )
+                    > 0
+                ):
                     logger.info(
                         LOGGER_COLOR_CYAN
                         + f"Env {env_name}: env's channel dependencies changed meaning env's channel need a rebuild"
@@ -349,7 +356,13 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
                     action = "update"
                     should_update_channel = True
 
-                if final_env_pip_file_path_exists and len(diff_lines(final_env_pip_file_path, temporary_file_pip.name)) > 0:
+                if (
+                    final_env_pip_file_path_exists
+                    and len(
+                        diff_lines(final_env_pip_file_path, temporary_file_pip.name)
+                    )
+                    > 0
+                ):
                     logger.info(
                         LOGGER_COLOR_CYAN
                         + f"Env {env_name}: env's pip dependencies changed meaning env's pip need a rebuild"
@@ -357,7 +370,6 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
                     )
                     action = "update"
                     should_update_pip = True
-
 
         # if the env doesn't exist we will create it
         else:
@@ -379,9 +391,7 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
 
             if action == "create":
                 logger.info(
-                    LOGGER_COLOR_CYAN
-                    + f"Creating env {env_name}"
-                    + LOGGER_COLOR_RESET
+                    LOGGER_COLOR_CYAN + f"Creating env {env_name}" + LOGGER_COLOR_RESET
                 )
 
                 subprocess.run(
@@ -404,9 +414,7 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
             # if the env is being created we don't need to check if the pip env file is different
             if action == "update":
                 logger.info(
-                    LOGGER_COLOR_CYAN
-                    + f"Updating env {env_name}"
-                    + LOGGER_COLOR_RESET
+                    LOGGER_COLOR_CYAN + f"Updating env {env_name}" + LOGGER_COLOR_RESET
                 )
                 if should_update_channel:
                     logger.info(
@@ -414,7 +422,10 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
                         + f"Updating channels for env {env_name}"
                         + LOGGER_COLOR_RESET
                     )
-                    os.link(temporary_file_channel.name, temporary_file_channel.name + ".yaml")
+                    os.link(
+                        temporary_file_channel.name,
+                        temporary_file_channel.name + ".yaml",
+                    )
 
                     subprocess.run(
                         [
@@ -423,7 +434,7 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
                             "-f",
                             f"{temporary_file_channel.name}.yaml",
                             "--retry-clean-cache",
-                            "-y"
+                            "-y",
                         ]
                     )
 
@@ -434,15 +445,17 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
                         + LOGGER_COLOR_RESET
                     )
                     os.link(temporary_file_pip.name, temporary_file_pip.name + ".txt")
-                    subprocess.run([
-                        "micromamba",
-                        "run",
-                        "-n",
-                        env_name,
-                        "/bin/bash",
-                        "-c",
-                        f"pip install --upgrade -r {temporary_file_pip.name}.txt",
-                    ])
+                    subprocess.run(
+                        [
+                            "micromamba",
+                            "run",
+                            "-n",
+                            env_name,
+                            "/bin/bash",
+                            "-c",
+                            f"pip install --upgrade -r {temporary_file_pip.name}.txt",
+                        ]
+                    )
 
         # if action = "" just log that the env is up to date
         else:
@@ -452,15 +465,11 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
                 + LOGGER_COLOR_RESET
             )
 
-
     except subprocess.CalledProcessError as error:
         raise RuntimeError(f"Couldn't create env {env_name}: {error}")
 
     finally:
-        shutil.copyfile(
-            src=temporary_file.name,
-            dst=final_env_file_path
-        )
+        shutil.copyfile(src=temporary_file.name, dst=final_env_file_path)
 
         shutil.copyfile(
             src=temporary_file_channel.name,
@@ -677,7 +686,9 @@ def main():
         path_to_apis = os.path.join(os.getenv("PATH_TO_GLADIA_SRC", "/app"), "apis")
 
     if args.server_env:
-        path_to_server_env = os.path.join(os.getenv("PATH_TO_GLADIA_SRC", "/app"), "env.yaml")
+        path_to_server_env = os.path.join(
+            os.getenv("PATH_TO_GLADIA_SRC", "/app"), "env.yaml"
+        )
 
         env = create_custom_env(
             env_name="server",
@@ -685,15 +696,17 @@ def main():
         )
 
         # install extra packages for the server
-        subprocess.run([
-            "micromamba",
-            "run",
-            "-n",
-            "server",
-            "/bin/bash",
-            "-c",
-            'pip install "jax[cuda11_cudnn82]==0.3.25" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html'
-        ])
+        subprocess.run(
+            [
+                "micromamba",
+                "run",
+                "-n",
+                "server",
+                "/bin/bash",
+                "-c",
+                'pip install "jax[cuda11_cudnn82]==0.3.25" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html',
+            ]
+        )
 
         return env
     else:
