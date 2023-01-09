@@ -28,29 +28,45 @@ G="\e[32m"
 R="\e[31m"
 EC="\e[0m"
 echo -e "${P}== INIT Micromamba Server Env ==${EC}"
-if [ -f $MAMBA_ROOT_PREFIX/envs/server/server.yml ]; then
-    echo -e "${C}Updating micromamba server env.${EC}"
-    micromamba install -f $PATH_TO_GLADIA_SRC/env.yaml -y
-    cp $PATH_TO_GLADIA_SRC/env.yaml $MAMBA_ROOT_PREFIX/envs/server/server.yml
-    micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]==0.3.25\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
-    micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
+
+echo -e "${C}Checking micromamba minimal server env requirements.${EC}"
+if micromamba env list | grep envs/server; then
+  echo -e "${C}Server env exists.${EC}"
 else
-    echo -e "${G}Creating micromamba server.${EC}"
-    micromamba create -f env.yaml -y
-    cp $PATH_TO_GLADIA_SRC/env.yaml $MAMBA_ROOT_PREFIX/envs/server/server.yml
-    micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]==0.3.25\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
-    micromamba run -n server /bin/bash -c "pip install \"jax[cuda11_cudnn82]\" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
+  echo -e "${C}Server env doesn't exists.${EC}"
+  echo -e "${C}Creating server env.${EC}"
+  micromamba create -n server -y
 fi
 
-export LD_LIBRARY_PATH=$MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/nvidia/cublas/lib/:$LD_LIBRARY_PATH
+echo -e "${C}Installing minimal requirements.${EC}"
+micromamba -n server install conda-forge::pyyaml conda-forge::tqdm
+
+echo -e "${C}Installing env server requirements.${EC}"
+micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py  --server_env --debug_mode --force_update"
 
 echo -e "${P}== INIT Micromamba Venvs ==${EC}"
-#micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*' --debug_mode";
+micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*' --debug_mode";
 
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/"
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/nvidia/cublas/lib/"
 
-echo -e "${P}== FIX Protobuh ==${EC}"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/"
+
+# Check if the string is already present in .bashrc
+# If not, add it
+STRING_EXISTS=`grep "export LD_LIBRARY_PATH=\"\$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/\"" ~/.bashrc`
+
+if [ -z "$STRING_EXISTS" ]; then
+    # String is not present, add it
+    echo "export LD_LIBRARY_PATH=\"\$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/\"" >> ~/.bashrc
+fi
+
+# same for cublas
+STRING_EXISTS=`grep "export LD_LIBRARY_PATH=\"\$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/nvidia/cublas/lib/\"" ~/.bashrc`
+if [ -z "$STRING_EXISTS" ]; then
+    # String is not present, add it
+    echo "export LD_LIBRARY_PATH=\"\$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/nvidia/cublas/lib/\"" >> ~/.bashrc
+fi
+
+echo -e "${P}== FIX Protobuf ==${EC}"
 wget https://raw.githubusercontent.com/protocolbuffers/protobuf/main/python/google/protobuf/internal/builder.py -O $MAMBA_ROOT_PREFIX/envs/server/lib/python3.8/site-packages/google/protobuf/internal/builder.py
 
 echo -e "${P}== ADJUST path rights ==${EC}"
@@ -73,6 +89,7 @@ if [ "$NLTK_CACHE_PURGE" == "true" ]; then
     echo -e "${R}Purging NLTK cache.${EC}"
     rm -rvf $NLTK_DATA
 fi
+
 micromamba run -n server --cwd $PATH_TO_GLADIA_SRC python prepare.py
 
 echo -e "${P}== START Gladia ==${EC}"

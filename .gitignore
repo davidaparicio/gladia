@@ -2,7 +2,7 @@
 .vscode/
 __pycache__/
 *.py[cod]
-*$py.class 
+*$py.class
 
 # Logs
 *.log
@@ -35,6 +35,9 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.conda/
+.keras/
+.mamba/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
