@@ -17,29 +17,49 @@ MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-/$GLADIA_PERSISTENT_PATH/conda}"
 # this is useful for devs for faster server start
 # its a flag from the bash
 # Initialize the flag variable
-MANUAL_SKIP_UPDATE=false
-MANUAL_SKIP_PREPARE=false
+MANUAL_SKIP_UPDATE=0
+MANUAL_SKIP_PREPARE=0
+PYTHON_VERSION="${PYTHON_VERSION:-3.8}"
 
-help_message="Usage: ./run_server.sh [-f] [-s] [-h] [-p]
+help_message="Usage: ./run_server.sh [-s] [-v] [-p] [-c] [-h]
 
 Options:
   -s  Set the flag to skip manually server env update
   -v  Set the flag to skip manually venvs updates
   -p  Set the flag to skip manually gladia preparation's steps
+  -c  Set the python version to use for the venvs
   -h  Display this help message"
 
 # Use getopts to parse the options
 while getopts ":svph" opt; do
   case $opt in
-    s) MANUAL_SKIP_SERVER_UPDATE=$OPTARG;;
-    v) MANUAL_SKIP_VENV_UPDATE=$OPTARG;;
-    p) MANUAL_SKIP_PREPARE=$OPTARG;;
+    s) MANUAL_SKIP_SERVER_UPDATE=1;;
+    v) MANUAL_SKIP_VENV_UPDATE=1;;
+    p) MANUAL_SKIP_PREPARE=1;;
+    c) PYTHON_VERSION=$OPTARG;;
     h) echo "$help_message"
        exit 0;;
     \?) echo "Invalid option: -$OPTARG" >&2
         exit 1;;
   esac
 done
+
+
+FORCE_ENV_UPDATE="${FORCE_ENV_UPDATE:-0}"
+FORCE_ENV_RECREATE="${FORCE_VENV_RECREATE:-0}"
+
+venv_opts=""
+
+# if FORCE_VENV_UPDATE=true set options to --force_update
+if [ "$FORCE_ENV_UPDATE" == "true" ]; then
+  venv_opts="$venv_opts --force_update"
+fi
+
+# if FORCE_VENV_RECREATE=1 set options to --force_recreate
+if [ "$FORCE_ENV_RECREATE" == "true" ]; then
+  venv_opts="$venv_opts --force_recreate"
+fi
+
 
 for path in $PATH_TO_GLADIA_SRC $GLADIA_PERSISTENT_PATH $SPACY_CACHE_DIR $NLTK_DATA $MAMBA_ROOT_PREFIX; do
     if [ ! -d $path ]; then
@@ -59,12 +79,11 @@ echo -e "${P}== INIT Micromamba Server Env ==${EC}"
 
 echo -e "${C}Checking micromamba minimal boot env requirements.${EC}"
 if micromamba env list | grep envs/boot; then
-  echo -e "${C}Cleaning boot env exists.${EC}"
-
+  echo -e "${C}Boot env exists.${EC}"
 else
   echo -e "${C}Boot env doesn't exists.${EC}"
   echo -e "${C}Creating Boot env and installing minimal requirements.${EC}"
-  micromamba create -n boot python=3.8 -y
+  micromamba create -n boot python=$PYTHON_VERSION -y
 fi
 
 micromamba -n boot install conda-forge::pyyaml conda-forge::tqdm
@@ -72,18 +91,19 @@ micromamba -n boot install conda-forge::pyyaml conda-forge::tqdm
 # if MANUAL_SKIP_UPDATE is set to true, skip the update
 # this is useful for devs for faster server start
 # its a flag from the bash
-if [ "$MANUAL_SKIP_SERVER_UPDATE" == "true" ]; then
+if [ "$MANUAL_SKIP_SERVER_UPDATE" == "1" ]; then
   echo -e "${C}Skipping Server env update manually .${EC}"
 else
   echo -e "${C}Updating Server env.${EC}"
-  micromamba run -n boot --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py  --server_env --debug_mode --debug_mode --force_recreate --python_version=3.8"
+  rm -rf $MAMBA_ROOT_PREFIX/envs/server
+  micromamba run -n boot --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py  --server_env --debug_mode --debug_mode --force_recreate --python_version=$PYTHON_VERSION"
 fi
 
-if [ "$MANUAL_SKIP_VENV_UPDATE" == "true" ]; then
+if [ "$MANUAL_SKIP_VENV_UPDATE" == "1" ]; then
   echo -e "${C}Skipping Venvs update manually .${EC}"
 else
   echo -e "${P}== INIT Micromamba Venvs if needed ==${EC}"
-  micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*' --debug_mode --python_version=3.8";
+  micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*' --debug_mode --python_version=$PYTHON_VERSION $venv_opts";
 fi
 
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/"
@@ -132,7 +152,7 @@ fi
 #if MANUAL_SKIP_PREPARE is set to true, skip the prepare
 # this is useful for devs for faster server start
 # its a flag from the bash
-if [ "$MANUAL_SKIP_PREPARE" == "true" ]; then
+if [ "$MANUAL_SKIP_PREPARE" == "1" ]; then
   echo -e "${C}Skipping prepare manually .${EC}"
 else
   echo -e "${P}== PREPARE Gladia ==${EC}"

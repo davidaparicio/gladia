@@ -42,6 +42,7 @@ ENV DOCKER_USER=$DOCKER_USER \
     distro="ubuntu2004" \
     arch="x86_64" \
     TZ="UTC" \
+    PYTHON_VERSION="3.8" \
     MAMBA_ROOT_PREFIX=$GLADIA_PERSISTENT_PATH/conda \
     MAMBA_EXE="/usr/local/bin/micromamba" \
     MAMBA_DOCKERFILE_ACTIVATE=1 \

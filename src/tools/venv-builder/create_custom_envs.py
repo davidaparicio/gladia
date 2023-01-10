@@ -167,7 +167,6 @@ dependencies:"""
     )
 
     content = content_chan
-    content_pip = str()
     content_pip_requirements = str()
 
     if (
@@ -294,7 +293,7 @@ def create_custom_env(
     packages_to_install_from_pip += [f"-e {PATH_TO_GLADIA_SRC}/api_utils/"]
 
     temporary_file, temporary_file_channel, temporary_file_pip = create_temp_env_files(
-        env_name, packages_to_install_from_channel, list_of_pip_packages_to_install
+        env_name, list_of_channel_packages_to_install, list_of_pip_packages_to_install
     )
 
     final_env_file_path = os.path.join(

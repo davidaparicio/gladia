@@ -106,6 +106,17 @@ jobs:
         run: |
           echo "TEST_DEFAULT_MODELS_ONLY=" >> $GITHUB_ENV
 
+      - name: Set env variables to set FORCE_VENV_UPDATE
+        if: |
+          contains(github.event.pull_request.labels.*.name, 'ci: force-env-update')
+        run: |
+          echo "FORCE_ENV_UPDATE=true" >> $GITHUB_ENV
+      - name: Set env variables to set FORCE_VENV_RECREATE
+        if: |
+          contains(github.event.pull_request.labels.*.name, 'ci: force-env-recreate')
+        run: |
+          echo "FORCE_ENV_RECREATE=true" >> $GITHUB_ENV
+
       # Wait for pod to start
       - name: Gladia container readiness
         run: |
