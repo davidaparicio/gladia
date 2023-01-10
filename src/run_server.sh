@@ -83,7 +83,7 @@ if micromamba env list | grep envs/boot; then
 else
   echo -e "${C}Boot env doesn't exists.${EC}"
   echo -e "${C}Creating Boot env and installing minimal requirements.${EC}"
-  micromamba create -n boot python=$PYTHON_VERSION -y
+  micromamba create -n boot python=$PYTHON_VERSION -c conda-forge
 fi
 
 micromamba -n boot install conda-forge::pyyaml conda-forge::tqdm
