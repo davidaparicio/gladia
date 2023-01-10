@@ -27,6 +27,7 @@ MAMBA_ROOT_PREFIX = os.getenv("MAMBA_ROOT_PREFIX", f"{GLADIA_PERSISTENT_PATH}/co
 
 FORCE_ENV_UPDATE = os.getenv("FORCE_ENV_UPDATE", "False").lower() == "true"
 
+PYTHON_VERSION = os.getenv("PYTHON_VERSION", "3.8")
 
 def delete_file(file_path: str) -> None:
     """
@@ -204,7 +205,7 @@ dependencies:"""
     return tmp, tmpchan, tmppip
 
 
-def create_custom_env(env_name: str, path_to_env_file: str) -> None:
+def create_custom_env(env_name: str, path_to_env_file: str, force_recreate: bool=False) -> None:
     """
     create the mamba env for the provided env file
 
@@ -331,6 +332,9 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
         # first check if the env already exists
         should_update_pip = False
         should_update_channel = False
+        if force_recreate:
+            final_env_file_path_exists = False
+
         if final_env_file_path_exists:
             # if FORCE_ENV_UPDATE is set to true we will update the env
             if FORCE_ENV_UPDATE:
@@ -405,6 +409,9 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
                     [
                         "micromamba",
                         "create",
+                        "-n",
+                        env_name,
+                        f"python={PYTHON_VERSION}",
                         "-f",
                         f"{temporary_file.name}.yaml",
                         "--retry-clean-cache",
@@ -536,7 +543,7 @@ def build_specific_envs(paths: List[str]) -> None:
 
 
 def build_env_for_activated_tasks(
-    path_to_config_file: str, path_to_apis: str, modality=".*", full_path_mode=False
+    path_to_config_file: str, path_to_apis: str, modality: str=".*", full_path_mode: bool=False, force_recreate: bool=False
 ) -> None:
     """
     Build the mamba env for every activated tasks
@@ -547,6 +554,7 @@ def build_env_for_activated_tasks(
         modality (str): modality name pattern filter (default: .*)
         full_path_mode (bool): If True, will not check regex, not check activated task and
             use modality as a full path to the api env to build (default: False)
+        force_recreate (bool): If True, will force the recreation of the env even if the env file didn't change (default: False)
 
     Returns:
         None
@@ -568,7 +576,8 @@ def build_env_for_activated_tasks(
             head, task = os.path.split(head.rstrip("/"))
 
             create_custom_env(
-                env_name="-".join([task, model]), path_to_env_file=env_file_path
+                env_name="-".join([task, model]), path_to_env_file=env_file_path,
+                force_recreate=force_recreate
             )
 
         else:
@@ -595,6 +604,7 @@ def build_env_for_activated_tasks(
                 create_custom_env(
                     env_name=os.path.split(task)[1],
                     path_to_env_file=env_file_path,
+                    force_recreate=force_recreate
                 )
 
             # make sur we don't have a __pycache__ folder
@@ -614,6 +624,7 @@ def build_env_for_activated_tasks(
                 create_custom_env(
                     env_name=f"{os.path.split(task)[-1]}-{model}",
                     path_to_env_file=env_file_path,
+                    force_recreate=force_recreate
                 )
 
 
@@ -666,6 +677,19 @@ def main():
         default=False,
         help="Force update of the env (True if called)",
     )
+    parser.add_argument(
+        "--force_recreate",
+        dest="force_recreate",
+        action="store_true",
+        default=False,
+        help="Force re-create of the env (True if called)",
+    )
+    parser.add_argument(
+        "--python_version",
+        action="append",
+        type=str,
+        help="Specify the python version to use for the env. default 3.8",
+    )
     args = parser.parse_args()
 
     if args.debug_mode:
@@ -680,6 +704,10 @@ def main():
 
         # Add the logger handler to the logger
         logger.addHandler(console_handler)
+
+    if args.python_version:
+        global PYTHON_VERSION
+        PYTHON_VERSION = args.python_version[0]
 
     if args.force_update:
         global FORCE_ENV_UPDATE
@@ -701,6 +729,7 @@ def main():
         env = create_custom_env(
             env_name="server",
             path_to_env_file=path_to_server_env,
+            force_recreate=args.force_recreate,
         )
 
         # install extra packages for the server
@@ -728,6 +757,7 @@ def main():
             path_to_apis=path_to_apis,
             modality=args.modality,
             full_path_mode=args.full_path_mode,
+            force_recreate=args.force_recreate,
         )
 
 
