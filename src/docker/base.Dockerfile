@@ -1,5 +1,5 @@
 #https://www.docker.com/blog/advanced-dockerfiles-faster-builds-and-smaller-images-using-buildkit-and-multistage-builds/
-ARG GLADIA_DOCKER_BASE=nvcr.io/nvidia/cuda:11.6.2-devel-ubuntu20.04
+ARG GLADIA_DOCKER_BASE=nvcr.io/nvidia/tritonserver:22.12-py3
 
 
 FROM $GLADIA_DOCKER_BASE
@@ -41,7 +41,8 @@ ENV TRANSFORMERS_CACHE=$GLADIA_TMP_MODEL_PATH/transformers \
     MAMBA_ALWAYS_YES=true \
     PATH=$PATH:/usr/local/bin/:$MAMBA_EXE \
     PATH_TO_GLADIA_SRC=$PATH_TO_GLADIA_SRC \
-    API_SERVER_PORT_HTTP=$API_SERVER_PORT_HTTP
+    API_SERVER_PORT_HTTP=$API_SERVER_PORT_HTTP \
+    TRITON_MODEL_REPOSITORY="/gladia/triton/"
 
 RUN mkdir -p $GLADIA_TMP_PATH && \
     mkdir -p $TRANSFORMERS_CACHE && \
