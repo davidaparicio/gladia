@@ -29,6 +29,7 @@ FORCE_ENV_UPDATE = os.getenv("FORCE_ENV_UPDATE", "False").lower() == "true"
 
 PYTHON_VERSION = os.getenv("PYTHON_VERSION", "3.8")
 
+
 def delete_file(file_path: str) -> None:
     """
     Delete a file if it exists
@@ -205,7 +206,9 @@ dependencies:"""
     return tmp, tmpchan, tmppip
 
 
-def create_custom_env(env_name: str, path_to_env_file: str, force_recreate: bool=False) -> None:
+def create_custom_env(
+    env_name: str, path_to_env_file: str, force_recreate: bool = False
+) -> None:
     """
     create the mamba env for the provided env file
 
@@ -543,7 +546,11 @@ def build_specific_envs(paths: List[str]) -> None:
 
 
 def build_env_for_activated_tasks(
-    path_to_config_file: str, path_to_apis: str, modality: str=".*", full_path_mode: bool=False, force_recreate: bool=False
+    path_to_config_file: str,
+    path_to_apis: str,
+    modality: str = ".*",
+    full_path_mode: bool = False,
+    force_recreate: bool = False,
 ) -> None:
     """
     Build the mamba env for every activated tasks
@@ -576,8 +583,9 @@ def build_env_for_activated_tasks(
             head, task = os.path.split(head.rstrip("/"))
 
             create_custom_env(
-                env_name="-".join([task, model]), path_to_env_file=env_file_path,
-                force_recreate=force_recreate
+                env_name="-".join([task, model]),
+                path_to_env_file=env_file_path,
+                force_recreate=force_recreate,
             )
 
         else:
@@ -604,7 +612,7 @@ def build_env_for_activated_tasks(
                 create_custom_env(
                     env_name=os.path.split(task)[1],
                     path_to_env_file=env_file_path,
-                    force_recreate=force_recreate
+                    force_recreate=force_recreate,
                 )
 
             # make sur we don't have a __pycache__ folder
@@ -624,7 +632,7 @@ def build_env_for_activated_tasks(
                 create_custom_env(
                     env_name=f"{os.path.split(task)[-1]}-{model}",
                     path_to_env_file=env_file_path,
-                    force_recreate=force_recreate
+                    force_recreate=force_recreate,
                 )
 
 
