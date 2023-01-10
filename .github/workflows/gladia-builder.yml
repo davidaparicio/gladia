@@ -135,7 +135,7 @@ jobs:
               sleep 6
           done
 
-          tryReady=200
+          tryReady=300
           while [[ $(/tmp/kubectl -n gladia-test-aipi get pod aipi-test-${{env.DOCKER_BUILD_IMAGE_TAG}} -o=jsonpath='{.status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
               if [ $tryReady -eq 0 ]; then
                 printf "\nError: Test pod timed out while waiting for readyness. Check logs and/or test your build manually."
