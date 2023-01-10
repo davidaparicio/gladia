@@ -367,6 +367,14 @@ def create_custom_env(env_name: str, path_to_env_file: str, force_recreate: bool
                     action = "update"
                     should_update_channel = True
 
+                else:
+                    logger.info(
+                        LOGGER_COLOR_CYAN
+                        + f"Env {env_name}: env's channel dependencies didn't change meaning env's channel doesn't need a rebuild"
+                        + LOGGER_COLOR_RESET
+                    )
+                    should_update_channel = False
+
                 if (
                     final_env_pip_file_path_exists
                     and len(
@@ -381,6 +389,13 @@ def create_custom_env(env_name: str, path_to_env_file: str, force_recreate: bool
                     )
                     action = "update"
                     should_update_pip = True
+                else:
+                    logger.info(
+                        LOGGER_COLOR_CYAN
+                        + f"Env {env_name}: env's dependencies didn't change meaning env doesn't need a rebuild"
+                        + LOGGER_COLOR_RESET
+                    )
+                    should_update_pip = False
 
         # if the env doesn't exist we will create it
         else:

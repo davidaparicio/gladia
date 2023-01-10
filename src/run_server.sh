@@ -31,45 +31,15 @@ Options:
 # Use getopts to parse the options
 while getopts ":svph" opt; do
   case $opt in
-    s) MANUAL_SKIP_SERVER_UPDATE=true;;
-    v) MANUAL_SKIP_VENV_UPDATE=true;;
-    p) MANUAL_SKIP_PREPARE=true;;
+    s) MANUAL_SKIP_SERVER_UPDATE=$OPTARG;;
+    v) MANUAL_SKIP_VENV_UPDATE=$OPTARG;;
+    p) MANUAL_SKIP_PREPARE=$OPTARG;;
     h) echo "$help_message"
        exit 0;;
     \?) echo "Invalid option: -$OPTARG" >&2
         exit 1;;
   esac
 done
-
-# Shift the options to the left to remove them from the positional parameters
-shift $((OPTIND - 1))
-
-# Check the value of the flag
-if [ $MANUAL_SKIP_SERVER_UPDATE -eq 1 ]; then
-  # Do something if the flag is set
-  echo "MANUAL_SKIP_SERVER_UPDATE is set"
-else
-  # Do something if the flag is not set
-  echo "MANUAL_SKIP_SERVER_UPDATE is not set"
-fi
-
-if [ $MANUAL_SKIP_VENV_UPDATE -eq 1 ]; then
-  # Do something if the flag is set
-  echo "MANUAL_SKIP_VENV_UPDATE is set"
-else
-  # Do something if the flag is not set
-  echo "MANUAL_SKIP_VENV_UPDATE is not set"
-fi
-
-# Check the value of the flag
-if [ $MANUAL_SKIP_PREPARE -eq 1 ]; then
-  # Do something if the flag is set
-  echo "MANUAL_SKIP_PREPARE is set"
-else
-  # Do something if the flag is not set
-  echo "MANUAL_SKIP_PREPARE is not set"
-fi
-
 
 for path in $PATH_TO_GLADIA_SRC $GLADIA_PERSISTENT_PATH $SPACY_CACHE_DIR $NLTK_DATA $MAMBA_ROOT_PREFIX; do
     if [ ! -d $path ]; then
@@ -93,7 +63,7 @@ if micromamba env list | grep envs/server; then
 else
   echo -e "${C}Server env doesn't exists.${EC}"
   echo -e "${C}Creating server env.${EC}"
-  micromamba create -n server -y
+  micromamba create -n server python=3.8 -y
 
   echo -e "${C}Installing minimal requirements.${EC}"
   micromamba -n server install conda-forge::pyyaml conda-forge::tqdm
@@ -106,14 +76,14 @@ if [ "$MANUAL_SKIP_SERVER_UPDATE" == "true" ]; then
   echo -e "${C}Skipping Server env update manually .${EC}"
 else
   echo -e "${C}Updating Server env.${EC}"
-  micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py  --server_env --debug_mode --debug_mode --force_update"
+  micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py  --server_env --debug_mode --debug_mode --force_recreate --python_version=3.8"
 fi
 
 if [ "$MANUAL_SKIP_VENV_UPDATE" == "true" ]; then
   echo -e "${C}Skipping Venvs update manually .${EC}"
 else
-  echo -e "${P}== INIT Micromamba Venvs if needed==${EC}"
-  micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*' --debug_mode";
+  echo -e "${P}== INIT Micromamba Venvs if needed ==${EC}"
+  micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*' --debug_mode --python_version=3.8";
 fi
 
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/"
