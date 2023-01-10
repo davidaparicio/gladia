@@ -67,7 +67,7 @@ else
   micromamba create -n boot python=3.8 -y
 fi
 
-micromamba install conda-forge::pyyaml conda-forge::tqdm
+micromamba -n boot install conda-forge::pyyaml conda-forge::tqdm
 
 # if MANUAL_SKIP_UPDATE is set to true, skip the update
 # this is useful for devs for faster server start
@@ -78,11 +78,12 @@ else
   echo -e "${C}Updating Server env.${EC}"
   micromamba run -n boot --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py  --server_env --debug_mode --debug_mode --force_recreate --python_version=3.8"
 fi
+
 if [ "$MANUAL_SKIP_VENV_UPDATE" == "true" ]; then
   echo -e "${C}Skipping Venvs update manually .${EC}"
 else
   echo -e "${P}== INIT Micromamba Venvs if needed ==${EC}"
-  micromamba run -n boot --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*' --debug_mode --python_version=3.8";
+  micromamba run -n server --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py --modality '.*' --debug_mode --python_version=3.8";
 fi
 
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX/envs/server/lib/"
