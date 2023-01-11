@@ -6,11 +6,11 @@ inputs:
 
   language:
     type: str
-    placeholder: "input language"
+    placeholder: "input language using iso 639-3 codes"
     examples:
-      - 'en'
-      - 'es'
-      - 'fr'
+      - 'eng'
+      - 'spa'
+      - 'fra'
 
   entities:
     type: str

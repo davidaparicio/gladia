@@ -1,5 +1,4 @@
 import os
-import shutil
 import sys
 import threading
 from logging import getLogger
@@ -8,6 +7,7 @@ from urllib.parse import urlparse
 
 import spacy
 from git import Repo
+from spacy.cli.download import get_compatibility
 
 from .file_management import (
     delete_directory,
@@ -22,35 +22,70 @@ from .system import load_models_config
 logger = getLogger(__name__)
 
 
-GLADIA_TMP_MODEL_PATH = os.getenv("GLADIA_TMP_MODEL_PATH", "/tmp/gladia/models")
+GLADIA_MODEL_PATH = os.getenv("GLADIA_MODEL_PATH", "/gladia/models")
 GLADIA_SRC_PATH = os.getenv("GLADIA_SRC_PATH", "/app")
+SPACY_CACHE_DIR = os.getenv("SPACY_CACHE_DIR", "/gladia/spacy/models")
 
 models_config = load_models_config()
 
 SPACY_LANGUAGE_MODEL = models_config["spacy"]["models"]
 
 
+def get_spacy_cache_dir_for_model(model: str) -> str:
+    """Get the spaCy cache directory for the specified model.
+
+    Args:
+        model (str): The name of the spaCy model to get the cache directory for.
+
+    Returns:
+        str: The spaCy cache directory for the specified model.
+    """
+    return os.path.join(SPACY_CACHE_DIR, model)
+
+
+def get_spacy_language_code(language_code: str) -> str:
+    """Get the spaCy language code for the specified language.
+
+    Args:
+        language_code (str): The 639-3 language code of the language to get the spaCy language code for. (e.g. "eng")
+
+    Returns:
+        str: The spaCy language code for the specified language.
+    """
+    spacy_models = get_compatibility()
+    if language_code in SPACY_LANGUAGE_MODEL:
+        language_code = SPACY_LANGUAGE_MODEL[language_code]["model"][:2]
+    elif language_code not in spacy_models:
+        language_code = "xx"
+
+    return language_code
+
+
 def load_spacy_language_model(language: str) -> spacy.language.Language:
     """Load the spaCy natural language processing model for the specified language.
 
     Args:
-        language_code: The ISO 3 language code of the language to load the model for.
+        language_code: The 639-3 language code of the language to load the model for.
 
     Returns:
         The spaCy language model for the specified language.
     """
-    if language not in SPACY_LANGUAGE_MODEL:
-        language = "others"
-
-    language_model = SPACY_LANGUAGE_MODEL[language]["model"]
+    language_model = None
+    spacy_models = get_compatibility()
+    if language in spacy_models:
+        language_model = language
+    elif language not in SPACY_LANGUAGE_MODEL:
+        language_model = SPACY_LANGUAGE_MODEL["others"]["model"]
+    else:
+        language_model = SPACY_LANGUAGE_MODEL[language]["model"]
 
     try:
-        nlp = spacy.load(language_model)
-
+        nlp = spacy.load(os.path.join(SPACY_CACHE_DIR, language_model))
     except ModuleNotFoundError:
         logger.info(f"Download spacy model {language_model}")
-        os.system(f"python -m spacy download {language_model}")
+        spacy.cli.download(language_model)
         nlp = spacy.load(language_model)
+        nlp.to_disk(os.path.join(SPACY_CACHE_DIR, language_model))
 
     return nlp
 
@@ -167,7 +202,7 @@ def create_folder_in_model_cache_directory(folder_path: str) -> str:
         namespace = sys._getframe(1).f_globals
         rel_path = str(os.path.dirname(namespace["__file__"]))
 
-        folder_path = GLADIA_TMP_MODEL_PATH + rel_path + "/" + folder_path
+        folder_path = GLADIA_MODEL_PATH + rel_path + "/" + folder_path
         logger.debug(f"Relative path detected, using {folder_path} as path")
 
     else:
@@ -208,7 +243,7 @@ def download_model(
         namespace = sys._getframe(1).f_globals
         rel_path = str(os.path.dirname(namespace["__file__"]))
 
-        output_path = GLADIA_TMP_MODEL_PATH + rel_path + "/" + output_path
+        output_path = GLADIA_MODEL_PATH + rel_path + "/" + output_path
         logger.debug(f"Relative path detected, using {output_path} as output path")
 
     if not os.path.exists(Path(output_path).parent):
@@ -261,7 +296,7 @@ def download_models(model_list: dict) -> dict:
     for key, model in model_list.items():
         if not os.path.isabs(model["output_path"]):
             model["output_path"] = os.path.join(
-                GLADIA_TMP_MODEL_PATH, rel_path, model["output_path"]
+                GLADIA_MODEL_PATH, rel_path, model["output_path"]
             )
 
             t = threading.Thread(

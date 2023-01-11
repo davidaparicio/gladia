@@ -6,9 +6,12 @@ def readme():
         return f.read()
 
 
+REQUIREMENTS = [i.strip() for i in open("requirements.txt").readlines()]
+
+
 setup(
     name="gladia-api-utils",
-    version="0.1.17",
+    version="0.1.18",
     description="Utils for Gladia APIs Framework",
     long_description=readme(),
     long_description_content_type="text/markdown",
@@ -31,27 +34,7 @@ setup(
         "gladia_api_utils.inpainting_helper",
         "gladia_api_utils.model_architectures",
     ],
-    install_requires=[
-        "PyYAML",
-        "pytest",
-        "requests",
-        "scikit-image",
-        "Pillow",
-        "numpy",
-        "xtract",
-        "gdown",
-        "python-magic",
-        "GitPython",
-        "pandas",
-        "lxml",
-        "fastapi-utils",
-        "googledrivedownloader",
-        "opencv-python",
-        "python-forge",
-        "python-multipart",
-        "tritonclient",
-        "tritonclient[http]",
-    ],
+    install_requires=REQUIREMENTS,
     include_package_data=True,
     zip_safe=False,
 )

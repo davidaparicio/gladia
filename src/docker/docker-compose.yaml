@@ -7,6 +7,7 @@ services:
       - API_SERVER_WORKERS=2
     volumes:
       - /tmp/gladia/:/tmp/gladia/
+      - /gladia/:/gladia/
     container_name: gladia
     shm_size: '5gb'
     deploy:
