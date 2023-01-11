@@ -12,6 +12,6 @@ inputs:
       - ["I am happy.", "I am sad.", "I am angry."]
 
 output:
-  name: text
-  type: text
+  name: array
+  type: array
   example: ""
