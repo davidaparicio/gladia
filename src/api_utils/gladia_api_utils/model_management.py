@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 import threading
 from logging import getLogger
 from pathlib import Path
