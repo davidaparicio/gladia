@@ -1,0 +1,21 @@
+# please use the env.txt as the master file for the environment
+# its highly recommended to use conda to create the environment
+PyYAML
+pytest
+requests
+scikit-image
+Pillow
+numpy
+xtract
+gdown
+python-magic
+GitPython
+pandas
+lxml
+fastapi-utils
+googledrivedownloader
+opencv-python
+python-forge
+python-multipart
+tritonclient
+tritonclient[http]

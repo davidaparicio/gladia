@@ -36,16 +36,6 @@ jobs:
             echo "TAG_PROMOTED=ci-$TAG" >> $GITHUB_ENV
           fi
 
-      - name: Promote *gladia-base* image to Gladia Registry
-        if: |
-          contains(github.event.pull_request.labels.*.name, 'ci: build-base')
-        env:
-          REPOSITORY: base
-        run: |
-          MANIFEST=$(curl -ns -X GET "https://${DOCKER_GLADIA_FQDN}/api/v2.0/projects/gladia/repositories/${{ env.REPOSITORY }}/artifacts/${{ env.TAG_PROMOTED }}/tags" | sed "s/${{ env.TAG_PROMOTED }}/latest/g" | tr -d "[]")
-          curl -n -X DELETE "${{ env.REGISTRY_URL }}/api/v2.0/projects/gladia/repositories/${{ env.REPOSITORY }}/artifacts/latest/tags/latest"
-          curl -n -X POST "${{ env.REGISTRY_URL }}/api/v2.0/projects/gladia/repositories/${{ env.REPOSITORY }}/artifacts/${{ env.TAG_PROMOTED }}/tags" -H "Content-Type: application/json" -d "${MANIFEST}"
-
       - name: Promote *gladia* image to Gladia Registry
         env:
           REPOSITORY: gladia
@@ -58,16 +48,8 @@ jobs:
     needs: promote-gladia-image
     runs-on: [self-hosted, build, persist]
     steps:
-      - name: Promote *gladia-base* image to DH Registry
-        if: |
-          contains(github.event.pull_request.labels.*.name, 'ci: build-base')
-        run: |
-          docker pull ${DOCKER_GLADIA_FQDN}/gladia/base:${{ env.TAG_PROMOTE }} &&
-          docker tag ${DOCKER_GLADIA_FQDN}/gladia/base:${{ env.TAG_PROMOTE }} gladiaio/gladia-base:latest &&
-          docker push gladiaio/gladia-base:latest
-
       - name: Promote *gladia* image to DH Registry
         run: |
-          docker pull ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }} &&
-          docker tag ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }} gladiaio/gladia:latest &&
+          docker pull ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }}
+          docker tag ${DOCKER_GLADIA_FQDN}/gladia/gladia:${{ env.TAG_PROMOTE }} gladiaio/gladia:latest
           docker push gladiaio/gladia:latest

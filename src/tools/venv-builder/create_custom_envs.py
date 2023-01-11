@@ -1,20 +1,105 @@
 import argparse
+import difflib
 import logging
 import os
 import re
+import shutil
 import subprocess
 import tempfile
 from logging import getLogger
+from pathlib import Path
 from typing import List, Tuple
 
 import yaml
-from gladia_api_utils import get_activated_task_path
 from tqdm import tqdm
 
 logger = getLogger(__name__)
 
+LOGGER_COLOR_CYAN = "\x1b[36m"
+LOGGER_COLOR_RESET = "\x1b[39m"
 
-ENV_DEFAULT_FILENAME = "env.yaml"
+ENV_DEFAULT_FILENAME_WITHOUT_EXTENSION = "env"
+ENV_DEFAULT_FILENAME = f"{ENV_DEFAULT_FILENAME_WITHOUT_EXTENSION}.yaml"
+
+PATH_TO_GLADIA_SRC = os.getenv("PATH_TO_GLADIA_SRC", "/app/src")
+GLADIA_PERSISTENT_PATH = os.getenv("GLADIA_PERSISTENT_PATH", "/gladia")
+MAMBA_ROOT_PREFIX = os.getenv("MAMBA_ROOT_PREFIX", f"{GLADIA_PERSISTENT_PATH}/conda")
+
+FORCE_ENV_UPDATE = os.getenv("FORCE_ENV_UPDATE", "False").lower() == "true"
+
+PYTHON_VERSION = os.getenv("PYTHON_VERSION", "3.8")
+
+
+def delete_file(file_path: str) -> None:
+    """
+    Delete a file if it exists
+
+    Args:
+        file_path (str): path to the file to delete
+
+    Returns:
+        None
+    """
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+
+def get_gladia_api_utils_package() -> Tuple[List[str], List[str]]:
+    """
+    Retrieve the packages to install from the gladia api utils env file
+    and return them in two lists, one for pip packages and one for mamba packages
+
+    Args:
+        None
+
+    Returns:
+        Tuple[List[str], List[str]]: a tuple containing two lists, one for pip packages and one for mamba packages
+    """
+    gladia_api_utils_env_path = f"{PATH_TO_GLADIA_SRC}/api_utils/env.txt"
+    pip_packages_list = []
+    mamba_packages_list = []
+    # open the env file and retrieve the packages to install
+    # each line represent a package to install
+    # if the package starts with a pip::, it means it should be installed from pip
+    # it means it should be in the pip_packages_list
+    # otherwise it should be in the mamba_packages_list
+    with open(gladia_api_utils_env_path, "r") as f:
+        for line in f.readlines():
+            if line.startswith("pip::"):
+                pip_packages_list.append(line.replace("pip::", "").strip())
+            else:
+                mamba_packages_list.append(line.strip())
+
+    return pip_packages_list, mamba_packages_list
+
+
+def diff_lines(file1: str, file2: str) -> List[str]:
+    """
+    Compare two files line by line and return the lines that are different.
+
+    Args:
+        file1 (str): path to the first file
+        file2 (str): path to the second file
+
+    Returns:
+        List[str]: list of the lines that are different between the two files
+    """
+    with open(file1, "r") as f1:
+        lines1 = f1.readlines()
+    with open(file2, "r") as f2:
+        lines2 = f2.readlines()
+
+    diff = difflib.ndiff(lines1, lines2)
+
+    return [
+        line
+        for line in diff
+        if (
+            (line.startswith("-") or line.startswith("+"))
+            and line != "+ \n"
+            and line != "- \n"
+        )
+    ]
 
 
 def retrieve_package_from_env_file(env_file: dict) -> Tuple[List[str], List[str]]:
@@ -46,7 +131,7 @@ def retrieve_package_from_env_file(env_file: dict) -> Tuple[List[str], List[str]
     return packages_to_install_from_pip, packages_to_install_from_channel
 
 
-def create_temp_env_file(
+def create_temp_env_files(
     env_name: str,
     packages_to_install_from_channel: List[str],
     packages_to_install_from_pip: List[str],
@@ -61,11 +146,17 @@ def create_temp_env_file(
 
     Returns:
         str: Path to the temporary env file
+        str: Path to the temporary env package only file
+        str: Path to the temporary env pip only file
     """
 
-    tmp = tempfile.NamedTemporaryFile(delete=False)
+    tmp, tmpchan, tmppip = (
+        tempfile.NamedTemporaryFile(delete=False),
+        tempfile.NamedTemporaryFile(delete=False),
+        tempfile.NamedTemporaryFile(delete=False),
+    )
 
-    content = (
+    content_chan = (
         """
 name: """
         + env_name
@@ -75,13 +166,25 @@ dependencies:"""
         + "".join([f"\n  - {package}" for package in packages_to_install_from_channel])
     )
 
+    content = content_chan
+    content_pip_requirements = str()
+
     if (
         packages_to_install_from_pip is not None
         and len(packages_to_install_from_pip) > 0
     ):
-        content += """
-  - pip:""" + "".join(
+        content_pip = "".join(
             [f"\n    - {package}" for package in packages_to_install_from_pip]
+        )
+
+        content_pip_requirements = "".join(
+            [f"\n{package}" for package in packages_to_install_from_pip]
+        )
+
+        content += (
+            """
+  - pip:"""
+            + content_pip
         )
 
     with open(tmp.name, "w") as f:
@@ -89,10 +192,22 @@ dependencies:"""
 
     tmp.close()
 
-    return tmp
+    with open(tmpchan.name, "w") as f:
+        f.write(content_chan)
+
+    tmpchan.close()
+
+    with open(tmppip.name, "w") as f:
+        f.write(content_pip_requirements)
+
+    tmppip.close()
+
+    return tmp, tmpchan, tmppip
 
 
-def create_custom_env(env_name: str, path_to_env_file: str) -> None:
+def create_custom_env(
+    env_name: str, path_to_env_file: str, force_recreate: bool = False
+) -> None:
     """
     create the mamba env for the provided env file
 
@@ -112,15 +227,10 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
 
     if "name" in custom_env:
         logger.info(
-            f"overwriting default custom env's name {env_name} to {custom_env['name']}"
+            f"Overwriting default custom env's name {env_name} to {custom_env['name']}"
         )
 
         env_name = custom_env["name"]
-
-    if os.path.isdir(os.path.join(os.getenv("MAMBA_ROOT_PREFIX"), "envs", env_name)):
-        logger.info(f"{env_name} already exists, skipping build")
-
-        return
 
     if "inherit" not in custom_env and "dependencies" not in custom_env:
         error_message = "Provided config env is empty, you must either specify `inherit` or `dependencies`."
@@ -129,11 +239,26 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
 
         raise RuntimeError(error_message)
 
-    (
-        packages_to_install_from_pip,
-        packages_to_install_from_channel,
-    ) = retrieve_package_from_env_file(custom_env)
+    # in order we will get the packages from the
+    # gladia_api_utils then install
+    # the inherated packages from the env
+    # and finally install the packages from the env file
+    list_of_pip_packages_to_install = list()
+    list_of_channel_packages_to_install = list()
 
+    # get the gladia_api_utils_packages
+    # this is needed to be able to use the gladia_api_utils
+    # especially to handle the input and output of the tasks
+    # as well as other utils like gpu / cuda handling
+    (
+        gladia_api_utils_pip_packages,
+        gladia_api_utils_channel_packages,
+    ) = get_gladia_api_utils_package()
+
+    list_of_pip_packages_to_install += gladia_api_utils_pip_packages
+    list_of_channel_packages_to_install += gladia_api_utils_channel_packages
+
+    # get the packages from the env to inherit from
     if "inherit" not in custom_env.keys():
         custom_env["inherit"] = []
 
@@ -147,35 +272,255 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
         )
 
         env_file = yaml.safe_load(open(path_to_env_to_inherit_from, "r"))
-        pip_packages, channel_packages = retrieve_package_from_env_file(env_file)
+        (
+            inherated_pip_packages,
+            inherated_channel_packages,
+        ) = retrieve_package_from_env_file(env_file)
 
-        packages_to_install_from_pip += pip_packages
-        packages_to_install_from_channel += channel_packages
+        list_of_pip_packages_to_install += inherated_pip_packages
+        list_of_channel_packages_to_install += inherated_channel_packages
 
-    temporary_file = create_temp_env_file(
-        env_name, packages_to_install_from_channel, packages_to_install_from_pip
+    (
+        packages_to_install_from_pip,
+        packages_to_install_from_channel,
+    ) = retrieve_package_from_env_file(custom_env)
+
+    list_of_pip_packages_to_install += packages_to_install_from_pip
+    list_of_channel_packages_to_install += packages_to_install_from_channel
+
+    # install mandatory package gladia-api-utils to handle
+    # input and output of the api natively
+    list_of_pip_packages_to_install += [f"-e {PATH_TO_GLADIA_SRC}/api_utils/"]
+
+    temporary_file, temporary_file_channel, temporary_file_pip = create_temp_env_files(
+        env_name, list_of_channel_packages_to_install, list_of_pip_packages_to_install
     )
 
-    os.link(temporary_file.name, temporary_file.name + ".yaml")
+    final_env_file_path = os.path.join(
+        MAMBA_ROOT_PREFIX, "envs", env_name, ENV_DEFAULT_FILENAME
+    )
+
+    final_env_channel_file_path = os.path.join(
+        MAMBA_ROOT_PREFIX,
+        "envs",
+        env_name,
+        f"{ENV_DEFAULT_FILENAME_WITHOUT_EXTENSION}-channel.yaml",
+    )
+
+    final_env_pip_file_path = os.path.join(
+        MAMBA_ROOT_PREFIX,
+        "envs",
+        env_name,
+        f"{ENV_DEFAULT_FILENAME_WITHOUT_EXTENSION}-pip.txt",
+    )
 
     try:
-        subprocess.run(
-            f"micromamba create -f {temporary_file.name  + '.yaml'} -y".split(" "),
-            check=True,
-        )
-        subprocess.run(
-            f"micromamba clean --all --yes".split(" "),
-            check=True,
-        )
+
+        # check if final_env_file_path exists
+        final_env_file_path_exists = os.path.isfile(final_env_file_path)
+        final_env_channel_file_path_exists = os.path.isfile(final_env_channel_file_path)
+        final_env_pip_file_path_exists = os.path.isfile(final_env_pip_file_path)
+
+        action = ""
+
+        # create a temp yaml file to be able to build the env with micromamba
+        temp_env_file_path = temporary_file.name + ".yaml"
+        os.link(temporary_file.name, temp_env_file_path)
+
+        # check if env need to be updated
+        # if FORCE_ENV_UPDATE is set to true
+        # or if the env file has changed
+
+        # first check if the env already exists
+        should_update_pip = False
+        should_update_channel = False
+        if force_recreate:
+            final_env_file_path_exists = False
+
+        if final_env_file_path_exists:
+            # if FORCE_ENV_UPDATE is set to true we will update the env
+            if FORCE_ENV_UPDATE:
+                logger.info(
+                    LOGGER_COLOR_CYAN
+                    + f"{LOGGER_COLOR_CYAN}Env {env_name}: env force to update by FORCE_ENV_UPDATE env. variable or script flag --force_update\n to avoid force update set $ export FORCE_ENV_UPDATE=false"
+                    + LOGGER_COLOR_RESET
+                )
+                action = "update"
+                should_update_channel = True
+                should_update_pip = True
+
+            # if the env file has changed we will update the env
+            elif len(diff_lines(final_env_file_path, temp_env_file_path)) > 0:
+
+                if (
+                    final_env_channel_file_path_exists
+                    and len(
+                        diff_lines(
+                            final_env_channel_file_path, temporary_file_channel.name
+                        )
+                    )
+                    > 0
+                ):
+                    logger.info(
+                        LOGGER_COLOR_CYAN
+                        + f"Env {env_name}: env's channel dependencies changed meaning env's channel need a rebuild"
+                        + LOGGER_COLOR_RESET
+                    )
+                    action = "update"
+                    should_update_channel = True
+
+                else:
+                    logger.info(
+                        LOGGER_COLOR_CYAN
+                        + f"Env {env_name}: env's channel dependencies didn't change meaning env's channel doesn't need a rebuild"
+                        + LOGGER_COLOR_RESET
+                    )
+                    should_update_channel = False
+
+                if (
+                    final_env_pip_file_path_exists
+                    and len(
+                        diff_lines(final_env_pip_file_path, temporary_file_pip.name)
+                    )
+                    > 0
+                ):
+                    logger.info(
+                        LOGGER_COLOR_CYAN
+                        + f"Env {env_name}: env's pip dependencies changed meaning env's pip need a rebuild"
+                        + LOGGER_COLOR_RESET
+                    )
+                    action = "update"
+                    should_update_pip = True
+                else:
+                    logger.info(
+                        LOGGER_COLOR_CYAN
+                        + f"Env {env_name}: env's dependencies didn't change meaning env doesn't need a rebuild"
+                        + LOGGER_COLOR_RESET
+                    )
+                    should_update_pip = False
+
+        # if the env doesn't exist we will create it
+        else:
+            logger.info(
+                LOGGER_COLOR_CYAN
+                + f"Env {env_name}: env file doesn't exist meaning the env was never fully initiated"
+                + LOGGER_COLOR_RESET
+            )
+            action = "create"
+
+        # lets apply the env action (update or create)
+        # action = "" means no action needed
+        if action != "":
+            logger.info(
+                LOGGER_COLOR_CYAN
+                + f"Env {env_name} will be {action}d"
+                + LOGGER_COLOR_RESET
+            )
+
+            if action == "create":
+                logger.info(
+                    LOGGER_COLOR_CYAN + f"Creating env {env_name}" + LOGGER_COLOR_RESET
+                )
+
+                subprocess.run(
+                    [
+                        "micromamba",
+                        "create",
+                        "-n",
+                        env_name,
+                        f"python={PYTHON_VERSION}",
+                        "-f",
+                        f"{temporary_file.name}.yaml",
+                        "--retry-clean-cache",
+                        "-y",
+                    ]
+                )
+
+            # update the env's pip packages if needed
+            # we will check if the action is update
+            # if so we should have a pre-existing pip env file
+            # if this pre-existing pip env file is not empty and is different from the new one
+            # we will update the to env completely
+            # else if not different from the previous one and that FORCE_ENV_UPDATE is set to true
+            # if the env is being created we don't need to check if the pip env file is different
+            if action == "update":
+                logger.info(
+                    LOGGER_COLOR_CYAN + f"Updating env {env_name}" + LOGGER_COLOR_RESET
+                )
+                if should_update_channel:
+                    logger.info(
+                        LOGGER_COLOR_CYAN
+                        + f"Updating channels for env {env_name}"
+                        + LOGGER_COLOR_RESET
+                    )
+                    os.link(
+                        temporary_file_channel.name,
+                        temporary_file_channel.name + ".yaml",
+                    )
+
+                    subprocess.run(
+                        [
+                            "micromamba",
+                            "install",
+                            "-f",
+                            f"{temporary_file_channel.name}.yaml",
+                            "--retry-clean-cache",
+                            "-y",
+                        ]
+                    )
+
+                if should_update_pip:
+                    logger.info(
+                        LOGGER_COLOR_CYAN
+                        + f"Updating pip for env {env_name}"
+                        + LOGGER_COLOR_RESET
+                    )
+                    os.link(temporary_file_pip.name, temporary_file_pip.name + ".txt")
+                    subprocess.run(
+                        [
+                            "micromamba",
+                            "run",
+                            "-n",
+                            env_name,
+                            "/bin/bash",
+                            "-c",
+                            f"pip install --upgrade -r {temporary_file_pip.name}.txt",
+                        ]
+                    )
+
+        # if action = "" just log that the env is up to date
+        else:
+            logger.info(
+                LOGGER_COLOR_CYAN
+                + f"Env {env_name}: env file didn't change and FORCE_ENV_UPDATE=false meaning env doesn't need a rebuild however if your face any issue try to set $ export FORCE_ENV_UPDATE=true to force the upgrade of packages as they were skipped for performance purpose"
+                + LOGGER_COLOR_RESET
+            )
 
     except subprocess.CalledProcessError as error:
         raise RuntimeError(f"Couldn't create env {env_name}: {error}")
 
     finally:
-        os.remove(temporary_file.name)
-        os.remove(temporary_file.name + ".yaml")
+        shutil.copyfile(src=temporary_file.name, dst=final_env_file_path)
 
-        logger.info(f"Env {env_name} has been successfully created")
+        shutil.copyfile(
+            src=temporary_file_channel.name,
+            dst=final_env_channel_file_path,
+        )
+
+        if os.stat(temporary_file_pip.name).st_size != 0:
+            shutil.copyfile(
+                src=temporary_file_pip.name,
+                dst=final_env_pip_file_path,
+            )
+            Path(temporary_file_pip.name)
+
+        delete_file(temp_env_file_path)
+        delete_file(temporary_file.name)
+        delete_file(temporary_file.name + ".yaml")
+        delete_file(temporary_file_channel.name)
+        delete_file(temporary_file_channel.name + ".yaml")
+        delete_file(temporary_file_pip.name)
+        delete_file(temporary_file_pip.name + ".txt")
 
 
 def build_specific_envs(paths: List[str]) -> None:
@@ -191,14 +536,13 @@ def build_specific_envs(paths: List[str]) -> None:
     Raises:
         FileNotFoundError: The profided model folder or env file couldn't be founded
     """
-
     paths = set(paths)
 
     for path in paths:
 
         if not os.path.exists(path):
             raise FileNotFoundError(
-                f"custom env {path} not found, please specify a correct path either leading to a model or model's env file."
+                f"Custom env {path} not found, please specify a correct path either leading to a model or model's env file."
             )
 
         if ENV_DEFAULT_FILENAME in path:
@@ -207,7 +551,7 @@ def build_specific_envs(paths: List[str]) -> None:
         task_path, model = os.path.split(path)
         task = os.path.split(task_path)[1]
 
-        logger.debug(f"building environemnt {task}-{model}")
+        logger.debug(f"Building environemnt {task}-{model}")
 
         create_custom_env(
             env_name=f"{task}-{model}",
@@ -216,7 +560,11 @@ def build_specific_envs(paths: List[str]) -> None:
 
 
 def build_env_for_activated_tasks(
-    path_to_config_file: str, path_to_apis: str, modality=".*", full_path_mode=False
+    path_to_config_file: str,
+    path_to_apis: str,
+    modality: str = ".*",
+    full_path_mode: bool = False,
+    force_recreate: bool = False,
 ) -> None:
     """
     Build the mamba env for every activated tasks
@@ -227,6 +575,7 @@ def build_env_for_activated_tasks(
         modality (str): modality name pattern filter (default: .*)
         full_path_mode (bool): If True, will not check regex, not check activated task and
             use modality as a full path to the api env to build (default: False)
+        force_recreate (bool): If True, will force the recreation of the env even if the env file didn't change (default: False)
 
     Returns:
         None
@@ -248,7 +597,9 @@ def build_env_for_activated_tasks(
             head, task = os.path.split(head.rstrip("/"))
 
             create_custom_env(
-                env_name="-".join([task, model]), path_to_env_file=env_file_path
+                env_name="-".join([task, model]),
+                path_to_env_file=env_file_path,
+                force_recreate=force_recreate,
             )
 
         else:
@@ -275,6 +626,7 @@ def build_env_for_activated_tasks(
                 create_custom_env(
                     env_name=os.path.split(task)[1],
                     path_to_env_file=env_file_path,
+                    force_recreate=force_recreate,
                 )
 
             # make sur we don't have a __pycache__ folder
@@ -294,6 +646,7 @@ def build_env_for_activated_tasks(
                 create_custom_env(
                     env_name=f"{os.path.split(task)[-1]}-{model}",
                     path_to_env_file=env_file_path,
+                    force_recreate=force_recreate,
                 )
 
 
@@ -332,7 +685,55 @@ def main():
         default=False,
         help="Activate the strict mode for modality/task/model path (True if called)",
     )
+    parser.add_argument(
+        "--server_env",
+        dest="server_env",
+        action="store_true",
+        default=False,
+        help="Build the server env only (True if called)",
+    )
+    parser.add_argument(
+        "--force_update",
+        dest="force_update",
+        action="store_true",
+        default=False,
+        help="Force update of the env (True if called)",
+    )
+    parser.add_argument(
+        "--force_recreate",
+        dest="force_recreate",
+        action="store_true",
+        default=False,
+        help="Force re-create of the env (True if called)",
+    )
+    parser.add_argument(
+        "--python_version",
+        action="append",
+        type=str,
+        help="Specify the python version to use for the env. default 3.8",
+    )
     args = parser.parse_args()
+
+    if args.debug_mode:
+        # Set the logger level to DEBUG
+        logger.setLevel(logging.DEBUG)
+
+        # Create a logger handler that writes log messages to the console
+        console_handler = logging.StreamHandler()
+
+        # Set the logger handler level to DEBUG
+        console_handler.setLevel(logging.DEBUG)
+
+        # Add the logger handler to the logger
+        logger.addHandler(console_handler)
+
+    if args.python_version:
+        global PYTHON_VERSION
+        PYTHON_VERSION = args.python_version[0]
+
+    if args.force_update:
+        global FORCE_ENV_UPDATE
+        FORCE_ENV_UPDATE = True
 
     if args.name:
         return build_specific_envs(args.name)
@@ -342,15 +743,44 @@ def main():
     else:
         path_to_apis = os.path.join(os.getenv("PATH_TO_GLADIA_SRC", "/app"), "apis")
 
-    if args.debug_mode:
-        logger.setLevel(logging.DEBUG)
+    if args.server_env:
+        path_to_server_env = os.path.join(
+            os.getenv("PATH_TO_GLADIA_SRC", "/app"), "env.yaml"
+        )
 
-    return build_env_for_activated_tasks(
-        path_to_config_file=os.path.join(path_to_apis, "..", "config.json"),
-        path_to_apis=path_to_apis,
-        modality=args.modality,
-        full_path_mode=args.full_path_mode,
-    )
+        env = create_custom_env(
+            env_name="server",
+            path_to_env_file=path_to_server_env,
+            force_recreate=args.force_recreate,
+        )
+
+        # install extra packages for the server
+        subprocess.run(
+            [
+                "micromamba",
+                "run",
+                "-n",
+                "server",
+                "/bin/bash",
+                "-c",
+                'pip install "jax[cuda11_cudnn82]==0.3.25" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html',
+            ]
+        )
+
+        return env
+    else:
+        # avoid importing this api_utils at the top of the file
+        # to avoid issue at the init of the server env
+        global get_activated_task_path
+        from gladia_api_utils import get_activated_task_path
+
+        return build_env_for_activated_tasks(
+            path_to_config_file=os.path.join(path_to_apis, "..", "config.json"),
+            path_to_apis=path_to_apis,
+            modality=args.modality,
+            full_path_mode=args.full_path_mode,
+            force_recreate=args.force_recreate,
+        )
 
 
 if __name__ == "__main__":

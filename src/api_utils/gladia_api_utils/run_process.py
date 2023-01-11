@@ -9,6 +9,9 @@ from PIL import Image
 
 logger = getLogger(__name__)
 
+GLADIA_PERSISTENT_PATH = os.getenv("GLADIA_PERSISTENT_PATH", "/gladia")
+MAMBA_ROOT_PREFIX = os.getenv("MAMBA_ROOT_PREFIX", f"{GLADIA_PERSISTENT_PATH}/conda")
+
 HELP_STRING = """
 python <PATH_TO_FILE>/run_process.py <module_path> <model> <output_tmp_result> <kwargs for predict>
     - module_path : the route to the targeted model (for instance `apis/image/image/face-blurings/ageitgey/`)
@@ -33,7 +36,7 @@ if __name__ == "__main__":
 
     os.environ[
         "LD_LIBRARY_PATH"
-    ] = "/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/opt/conda/lib"
+    ] = f"/usr/local/nvidia/lib64:/usr/local/cuda/lib64:{MAMBA_ROOT_PREFIX}/lib"
 
     # if module_path is not absolute
     # then prepend the PATH_TO_GLADIA_SRC
