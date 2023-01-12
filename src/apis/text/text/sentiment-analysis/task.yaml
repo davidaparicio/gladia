@@ -11,6 +11,6 @@ inputs:
       - ["I like you. I love you", "I hate you. you are so bad"]
 
 output:
-  name: text
-  type: text
+  name: array
+  type: array
   example: ""

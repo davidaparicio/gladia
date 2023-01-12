@@ -11,60 +11,68 @@ ARG SKIP_YARN_CACHE_CLEANING="false"
 ARG SKIP_NPM_CACHE_CLEANING="false"
 ARG SKIP_TMPFILES_CACHE_CLEANING="false"
 ARG GLADIA_TMP_PATH="/tmp/gladia"
-ARG GLADIA_TMP_MODEL_PATH=$GLADIA_TMP_PATH/models
+ARG GLADIA_PERSISTENT_PATH="/gladia"
 ARG PATH_TO_GLADIA_SRC="/app"
 ARG DOCKER_USER=root
 ARG DOCKER_GROUP=root
 ARG API_SERVER_PORT_HTTP=8080
 ARG MAMBA_ALWAYS_SOFTLINK="true"
+ARG MAMBA_ALLOW_UNINSTALL="true"
+ARG MAMBA_ALLOW_DOWNGRADE="true"
 ARG CLEAN_LAYER_SCRIPT=$PATH_TO_GLADIA_SRC/tools/docker/clean-layer.sh
-ARG VENV_BUILDER_PATH=$PATH_TO_GLADIA_SRC/tools/venv-builder
+ARG VENV_BUILDER_PATH=$PATH_TO_GLADIA_SRC/tools/venv-builder/
+ARG GLADIA_BUILD="unknown"
 
-ENV GLADIA_TMP_MODEL_PATH=$GLADIA_TMP_MODEL_PATH
-
-ENV TRANSFORMERS_CACHE=$GLADIA_TMP_MODEL_PATH/transformers \
+ENV DOCKER_USER=$DOCKER_USER \
+    DOCKER_GROUP=$DOCKER_GROUP \
+    PATH_TO_GLADIA_SRC=$PATH_TO_GLADIA_SRC \
+    VENV_BUILDER_PATH=$VENV_BUILDER_PATH \
+    GLADIA_PERSISTENT_PATH=$GLADIA_PERSISTENT_PATH \
+    GLADIA_MODEL_PATH=$GLADIA_PERSISTENT_PATH/model \
+    TRANSFORMERS_CACHE=$GLADIA_MODEL_PATH/transformers \
+    TORCH_HOME=$GLADIA_MODEL_PATH/torch/hub \
+    PYTORCH_TRANSFORMERS_CACHE=$GLADIA_MODEL_PATH/pytorch_transformers \
+    PYTORCH_PRETRAINED_BERT_CACHE=$GLADIA_MODEL_PATH/pytorch_pretrained_bert \
+    TORCH_HUB=$GLADIA_MODEL_PATH/torch/hub \
+    NLTK_DATA=$GLADIA_PERSISTENT_PATH/nltk \
     PIPENV_VENV_IN_PROJECT="enabled" \
-    PYTORCH_TRANSFORMERS_CACHE=$GLADIA_TMP_MODEL_PATH/pytorch_transformers \
-    PYTORCH_PRETRAINED_BERT_CACHE=$GLADIA_TMP_MODEL_PATH/pytorch_pretrained_bert \
-    NLTK_DATA=$GLADIA_TMP_MODEL_PATH/nltk \
     TOKENIZERS_PARALLELISM="true" \
     LC_ALL="C.UTF-8" \
     LANG="C.UTF-8" \
     distro="ubuntu2004" \
     arch="x86_64" \
-    PATH_TO_GLADIA_SRC="/app" \
-    API_SERVER_WORKERS=1 \
-    TORCH_HOME=$GLADIA_TMP_MODEL_PATH/torch/hub \
-    MAMBA_ROOT_PREFIX="/opt/conda" \
+    TZ="UTC" \
+    PYTHON_VERSION="3.8" \
+    MAMBA_ROOT_PREFIX=$GLADIA_PERSISTENT_PATH/conda \
     MAMBA_EXE="/usr/local/bin/micromamba" \
     MAMBA_DOCKERFILE_ACTIVATE=1 \
     MAMBA_ALWAYS_YES=true \
     PATH=$PATH:/usr/local/bin/:$MAMBA_EXE \
-    PATH_TO_GLADIA_SRC=$PATH_TO_GLADIA_SRC \
+    API_SERVER_WORKERS=1 \
     API_SERVER_PORT_HTTP=$API_SERVER_PORT_HTTP \
+    TF_CPP_MIN_LOG_LEVEL=2 \
+    TF_FORCE_GPU_ALLOW_GROWTH=true \
+    CUDA_DEVICE_ORDER=PCI_BUS_ID \
+    JAX_PLATFORM_NAME=gpu \
+    XLA_PYTHON_CLIENT_PREALLOCATE=false \
     TRITON_SERVER_PORT_HTTP="8000" \
     TRITON_SERVER_PORT_GRPC="8001" \
     TRITON_SERVER_PORT_METRICS="8002" \
     TRITON_MODELS_PATH="/gladia/triton" \
     TRITON_CHECKPOINTS_PATH="/gladia/triton-chkpt"
 
-RUN mkdir -p $GLADIA_TMP_PATH && \
-    mkdir -p $TRANSFORMERS_CACHE && \
-    mkdir -p $PYTORCH_TRANSFORMERS_CACHE && \
-    mkdir -p $PYTORCH_PRETRAINED_BERT_CACHE && \
-    mkdir -p $NLTK_DATA && \
-    mkdir -p $PATH_TO_GLADIA_SRC
+RUN mkdir -p $GLADIA_TMP_PATH \
+             $GLADIA_PERSISTENT_PATH \
+             $GLADIA_MODEL_PATH \
+             $TRANSFORMERS_CACHE \
+             $PYTORCH_TRANSFORMERS_CACHE \
+             $PYTORCH_PRETRAINED_BERT_CACHE \
+             $NLTK_DATA \
+             $PATH_TO_GLADIA_SRC
 
-ADD ./tools/docker/clean-layer.sh $CLEAN_LAYER_SCRIPT
+COPY ./tools/docker/clean-layer.sh $CLEAN_LAYER_SCRIPT
 
-ENV TZ="UTC"
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
-    mkdir -p $GLADIA_TMP_PATH && \
-    mkdir -p $TRANSFORMERS_CACHE && \
-    mkdir -p $PYTORCH_TRANSFORMERS_CACHE && \
-    mkdir -p $PYTORCH_PRETRAINED_BERT_CACHE && \
-    mkdir -p $NLTK_DATA && \
-    mkdir -p $PATH_TO_GLADIA_SRC && \
 # Update apt repositories - Add Nvidia GPG key
     apt-key del 7fa2af80 && \
     apt-get update && \
@@ -108,9 +116,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
         ffmpeg \
         nvidia-cuda-toolkit \
         protobuf-compiler && \
-    echo "== ADJUSTING binaries ==" && \
-    mv /usr/bin/python3 /usr/bin/python38 && \
-    ln -sf /usr/bin/python /usr/bin/python3 && \
     echo "== INSTALLING GITLFS ==" && \
     cd /tmp && \
     wget https://github.com/git-lfs/git-lfs/releases/download/v3.0.1/git-lfs-linux-386-v3.0.1.tar.gz && \
@@ -130,6 +135,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
     mv bin/micromamba /usr/local/bin/micromamba && \
     micromamba shell init -s bash && \
     micromamba config set always_softlink $MAMBA_ALWAYS_SOFTLINK && \
+    micromamba config set allow-uninstall $MAMBA_ALLOW_UNINSTALL && \
+    micromamba config set allow-downgrade $MAMBA_ALLOW_DOWNGRADE && \
     git clone https://github.com/Tencent/rapidjson.git && \
     cd rapidjson && \
     cmake . && \
@@ -138,3 +145,20 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
     $CLEAN_LAYER_SCRIPT
 
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH
+
+
+COPY . $PATH_TO_GLADIA_SRC
+
+# Automatically activate micromaba for every bash shell
+RUN mv $PATH_TO_GLADIA_SRC/tools/docker/_activate_current_env.sh /usr/local/bin/ && \
+    echo "source /usr/local/bin/_activate_current_env.sh" >> ~/.bashrc && \
+    echo "source /usr/local/bin/_activate_current_env.sh" >> /etc/skel/.bashrc && \
+    echo "micromamba activate server" >> ~/.bashrc
+
+RUN echo $GLADIA_BUILD > $PATH_TO_GLADIA_SRC/tools/version/build
+
+WORKDIR $PATH_TO_GLADIA_SRC
+
+ENTRYPOINT ["micromamba", "run", "-n", "server"]
+
+CMD ["run_server.sh"]
