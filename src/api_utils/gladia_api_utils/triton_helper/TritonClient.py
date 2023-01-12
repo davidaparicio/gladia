@@ -3,7 +3,7 @@ import pathlib
 import sys
 from logging import getLogger
 from time import sleep
-from typing import List, Any
+from typing import Any, List
 from warnings import warn
 
 import requests
@@ -113,7 +113,9 @@ class TritonClient:
             )
 
             if response.status_code != 200:
-                logger.warning(f"Loading model returned a non-200 response status, body: {response.content}")
+                logger.warning(
+                    f"Loading model returned a non-200 response status, body: {response.content}"
+                )
 
                 return False
 
