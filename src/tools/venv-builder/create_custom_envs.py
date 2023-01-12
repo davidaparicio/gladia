@@ -336,8 +336,8 @@ def create_custom_env(
         should_update_channel = False
         if force_recreate:
             LOGGER_COLOR_CYAN
-            + f"{LOGGER_COLOR_CYAN}Env {env_name}: Force create (ignore existing cache) caused by --force_recreate"
-            + LOGGER_COLOR_RESET
+            +f"{LOGGER_COLOR_CYAN}Env {env_name}: Force create (ignore existing cache) caused by --force_recreate"
+            +LOGGER_COLOR_RESET
             final_env_file_path_exists = False
 
         if final_env_file_path_exists:
