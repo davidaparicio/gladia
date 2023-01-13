@@ -335,6 +335,11 @@ def create_custom_env(
         should_update_pip = False
         should_update_channel = False
         if force_recreate:
+            logger.info(
+                LOGGER_COLOR_CYAN
+                + f"Env {env_name}: Force create (ignore existing cache) caused by --force_recreate"
+                + LOGGER_COLOR_RESET
+            )
             final_env_file_path_exists = False
 
         if final_env_file_path_exists:
@@ -342,7 +347,7 @@ def create_custom_env(
             if FORCE_ENV_UPDATE:
                 logger.info(
                     LOGGER_COLOR_CYAN
-                    + f"{LOGGER_COLOR_CYAN}Env {env_name}: env force to update by FORCE_ENV_UPDATE env. variable or script flag --force_update\n to avoid force update set $ export FORCE_ENV_UPDATE=false"
+                    + f"Env {env_name}: env force to update by FORCE_ENV_UPDATE env. variable or script flag --force_update\n to avoid force update set $ export FORCE_ENV_UPDATE=false"
                     + LOGGER_COLOR_RESET
                 )
                 action = "update"
@@ -401,11 +406,12 @@ def create_custom_env(
 
         # if the env doesn't exist we will create it
         else:
-            logger.info(
-                LOGGER_COLOR_CYAN
-                + f"Env {env_name}: env file doesn't exist meaning the env was never fully initiated"
-                + LOGGER_COLOR_RESET
-            )
+            if not force_recreate:
+                logger.info(
+                    LOGGER_COLOR_CYAN
+                    + f"Env {env_name}: env not found : env is new or not correctly initialized."
+                    + LOGGER_COLOR_RESET
+                )
             action = "create"
 
         # lets apply the env action (update or create)

@@ -95,8 +95,7 @@ if [ "$MANUAL_SKIP_SERVER_UPDATE" == "1" ]; then
   echo -e "${C}Skipping Server env update manually .${EC}"
 else
   echo -e "${C}Updating Server env.${EC}"
-  rm -rf $MAMBA_ROOT_PREFIX/envs/server
-  micromamba run -n boot --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py  --server_env --debug_mode --python_version=$PYTHON_VERSION"
+  micromamba run -n boot --cwd $VENV_BUILDER_PATH /bin/bash -c "python3 create_custom_envs.py  --server_env --debug_mode --python_version=$PYTHON_VERSION $venv_opts"
 fi
 
 if [ "$MANUAL_SKIP_VENV_UPDATE" == "1" ]; then
