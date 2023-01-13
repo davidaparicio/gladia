@@ -1,5 +1,5 @@
 #https://www.docker.com/blog/advanced-dockerfiles-faster-builds-and-smaller-images-using-buildkit-and-multistage-builds/
-ARG GLADIA_DOCKER_BASE=nvcr.io/nvidia/cuda:11.6.2-devel-ubuntu20.04
+ARG GLADIA_DOCKER_BASE=nvcr.io/nvidia/tritonserver:22.12-py3
 
 
 FROM $GLADIA_DOCKER_BASE
@@ -54,7 +54,12 @@ ENV DOCKER_USER=$DOCKER_USER \
     TF_FORCE_GPU_ALLOW_GROWTH=true \
     CUDA_DEVICE_ORDER=PCI_BUS_ID \
     JAX_PLATFORM_NAME=gpu \
-    XLA_PYTHON_CLIENT_PREALLOCATE=false
+    XLA_PYTHON_CLIENT_PREALLOCATE=false \
+    TRITON_SERVER_PORT_HTTP="8000" \
+    TRITON_SERVER_PORT_GRPC="8001" \
+    TRITON_SERVER_PORT_METRICS="8002" \
+    TRITON_MODELS_PATH="/gladia/triton" \
+    TRITON_CHECKPOINTS_PATH="/gladia/triton-chkpt"
 
 RUN mkdir -p $GLADIA_TMP_PATH \
              $GLADIA_PERSISTENT_PATH \

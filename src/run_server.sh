@@ -158,9 +158,34 @@ else
   micromamba run -n server --cwd $PATH_TO_GLADIA_SRC python prepare.py
 fi
 
-echo -e "${P}== START Gladia ==${EC}"
-micromamba run -n server --cwd $PATH_TO_GLADIA_SRC gunicorn main:app \
--b 0.0.0.0:${API_SERVER_PORT_HTTP:-8080} \
---workers ${API_SERVER_WORKERS:-1} \
---worker-class uvicorn.workers.UvicornWorker \
---timeout ${API_SERVER_TIMEOUT:-1200}
+mkdir -p $TRITON_MODELS_PATH
+
+echo -e "${P}== START Gladia as ${MODE} ==${EC}"
+if [ $MODE = "standalone" ]
+then
+  micromamba run -n server tritonserver \
+    --http-port ${TRITON_SERVER_PORT_HTTP} \
+    --grpc-port ${TRITON_SERVER_PORT_GRPC} \
+    --metrics-port ${TRITON_SERVER_PORT_METRICS} \
+    --model-repository=${TRITON_MODELS_PATH} \
+    --exit-on-error=false \
+    --model-control-mode=explicit \
+    --repository-poll-secs 10 \
+    --allow-metrics=false & \
+  micromamba run -n server --cwd $PATH_TO_GLADIA_SRC gunicorn main:app \
+    -b 0.0.0.0:${API_SERVER_PORT_HTTP:-8080} \
+    --workers ${API_SERVER_WORKERS:-1} \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --timeout ${API_SERVER_TIMEOUT:-1200}
+
+elif [ $MODE = "server" ]
+then
+  micromamba run -n server --cwd $PATH_TO_GLADIA_SRC gunicorn main:app \
+    -b 0.0.0.0:${API_SERVER_PORT_HTTP:-8080} \
+    --workers ${API_SERVER_WORKERS:-1} \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --timeout ${API_SERVER_TIMEOUT:-1200}
+else
+  echo "Error: "$MODE" in an unknown mode"
+  exit 1
+fi
