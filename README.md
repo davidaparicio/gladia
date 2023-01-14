@@ -186,7 +186,8 @@ cd src ; python -m pytest ./
 To know more about test please check this [readme dedicated to test](https://github.com/gladiaio/gladia/tree/main/src/api_utils/gladia_api_utils/tester)
 
 ## Tested Hardware
-
+- Nvidia H100 PCIe (80GB) ✅
+- Nvidia H100 SXM4 (80GB) ✅
 - Nvidia A100 PCIe (40GB) ✅
 - Nvidia A100 SXM4 (40GB) ✅
 - Nvidia A100 SXM4 (80GB) ✅
